@@ -30,6 +30,7 @@ int strengthPoints
 int fitnessPoints
 int sportsPoints
 string stackedLevelDistributions
+FISSInterface fiss
 
 Event OnInit()
 	firstWeekPotionReceived = new bool[7]
@@ -40,6 +41,12 @@ Event OnPlayerLoadGame()
 	debug.messagebox("The synced user is: " + syncedUserName + "the theoretical level is: " + realPlayerLevel)
 	if (syncedUserName != "")
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
+
+		fiss = FISSFactory.getFISS()
+		If !fiss
+			debug.MessageBox("Fiss is not installed, Please install Fiss before using this mod.")
+			return
+		endif
 
 		;load the old exercisedata file
 		loadOldData()
@@ -72,6 +79,7 @@ Event OnPlayerLoadGame()
 	Else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 	endif
+
 endEvent
 
 ;###################################################
@@ -80,25 +88,19 @@ endEvent
 
 ;reads the previous data is the players exerciseData.txt file and loads the values
 Function loadOldData()
-	FISSInterface fiss = FISSFactory.getFISS()
-		If !fiss
-			debug.MessageBox("Fiss is not installed, Please install Fiss before using this mod.")
-			return
-		endif
-	
-		;get all the past data from the save file
-		fiss.beginLoad( syncedUserName + syncedSaveID + "_Exercise_Data.txt")
-		firstSyncDate = fiss.loadString("first_import_date")
-		lastSyncDate = fiss.loadString("last_import_date")
-		totalPoints = fiss.loadInt("total_points")
-		totalWorkouts = fiss.loadInt("total_workouts")
+	;get all the past data from the save file
+	fiss.beginLoad( syncedUserName + syncedSaveID + "_Exercise_Data.txt")
+	firstSyncDate = fiss.loadString("first_import_date")
+	lastSyncDate = fiss.loadString("last_import_date")
+	totalPoints = fiss.loadInt("total_points")
+	totalWorkouts = fiss.loadInt("total_workouts")
 
-		firstWeekCompleted = fiss.loadBool("first_week_completed")
-		strengthPoints = fiss.loadInt("outstanding_strength_points")
-		fitnessPoints = fiss.loadInt("outstanding_fitness_points")
-		sportsPoints = fiss.loadInt("outstanding_sports_points")
+	firstWeekCompleted = fiss.loadBool("first_week_completed")
+	strengthPoints = fiss.loadInt("outstanding_strength_points")
+	fitnessPoints = fiss.loadInt("outstanding_fitness_points")
+	sportsPoints = fiss.loadInt("outstanding_sports_points")
 
-		fiss.endLoad()
+	fiss.endLoad()
 endFunction
 
 ;runs the custom SKSE functions to save the xml into the skyrim directory
@@ -117,12 +119,6 @@ endFunction
 
 ;assumes the updated xml file has already been saved into the fiss directory and then loads the data.
 Function importDataFromXml()
-
-	FISSInterface fiss = FISSFactory.getFISS()
-	If !fiss
-		debug.MessageBox("Fiss is not installed, Please install Fiss before using this mod.")
-		return
-	endif
 	fiss.beginLoad("NEWXMLDATA.txt")
 	stackedLevelDistributions = ""
 	int workoutCounter = 1
@@ -278,7 +274,6 @@ Function convertExpToPotions()
 
 			requiredXPToLevelUp = requiredXPToLevelUp - strengthPointsCopy	
 			remainingPoints = remainingPoints - strengthPointsCopy 
-
 		EndIf
 
 		If (!levelComplete) && (fitnessPointsCopy >= requiredXPToLevelUp)
@@ -305,7 +300,6 @@ Function convertExpToPotions()
 
 			requiredXPToLevelUp = requiredXPToLevelUp - fitnessPointsCopy 
 			remainingPoints = remainingPoints - fitnessPointsCopy
-
 		EndIf
 
 		If (!levelComplete) && (sportsPointsCopy >= requiredXPToLevelUp)
@@ -357,7 +351,6 @@ Function convertExpToPotions()
 		messageVariable = stackLevels
 		;Add Potion(s) of Experience to the player's inventory. The number of orbs given is the number of stackLevels.
 		game.getplayer().AddItem(LevelUpPotion, stackLevels)
-		
 	
 		;Write the attribute distributions to a file so that they can be read in after X amount of time (see quest script) when an Orb of Experience is consumed.
 		writeDistsToFile(stackedLevelDistributions)
@@ -403,11 +396,6 @@ Function UpdateLevelModifiers(int newPlayerLevel)
 	EndIf
 
 	If bracketChangedTo != 1
-		FISSInterface fiss = FISSFactory.getFISS()
-		If !fiss 
-			Debug.MessageBox("Fiss is not installed. Mod will not work correctly")
-			return None
-		EndIf
 		
 		fiss.beginLoad(syncedUserName + syncedSaveID + "_Exercise_Data.txt")
 		totalPoints = fiss.loadInt("total_points")
@@ -444,12 +432,6 @@ EndFunction
 ;Write attribute distributions to a file so that they may be read in when a potion is used is used
 Function writeDistsToFile(string levelDists)
 
-	FISSInterface fiss = FISSFactory.getFISS()
-	If !fiss 
-		Debug.MessageBox("Fiss is not installed. Mod will not work correctly")
-		return None
-	EndIf
-
 	String previousDistributions = ""
 	;check if the distributions file exists
 	fiss.beginLoad(syncedUserName + syncedSaveID + "_StackedLevelDistributions.txt")
@@ -474,11 +456,6 @@ EndFunction
 
 ;Update the exercise_data file after points have been spent to ensure players cannot get multiple level ups from the same exercise session points
 Function updateExerciseDataFile()
-	FISSInterface fiss = FISSFactory.getFISS()
-	If !fiss 
-		Debug.MessageBox("Fiss is not installed. Mod will not work correctly")
-		return
-	EndIf
 
 	fiss.beginSave(syncedUserName + syncedSaveID + "_Exercise_Data.txt", "P4P")
 
@@ -528,6 +505,4 @@ Function displayEndingMessage()
 	else
 		levelUpMessage.show(messageVariable)
 	endIf
-
-
 endFunction
