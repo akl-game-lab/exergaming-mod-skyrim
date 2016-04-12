@@ -17,7 +17,7 @@ namespace MyPluginNamespace {
 		std::string fullString = sGameID + " " + sUserName + " " + sLastSyncDate;
 
 
-		std::string exePath = "C:\\Users\\Mitchell\\Desktop\\exeTest\\webServiceTest.exe";
+		std::string exePath = "Data\\webserviceTest\\Release\\webserviceTest.exe";
 		LPCSTR swExePath = exePath.c_str();
 
 

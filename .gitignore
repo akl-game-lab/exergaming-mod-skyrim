@@ -116,3 +116,5 @@ plugin_example/plugin_example/Debug/plugin_example.Build.CppClean.log
 plugin_example/plugin_example/Debug/plugin_example.log
 plugin_example/plugin_example/Debug/vc140.idb
 plugin_example/plugin_example/Debug/vc140.pdb
+SKSE/Plugins/plugin_example.dll
+SKSE/Plugins/webserviceTest.exe
