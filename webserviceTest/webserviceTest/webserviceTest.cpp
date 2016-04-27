@@ -102,7 +102,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 
 	LocalFree(szArgList);
 	
-	std::string url = "http://ec2-54-252-163-152.ap-southeast-2.compute.amazonaws.com:3000/users/paul%40paulralph.name/workouts/" + fromDate + "/" + toDate;
+	std::string url = "http://ec2-54-252-163-152.ap-southeast-2.compute.amazonaws.com:3000/users/paul@paulralph.name/workouts/" + fromDate + "/" + toDate;
 	uri fullUri(conversions::to_string_t(url));
 
 	auto fileStream = std::make_shared<ostream>();

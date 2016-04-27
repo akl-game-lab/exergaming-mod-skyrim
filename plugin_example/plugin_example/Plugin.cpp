@@ -35,7 +35,6 @@ namespace plugin
 		std::string sUserName(userName.data);
 		std::string sFromDate("0"/*config.getConfigProperty("Last_Sync_Date")*/);
 		std::string toDate = std::to_string(currentDate(NULL)) + "000";
-		writeToDebug(toDate);
 
 		std::string exeParams = sGameID + " " + sUserName + " " + sFromDate + " " + toDate;
 
