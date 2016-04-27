@@ -20,7 +20,7 @@ namespace plugin
 	{
 		ConfigHandler config;
 		std::string lastSyncDate = config.getConfigProperty("lastSyncDate");
-		return std::stoi(creationDate.data) < std::stoi(lastSyncDate);
+		return _atoi64(creationDate.data) < _atoi64(lastSyncDate.c_str());
 	}
 
 	//Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
@@ -34,7 +34,7 @@ namespace plugin
 		std::string sGameID(gameID.data);
 		std::string sUserName(userName.data);
 		std::string sFromDate("0"/*config.getConfigProperty("Last_Sync_Date")*/);
-		std::string toDate = std::to_string(currentDate(NULL)) + "100";
+		std::string toDate = std::to_string(currentDate(NULL)) + "000";
 		writeToDebug(toDate);
 
 		std::string exeParams = sGameID + " " + sUserName + " " + sFromDate + " " + toDate;

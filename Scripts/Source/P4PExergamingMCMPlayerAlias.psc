@@ -8,16 +8,15 @@ string property outstandingLevel auto
 
 event OnPlayerLoadGame()
 	;when the player loads in, need to grab the previous exercisedata if there is a synced account
-	creationDate = currentDate();
 	showMessage("Currently synced with " + syncedUserName)
 	if (syncedUserName != "")
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
 		checkLevelUps()
+		creationDate = currentDate()
 		game.requestSave()
 	Else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 	endif
-
 endEvent
 
 function showMessage(string msg)
@@ -34,7 +33,6 @@ function checkLevelUps()
 		;workouts = getNthWeeksWorkouts(weekNumber)
 	;endIf
 	if(workouts != "")
-		showMessage(workouts)
 		string levelUpsString = getLevelUpsAsString(outstandingLevel,workouts)
 		int n = 0
 		int health = 0

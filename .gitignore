@@ -37,7 +37,10 @@ Scripts/Source/P4P_TIF__0200CA0D.psc
 Scripts/Source/P4P_TIF__03005378.psc
 Scripts/Source/P4P_TIF__04011AD3.psc
 Scripts/Source/P4P_TIF__04015B78.psc
-Scripts/Source/P[A-Z]*
+Scripts/Source/P[A-K]*
+Scripts/Source/P[M-Z]*
+Scripts/Source/PL[A-T]*
+Scripts/Source/PL[V-Z]*
 Scripts/Source/[Q-Z]*
 *.bsa
 *.obj
@@ -106,7 +109,6 @@ webserviceTest/webserviceTest/webserviceTest.vcxproj
 webserviceTest/webserviceTest/webserviceTest.vcxproj.filters
 webserviceTest/webserviceTest/xmlTestfile.txt
 SKSE/Plugins/cpprest120_2_7.dll
-Scripts/Source/P4PExergamingMCMPlayerAlias_ylo019.psc
 plugin_example/.vs/plugin_example/v14/.suo
 plugin_example/Debug/common.pdb
 plugin_example/Debug/skse.pdb
@@ -133,3 +135,6 @@ plugin_example/test_suite/test_suite.vcxproj.filters
 webserviceTest/webserviceTest.v12.suo
 webserviceTest/webserviceTest/Debug/
 webserviceTest/webserviceTest/Release/
+plugin_example/plugin_example.VC.VC.opendb
+webserviceTest/webserviceTest.VC.VC.opendb
+Scripts/Source/pLurbukScript.psc

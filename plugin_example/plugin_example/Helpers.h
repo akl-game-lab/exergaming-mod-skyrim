@@ -27,6 +27,7 @@ namespace plugin
 	char FIELD_SEPARATOR = ',';
 	std::string WEB_SERVICE_DIR = "Data\\webserviceTest\\Release";
 	
+	//Stores strings that are retrieved from xml files
 	struct Workout
 	{
 		std::string date;
@@ -89,7 +90,7 @@ namespace plugin
 		if (!fileExists(fileName))
 		{
 			std::ofstream outputFile(fileName);
-			outputFile << "<?xml version=\"1.0\"?><Data></Data>";
+			outputFile << "<?xml version=\"1.0\"?><data></data>";
 			outputFile.close();
 		}
 	}
@@ -110,10 +111,10 @@ namespace plugin
 	}
 
 	//Returns the date that is the sunday of the week to which the given date belongs
-	int getStartOfWeekFromDate(int date)
+	time_t getStartOfWeekFromDate(time_t date)
 	{
 		std::string startOfWeek;
-		int dayOfWeek = std::stoi(toFormattedDate(date, "%w"));
+		time_t dayOfWeek = _atoi64(toFormattedDate(date, "%w").c_str());
 		time_t untruncatedStartOfWeek = date - dayOfWeek*SECONDS_PER_DAY;
 		struct tm * timeinfo;
 		timeinfo = localtime(&untruncatedStartOfWeek);
@@ -124,15 +125,15 @@ namespace plugin
 	}
 
 	//Returns the year component of the given date
-	int getYear(int date)
+	time_t getYear(time_t date)
 	{
-		return std::stoi(toFormattedDate(date, "%Y"));
+		return _atoi64(toFormattedDate(date, "%Y").c_str());
 	}
 
 	//Returns the week number that is the number of weeks since the start of the year that the week belongs to
-	int getWeekNumber(int date)
+	time_t getWeekNumber(time_t date)
 	{
-		return std::stoi(toFormattedDate(date, "%U"));
+		return _atoi64(toFormattedDate(date, "%U").c_str());
 	}
 
 	/**********************************************************************************************************
@@ -242,7 +243,7 @@ namespace plugin
 			return getWorkoutForWeek(weekNumber, workoutNumber)->selectSingleNode(toBSTR(propertyName))->Gettext();
 		}
 
-		void addWeek(int date)
+		void addWeek(time_t date)
 		{
 			MSXML::IXMLDOMNodePtr week = doc->createNode(MSXML::NODE_ELEMENT, _T("Week"), _T(""));
 			week->appendChild(createAndFillNode(doc, "startDate", std::to_string(getStartOfWeekFromDate(date))));
@@ -325,7 +326,7 @@ namespace plugin
 	}
 
 	//If the week to which the given date belongs to exists, the week number is returned
-	int weekExists(int date, WeekHandler weekHandler)
+	int weekExists(time_t date, WeekHandler weekHandler)
 	{
 		int weekCount = weekHandler.getWeekCount();
 		if (weekCount != 0){
@@ -344,7 +345,7 @@ namespace plugin
 	Workout getWorkout(int workoutNumber, RawDataHandler rawDataHandler)
 	{
 		Workout workout;
-		workout.date = std::to_string(std::stoi(rawDataHandler.getWorkoutProperty(workoutNumber, "workoutDate"))/1000);
+		workout.date = std::to_string(_atoi64(rawDataHandler.getWorkoutProperty(workoutNumber, "workoutDate").c_str())/1000);
 		workout.health = rawDataHandler.getWorkoutProperty(workoutNumber, "health");
 		workout.stamina = rawDataHandler.getWorkoutProperty(workoutNumber, "stamina");
 		workout.magicka = rawDataHandler.getWorkoutProperty(workoutNumber, "magicka");
@@ -356,7 +357,7 @@ namespace plugin
 	{
 		std::string workoutsAsString = "";
 		int health = 0, stamina = 0, magicka = 0;
-
+		writeToDebug("Current date : " + std::to_string(currentDate(NULL)));
 		RawDataHandler rawDataHandler;
 		int workoutCount = rawDataHandler.getWorkoutCount();
 		writeToDebug(std::to_string(workoutCount) + " workout(s) found.");
@@ -365,11 +366,9 @@ namespace plugin
 		//for each workout
 		for (int workoutNumber = 0; workoutNumber < workoutCount; workoutNumber++)
 		{
-			writeToDebug("Getting workout date.");
-			writeToDebug(rawDataHandler.getWorkoutProperty(workoutNumber, "workoutDate"));
-			int date = std::stoi(rawDataHandler.getWorkoutProperty(workoutNumber, "workoutDate"));
-			//date = date/100;
-			writeToDebug("Workout found for " + std::to_string(date));
+			writeToDebug("Workout date was [" + rawDataHandler.getWorkoutProperty(workoutNumber, "workoutDate") + "]");
+			time_t date = _atoi64(rawDataHandler.getWorkoutProperty(workoutNumber, "workoutDate").c_str());
+			writeToDebug("Workout as int [" + std::to_string(date) + "]");
 			//check if the current workout belongs to an existing week
 			int weekNumber = weekExists(date, weekHandler);
 			if (weekNumber == -1)
