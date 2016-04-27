@@ -1,6 +1,6 @@
 Scriptname ExergameConfigMenu extends ski_configbase  
 
-import myPluginScript
+import PluginScript
 import FISSFactory
 import StringUtil
 
@@ -102,8 +102,6 @@ event OnOptionSelect(int option)
 					fiss.beginLoad("SaveManager.txt")
 					int saveID = fiss.loadInt("saveID")
 					playerReference.syncedUserName = ""
-					playerReference.syncedSaveID = 0
-					playerReference.realPlayerLevel = 0
 					Debug.messageBox("the saveID is: " + saveID)
 					fiss.endLoad()
 					fiss.beginSave("SaveManager.txt", "P4P")
@@ -169,12 +167,6 @@ Event OnOptionInputAccept(int option, string userInput)
 			fiss.saveInt("saveID", 1)
 			fiss.endSave()
 			playerReference.syncedUserName = userName
-			playerReference.syncedSaveID = 1
-			playerReference.realPlayerLevel = Game.getPlayer().getLevel()
-
-			;also need to make an clean exercise data file with necessary tags.
-			;get time stamp from c++ function
-			makeEmptyExerciseData()
 
 			SetTextOptionValue(SyncStatusOID, userName)
 			ShowMessage("Sync with " + userName + " Complete!", false, "$Ok")
@@ -198,10 +190,7 @@ Event OnOptionInputAccept(int option, string userInput)
 				fiss.savebool("AccountCurrentlySynced", true)
 				fiss.endSave()
 				playerReference.syncedUserName = userName
-				playerReference.syncedSaveID = updatedSaveID
-				playerReference.realPlayerLevel = game.getPlayer().getLevel()
 				SetTextOptionValue(SyncStatusOID, userName)
-				makeEmptyExerciseData()
 				;using the showmessage from the MCM api because it pauses the script until the user clicks yes
 				;otherwise saving doesn't work when there is a popup open
 				ShowMessage("Sync with " + userName + " Complete!", false, "$Ok")
@@ -229,26 +218,3 @@ event OnOptionHighlight(int option)
 		SetInfoText("Turns off in-game experience and allows you to gain experience from logged workouts")
 	endIf
 endEvent
-
-Function makeEmptyExerciseData()
-
-	string currentDate = currentDate()
-
-	FISSInterface fiss = FISSFactory.getFISS()
-	
-	If !fiss
-		debug.MessageBox("Fiss is not installed, Please install Fiss before using this mod.")
-		return
-	endif
-
-	fiss.beginSave(playerReference.syncedUserName + playerReference.syncedSaveID + "_Exercise_Data.txt", "P4P")
-	fiss.saveString("first_import_date", currentDate)
-	fiss.saveString("last_import_date", currentDate)
-	fiss.saveint("total_points", 0)
-	fiss.saveint("total_workouts", 0)
-	fiss.saveBool("first_week_completed", false)
-	fiss.saveInt("outstanding_strength_points", 0)
-	fiss.saveInt("outstanding_fitness_points", 0)
-	fiss.saveInt("outstanding_sports_points", 0)
-	fiss.endSave()
-EndFunction

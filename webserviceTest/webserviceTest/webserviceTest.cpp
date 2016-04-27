@@ -97,13 +97,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 
 	std::string gameID = toString(szArgList[1]);
 	std::string userName = toString(szArgList[2]);
-	std::string fromDate = "2016-02-0100:00:00";//toString(szArgList[3]);
+	std::string fromDate = toString(szArgList[3]);
 	std::string toDate = toString(szArgList[4]);
 
 	LocalFree(szArgList);
 
-
-	std::string url = "http://exergaming.isaac.techrus.co.nz/poc_api/get-workout/" + gameID + "/" + userName + "/" + fromDate + "/" + toDate;
+	std::string url = "http://ec2-54-206-18-142.ap-southeast-2.compute.amazonaws.com:3000/users/paul%40paulralph.name/workouts/" + fromDate + "/" + toDate;
 	uri fullUri(conversions::to_string_t(url));
 
 	auto fileStream = std::make_shared<ostream>();
@@ -116,10 +115,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 		// Create http_client to send the request.
 		http_client client(fullUri);
 
-		// Build request URI and start the request.
-		uri_builder builder(U("/search"));
-		builder.append_query(U("q"), U("Casablanca CodePlex"));
-		return client.request(methods::GET, builder.to_string());
+		// Start the request.
+		return client.request(methods::GET);
 	})
 
 		// Handle response headers arriving.
