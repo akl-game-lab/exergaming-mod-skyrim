@@ -6,7 +6,7 @@ namespace plugin
 	/**********************************************************************************************************
 	*	Functions
 	*/
-	
+
 	//Returns the current date to the calling papyrus script
 	UInt32 currentDate(StaticFunctionTag* base) 
 	{
@@ -18,7 +18,6 @@ namespace plugin
 	//Checks if the current save is old
 	bool isOldSave(StaticFunctionTag* base, BSFixedString creationDate)
 	{
-		ConfigHandler config;
 		std::string lastSyncDate = config.getConfigProperty("lastSyncDate");
 		return _atoi64(creationDate.data) < _atoi64(lastSyncDate.c_str());
 	}
@@ -26,9 +25,8 @@ namespace plugin
 	//Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
 	BSFixedString fetchWorkouts(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName) 
 	{
-		clearDebug();
-		clearRawData();
-		ConfigHandler config;
+		debug.clear();
+		rawData.clear();
 
 		//Take the arguments and put them into a set of parameters for the executable
 		std::string sGameID(gameID.data);
@@ -60,38 +58,12 @@ namespace plugin
 		return updateWeeks().c_str();
 	}
 
-	//Returns the best week between the creation date of the calling save and now
-	UInt32 getBestWeek(StaticFunctionTag* base, BSFixedString creationDate)
+	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
+	BSFixedString getWorkoutsFromBestWeek(StaticFunctionTag* base, BSFixedString creationDate)
 	{
-		//get the current wee for testing
-		return getWeekNumber(currentDate(NULL));
-	}
-
-	//Returns the given weeks workouts as a string (format is "W,H,S,M;W,H,S,M...")
-	BSFixedString getNthWeeksWorkouts(StaticFunctionTag* base, UInt32 weekNumber)
-	{
-		std::string workouts = "";
-
-		//get the given week
-		WeekHandler weekHandler;
-
-		for (int workoutNumber = 0; workoutNumber < weekHandler.getWorkoutCountForWeek(weekNumber); workoutNumber++)
-		{
-			if (workoutNumber > 0)
-			{
-				workouts += ";";
-			}
-
-			std::string weightString = weekHandler.getWorkoutProperty(weekNumber,workoutNumber,"weight");
-			std::string healthString = weekHandler.getWorkoutProperty(weekNumber, workoutNumber, "health");
-			std::string staminaString = weekHandler.getWorkoutProperty(weekNumber, workoutNumber, "stamina");
-			std::string magickaString = weekHandler.getWorkoutProperty(weekNumber, workoutNumber, "magicka");
-
-			std::string newWorkoutString = weightString + FIELD_SEPARATOR + healthString + FIELD_SEPARATOR + staminaString + FIELD_SEPARATOR + magickaString;
-			workouts += newWorkoutString;
-		}
-
-		return workouts.c_str();
+		debug.write(ENTRY,"getWorkoutsFromBestWeek()");
+		return weekHandler.getWorkoutsFromBestWeek(_atoi64(creationDate.data)).c_str();
+		debug.write(EXIT, "getWorkoutsFromBestWeek()");
 	}
 
 	//Returns a string representation of the levels gained in the given week (format is "H,S,M;H,S,M...")
@@ -118,13 +90,11 @@ namespace plugin
 			}
 			catch (const std::out_of_range& oor)
 			{
-				writeToDebug("out_of_range error for outstandingLevelFields access.");
 			}
 		}
 
 
 		std::vector<std::string> workouts = split(workoutsString.data, ITEM_SEPARATOR);
-		writeToDebug(std::to_string(workouts.size()) + " workout(s) found.");
 		//loop through the given weeks workouts to see if a level up can be awarded
 		for (int i = 0; i < workouts.size(); i++)
 		{
@@ -152,12 +122,6 @@ namespace plugin
 				totalHealth += healthUsed;
 				totalStamina += staminaUsed;
 				totalMagicka += magickaUsed;
-
-				writeToDebug("totalHealth = " + std::to_string(totalHealth));
-				writeToDebug("totalStamina = " + std::to_string(totalStamina));
-				writeToDebug("totalMagicka = " + std::to_string(totalMagicka));
-				writeToDebug("weightNeeded = " + std::to_string(weightNeeded));
-				writeToDebug("weight = " + std::to_string(weight));
 
 				//if the weight of the current workout is greter than the weight needed then the player has levelled up
 				if (weightNeeded <= weight)
@@ -191,7 +155,6 @@ namespace plugin
 			}
 			catch (const std::out_of_range& oor)
 			{
-				writeToDebug("out_of_range error for workout access. Invalid workout [" + workout + "]");
 			}
 		}
 		//add the left over health, stamina and magicka to outstandingLevel
@@ -204,11 +167,9 @@ namespace plugin
 	//Returns true if there is another level up and sets the health,stamina and magicka values
 	bool isNthLevelUp(StaticFunctionTag* base, BSFixedString levelUpsString, UInt32 n)
 	{
-		writeToDebug("levelUpsString : [" + std::string(levelUpsString.data) + "]");
 
 		if (std::string(levelUpsString.data) == "")
 		{
-			writeToDebug("No more level ups.");
 			return FALSE;
 		}
 
@@ -216,11 +177,9 @@ namespace plugin
 
 		if (n >= levelUps.size())
 		{
-			writeToDebug("No more level ups.");
 			return FALSE;
 		}
 
-		writeToDebug(std::to_string(levelUps.size()) + " level up(s) found.");
 		return TRUE;
 	}
 
@@ -257,10 +216,7 @@ namespace plugin
 			new NativeFunction2 <StaticFunctionTag, BSFixedString, BSFixedString, BSFixedString>("fetchWorkouts", "PluginScript", plugin::fetchWorkouts, registry));
 
 		registry->RegisterFunction(
-			new NativeFunction1 <StaticFunctionTag, UInt32, BSFixedString>("getBestWeek", "PluginScript", plugin::getBestWeek, registry));
-
-		registry->RegisterFunction(
-			new NativeFunction1 <StaticFunctionTag, BSFixedString, UInt32>("getNthWeeksWorkouts", "PluginScript", plugin::getNthWeeksWorkouts, registry));
+			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getWorkoutsFromBestWeek", "PluginScript", plugin::getWorkoutsFromBestWeek, registry));
 
 		registry->RegisterFunction(
 			new NativeFunction2 <StaticFunctionTag, BSFixedString, BSFixedString, BSFixedString>("getLevelUpsAsString", "PluginScript", plugin::getLevelUpsAsString, registry));

@@ -139,3 +139,4 @@ plugin_example/plugin_example.VC.VC.opendb
 webserviceTest/webserviceTest.VC.VC.opendb
 Scripts/Source/pLurbukScript.psc
 plugin_example/plugin_example.opensdf
+plugin_example/plugin_example/plugin_example.vcxproj.filters

@@ -98,27 +98,6 @@ void testAddWeek()
 	printf("failed.\n");*/
 }
 
-void testAddWorkoutToWeek()
-{
-	printf("addWorkoutToWeek ");
-	WeekHandler wH;
-	int workoutCountBefore = wH.getWorkoutCountForWeek(0);
-	Workout w;
-	w.date = "1";
-	w.health = "1";
-	w.stamina = "1";
-	w.magicka = "1";
-	w.weight = "1";
-	wH.addWorkoutToWeek(0,w);
-	int workoutCountAfter = wH.getWorkoutCountForWeek(0);
-	if (workoutCountAfter == workoutCountBefore + 1)
-	{
-		printf("succeeded.\n");
-		return;
-	}
-	printf("failed.\n");
-}
-
 void testUpdateWeeks()
 {
 	printf("updateWeeks ");
@@ -132,19 +111,8 @@ void testGetLevelUpsAsString()
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	clearDebug();
-	//testGetDoc();
-	//testGetWeekCount();
-	//testGetWorkoutCount();
-	testGetWorkoutCountForWeek();
-	//testRawDataGetWorkoutProperty();
-	//testWeekExists();
-	//testDateFormatting();
-	//testGetStartOfWeekFromDate();
-	//testAddWeek();
-	testAddWorkoutToWeek();
-	//testUpdateWeeks();
-	//testGetLevelUpsAsString();
+	DebugHandler debug;
+	debug.clear();
 	getchar();
 	return 0;
 }
