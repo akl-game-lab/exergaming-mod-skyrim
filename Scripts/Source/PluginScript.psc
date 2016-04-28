@@ -9,11 +9,8 @@ scriptName PluginScript Hidden
 	;Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
 	string function fetchWorkouts(string gameID, string userName) global native
 
-	;Returns the best week between the creation date of the calling save and now
-	int function getBestWeek(string creationDate) global native
-
-	;Returns the given weeks workouts as a string (format is "W,H,S,M;W,H,S,M...")
-	string function getNthWeeksWorkouts(int weekNumber) global native
+	;Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
+	string function getWorkoutsFromBestWeek(string creationDate) global native
 
 	;Returns a string representation of the levels gained in the given week (format is "H,S,M;H,S,M...")
 	string function getLevelUpsAsString(string outstandingLevel, string workoutsString) global native

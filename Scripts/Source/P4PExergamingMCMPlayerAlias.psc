@@ -29,8 +29,8 @@ function checkLevelUps()
 	int weekNumber
 	workouts = fetchWorkouts("Skyrim",syncedUserName)
 	;if(isOldSave(creationDate))
-		;weekNumber = getBestWeek(creationDate)
-		;workouts = getNthWeeksWorkouts(weekNumber)
+		;showMessage("Old save detected.");
+		;workouts = getWorkoutsFromBestWeek(weekNumber)
 	;endIf
 	if(workouts != "")
 		string levelUpsString = getLevelUpsAsString(outstandingLevel,workouts)
