@@ -141,3 +141,10 @@ Scripts/Source/pLurbukScript.psc
 plugin_example/plugin_example.opensdf
 plugin_example/plugin_example/plugin_example.vcxproj.filters
 webserviceTest/.vs/webserviceTest/v14/.suo
+plugin_example/test_suite/.vs/test_suite/v14/.suo
+plugin_example/test_suite/ReadMe.txt
+plugin_example/test_suite/ipch/TEST_SUITE-731eddab/TEST_SUITE-326e9d5.ipch
+plugin_example/test_suite/test_suite.VC.VC.opendb
+plugin_example/test_suite/test_suite.VC.db
+plugin_example/test_suite/test_suite.sln
+plugin_example/test_suite/test_suite.vcxproj.user

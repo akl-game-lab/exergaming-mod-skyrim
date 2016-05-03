@@ -1,7 +1,6 @@
 Scriptname ExergameConfigMenu extends ski_configbase  
 
 import PluginScript
-import FISSFactory
 import StringUtil
 
 ;###################################################
@@ -93,21 +92,21 @@ event OnOptionSelect(int option)
 					Debug.messagebox("pressed yes")
 					;unsyncing the account
 					SetTextOptionValue(SyncStatusOID, "Not Synced")
-					FISSInterface fiss = FISSFactory.getFISS()
-					If !fiss
-						debug.MessageBox("Fiss is not installed, Please install Fiss before using this mod.")
-						return
-					endif
+					;FISSInterface fiss = FISSFactory.getFISS()
+					;If !fiss
+					;	debug.MessageBox("Fiss is not installed, Please install Fiss before using this mod.")
+					;	return
+					;endif
 					exergamingBool = !exergamingBool
-					fiss.beginLoad("SaveManager.txt")
-					int saveID = fiss.loadInt("saveID")
+					;fiss.beginLoad("SaveManager.txt")
+					;int saveID = fiss.loadInt("saveID")
 					playerReference.syncedUserName = ""
 					Debug.messageBox("the saveID is: " + saveID)
-					fiss.endLoad()
-					fiss.beginSave("SaveManager.txt", "P4P")
-					fiss.saveBool("accountCurrentlySynced", false)
-					fiss.saveInt("saveID", saveID)
-					fiss.endSave()
+					;fiss.endLoad()
+					;fiss.beginSave("SaveManager.txt", "P4P")
+					;fiss.saveBool("accountCurrentlySynced", false)
+					;fiss.saveInt("saveID", saveID)
+					;fiss.endSave()
 
 					;reset the exp variables
 					Game.SetGameSettingFloat("fXPLevelUpBase", 75)
@@ -148,47 +147,55 @@ Event OnOptionInputAccept(int option, string userInput)
 		string userName = userInput
 
 		;this will be executed when the sync button is pressed
-		FISSInterface fiss = FISSFactory.getFISS()
+		;FISSInterface fiss = FISSFactory.getFISS()
 		
-		If !fiss
-			debug.MessageBox("Fiss is not installed, Please install Fiss before using this mod.")
-			return
-		endif
+		;if !fiss
+		;	debug.MessageBox("Fiss is not installed, Please install Fiss before using this mod.")
+		;	return
+		;endif
 		
 		;checking if the file exists
-		fiss.beginLoad("SaveManager.txt")
-		string readInSuccess = fiss.endLoad()
+		;fiss.beginLoad("SaveManager.txt")
+		;string readInSuccess = fiss.endLoad()
 
-		;If readInSuccess != "" it implies that the file has not been found
-		If readInSuccess != ""
+
+		;#TODO#Check for config file (with data for user name)
+		;If data does not exist for this user
+		if readInSuccess != ""
 			;if the textfile does not exist, then make a file with boolean to true, and integer to 1. and set the name of sync.
-			fiss.beginSave("SaveManager.txt", "P4P")
-			fiss.saveBool("AccountCurrentlySynced", true)
-			fiss.saveInt("saveID", 1)
-			fiss.endSave()
+			;fiss.beginSave("SaveManager.txt", "P4P")
+			;fiss.saveBool("AccountCurrentlySynced", true)
+			;fiss.saveInt("saveID", 1)
+			;fiss.endSave()
 			playerReference.syncedUserName = userName
+
+			string workouts = fetchWorkouts("Skyrim",syncedUserName,Game.getPlayer().getLevel())
+			if(workouts != "")
+				showMessage("Prior workouts detected.")
+				doLevelUP(4,3,3)
+			endIf
 
 			SetTextOptionValue(SyncStatusOID, userName)
 			ShowMessage("Sync with " + userName + " Complete!", false, "$Ok")
 			game.requestsave()
 			
-		Else
+		else
 			;otherwise there is already a file so we need to read it and check the state of the account sync
-			fiss.beginLoad("SaveManager.txt")
-			if (fiss.loadBool("AccountCurrentlySynced"))
+			;fiss.beginLoad("SaveManager.txt")
+			;if (fiss.loadBool("AccountCurrentlySynced"))
 				;this means that there is already an account that is connected so we need to tell the user to unsync the other account before connecting this one.
-				Debug.messageBox("There is a save file already synced with this account. Please disconnect the other save file before syncing.")
-				fiss.endLoad()
-				return
-			else
+			;	Debug.messageBox("There is a save file already synced with this account. Please disconnect the other save file before syncing.")
+			;	fiss.endLoad()
+			;	return
+			;else
 				;this means that there is no account currently synced, so all we need to do is increment the integer and set the boolean to true.
 				;also need to make a clean exercise data txt file
-				int updatedSaveID = fiss.loadInt("saveID") + 1
-				fiss.endLoad()
-				fiss.beginSave("SaveManager.txt", "P4P")
-				fiss.saveInt("saveID", updatedSaveID)
-				fiss.savebool("AccountCurrentlySynced", true)
-				fiss.endSave()
+			;	int updatedSaveID = fiss.loadInt("saveID") + 1
+			;	fiss.endLoad()
+			;	fiss.beginSave("SaveManager.txt", "P4P")
+			;	fiss.saveInt("saveID", updatedSaveID)
+			;	fiss.savebool("AccountCurrentlySynced", true)
+			;	fiss.endSave()
 				playerReference.syncedUserName = userName
 				SetTextOptionValue(SyncStatusOID, userName)
 				;using the showmessage from the MCM api because it pauses the script until the user clicks yes
@@ -196,7 +203,7 @@ Event OnOptionInputAccept(int option, string userInput)
 				ShowMessage("Sync with " + userName + " Complete!", false, "$Ok")
 				game.requestsave()				
 			endIf
-		EndIf
+		endIf
 	endIf
 endEvent
 

@@ -14,7 +14,7 @@ namespace plugin
 	bool isOldSave(StaticFunctionTag* base, BSFixedString creationDate);
 
 	//Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
-	BSFixedString fetchWorkouts(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName);
+	BSFixedString fetchWorkouts(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName, UInt32 level);
 
 	//Returns the best week between the creation date of the calling save and now
 	UInt32 getBestWeek(StaticFunctionTag* base, BSFixedString creationDate);
@@ -30,6 +30,12 @@ namespace plugin
 
 	//Returns the health, stamina or magicka component of the given level up
 	UInt32 getLevelComponent(StaticFunctionTag* base, BSFixedString levelUpsString, UInt32 n, BSFixedString type);
+
+	//Returns the outstanding level weight
+	float getOutstandingWeight(BSFixedString outstandingLevel);
+
+	//Returns the outstanding level as a string
+	BSFixedString getOutstandingLevel(StaticFunctionTag* base, BSFixedString levelUpsString);
 
 	/**********************************************************************************************************
 	*	Register

@@ -1,8 +1,12 @@
 // test_suite.cpp : Defines the entry point for the console application.
 //
 
+// #define NDEBUG uncomment this line when going live
+
+#include <assert.h>
+
 #include "stdafx.h"
-#include "plugin_example\Helpers.h"
+#include "..\plugin_example\Helpers.h"
 
 using namespace plugin;
 
@@ -100,8 +104,9 @@ void testAddWeek()
 
 void testUpdateWeeks()
 {
-	printf("updateWeeks ");
+	/* printf("updateWeeks ");
 	std::cout << "returned " << updateWeeks() << "\n";
+	*/
 }
 
 void testGetLevelUpsAsString()

@@ -23,18 +23,39 @@ namespace plugin
 	}
 
 	//Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
-	BSFixedString fetchWorkouts(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName) 
+	BSFixedString fetchWorkouts(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName, UInt32 level) 
 	{
 		debug.clear();
+		debug.write(ENTRY, "fetchWorkouts()");
+		ConfigHandler config;
+		std::string fromDate;
+		std::string toDate;
+
+		bool firstFetch = FALSE;
+
+		if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
+		{
+			fromDate = "0";
+			//TODO write function for rounding day
+			toDate = std::to_string((currentDate(NULL) / SECONDS_PER_DAY)*SECONDS_PER_DAY);
+			firstFetch = TRUE;
+			config.setConfigProperty("startDate",toDate);
+			debug.write(WRITE, "Start date was 0");
+		}
+		else
+		{
+			fromDate = config.getConfigProperty("lastSyncDate");
+			toDate = std::to_string(currentDate(NULL));
+			debug.write(WRITE, "Start date was " + config.getConfigProperty("startDate"));
+		}
+
 		rawData.clear();
 
 		//Take the arguments and put them into a set of parameters for the executable
-		std::string sGameID(gameID.data);
-		std::string sUserName(userName.data);
-		std::string sFromDate("0"/*config.getConfigProperty("Last_Sync_Date")*/);
-		std::string toDate = std::to_string(currentDate(NULL)) + "000";
+		std::string sGameID = gameID.data;
+		std::string sUserName = userName.data;
 
-		std::string exeParams = sGameID + " " + sUserName + " " + sFromDate + " " + toDate;
+		std::string exeParams = sGameID + " " + sUserName + " " + fromDate + " " + toDate;
 
 		LPCSTR swExeParams = exeParams.c_str();
 
@@ -55,7 +76,23 @@ namespace plugin
 		ShExecInfo.hInstApp = NULL;
 		ShellExecuteEx(&ShExecInfo);
 		WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
-		return updateWeeks().c_str();
+
+		BSFixedString workouts;
+
+		if (firstFetch)
+		{
+			if(rawData.getWorkoutCount() > 0)
+			workouts = "Prior Workout";
+			debug.write(WRITE, "firstFetch");
+		}
+		else 
+		{
+			workouts = updateWeeks(level).c_str();
+		}
+		 
+
+		debug.write(EXIT, "fetchWorkouts()");
+		return workouts;
 	}
 
 	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
@@ -69,6 +106,7 @@ namespace plugin
 	//Returns a string representation of the levels gained in the given week (format is "H,S,M;H,S,M...")
 	BSFixedString getLevelUpsAsString(StaticFunctionTag* base, BSFixedString outstandingLevel, BSFixedString workoutsString)
 	{
+		debug.write(ENTRY, "getLevelUpsAsString()");
 		std::string levelUps = "";
 		
 		//initialise the level ditribution with the outstanding points
@@ -93,16 +131,22 @@ namespace plugin
 			}
 		}
 
-
 		std::vector<std::string> workouts = split(workoutsString.data, ITEM_SEPARATOR);
 		//loop through the given weeks workouts to see if a level up can be awarded
 		for (int i = 0; i < workouts.size(); i++)
 		{
 			std::string workout = workouts.at(i);
+
 			std::vector<std::string> workoutFields = split(workout, FIELD_SEPARATOR);
 
 			try
 			{
+
+				for (int i = 0; i < workoutFields.size(); i++)
+				{
+					debug.write(WRITE, "Field(" + std::to_string(i) + ") : " + workoutFields.at(i));
+				}
+				
 				int weight = std::stoi(workoutFields.at(WEIGHT));
 				int health = std::stoi(workoutFields.at(HEALTH));
 				int stamina = std::stoi(workoutFields.at(STAMINA));
@@ -134,6 +178,8 @@ namespace plugin
 					//format the level up string
 					std::string newLevelUp = std::to_string(healthInt) + "," + std::to_string(staminaInt) + "," + std::to_string(magikaInt);
 
+					debug.write(WRITE,"newLevelUp : " + newLevelUp);
+
 					//add the new level up to the string of level ups
 					if (levelUps == "")
 					{
@@ -141,7 +187,7 @@ namespace plugin
 					}
 					else
 					{
-						levelUps = newLevelUp + ITEM_SEPARATOR + levelUps;
+						levelUps = levelUps + ITEM_SEPARATOR + newLevelUp;
 					}
 
 					//store the left over health, stamina and magicka
@@ -157,19 +203,28 @@ namespace plugin
 			{
 			}
 		}
+
 		//add the left over health, stamina and magicka to outstandingLevel
 		std::string totals = std::to_string(totalHealth) + FIELD_SEPARATOR + std::to_string(totalStamina) + FIELD_SEPARATOR + std::to_string(totalMagicka);
 
-		outstandingLevel = totals.c_str();
-		return levelUps.c_str();
+		//add the outstanding level to the start of the return string
+		levelUps = totals + ITEM_SEPARATOR + levelUps;
+
+		debug.write(WRITE,"levelUps : " + levelUps);
+
+		BSFixedString levelUpsBS = levelUps.c_str();
+
+		debug.write(EXIT, "getLevelUpsAsString()");
+		return levelUpsBS;
 	}
 
 	//Returns true if there is another level up and sets the health,stamina and magicka values
 	bool isNthLevelUp(StaticFunctionTag* base, BSFixedString levelUpsString, UInt32 n)
 	{
-
+		debug.write(ENTRY, "isNthLevelUp()");
 		if (std::string(levelUpsString.data) == "")
 		{
+			debug.write(EXIT, "isNthLevelUp()");
 			return FALSE;
 		}
 
@@ -177,26 +232,47 @@ namespace plugin
 
 		if (n >= levelUps.size())
 		{
+			debug.write(EXIT, "isNthLevelUp()");
 			return FALSE;
 		}
 
+		debug.write(EXIT, "isNthLevelUp()");
 		return TRUE;
 	}
 
 	//Returns the health, stamina or magicka component of the given level up
 	UInt32 getLevelComponent(StaticFunctionTag* base, BSFixedString levelUpsString, UInt32 n, BSFixedString type)
 	{
+		debug.write(ENTRY, "getLevelComponent()");
 		std::vector<std::string> levelUps = split(levelUpsString.data, ITEM_SEPARATOR);
 		std::vector<std::string> levelUpComponents = split(levelUps.at(n), FIELD_SEPARATOR);
+
+		int levelComponent = 0;
+
 		if (type == "H")
 		{
-			return std::stoi(levelUpComponents.at(0));
+			levelComponent = std::stoi(levelUpComponents.at(0));
 		}
 		else if (type == "S")
 		{
-			return std::stoi(levelUpComponents.at(1));
+			levelComponent = std::stoi(levelUpComponents.at(1));
 		}
-		return std::stoi(levelUpComponents.at(2));
+		else
+		{
+			levelComponent = std::stoi(levelUpComponents.at(2));
+		}
+		debug.write(EXIT, "getLevelComponent()");
+		return levelComponent;
+	}
+
+	//Returns the outstanding level as a string
+	BSFixedString getOutstandingLevel(StaticFunctionTag* base, BSFixedString levelUpsString)
+	{
+		debug.write(ENTRY, "getOutstandingLevel()");
+		std::vector<std::string> levelUps = split(levelUpsString.data, ITEM_SEPARATOR);
+		BSFixedString outstandingLevel = levelUps.at(0).c_str();
+		debug.write(EXIT, "getOutstandingLevel()");
+		return outstandingLevel;
 	}
 
 	/**********************************************************************************************************
@@ -213,7 +289,7 @@ namespace plugin
 			new NativeFunction1 <StaticFunctionTag, bool, BSFixedString>("isOldSave", "PluginScript", plugin::isOldSave, registry));
 
 		registry->RegisterFunction(
-			new NativeFunction2 <StaticFunctionTag, BSFixedString, BSFixedString, BSFixedString>("fetchWorkouts", "PluginScript", plugin::fetchWorkouts, registry));
+			new NativeFunction3 <StaticFunctionTag, BSFixedString, BSFixedString, BSFixedString, UInt32>("fetchWorkouts", "PluginScript", plugin::fetchWorkouts, registry));
 
 		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getWorkoutsFromBestWeek", "PluginScript", plugin::getWorkoutsFromBestWeek, registry));
@@ -227,6 +303,8 @@ namespace plugin
 		registry->RegisterFunction(
 			new NativeFunction3 <StaticFunctionTag, UInt32, BSFixedString, UInt32, BSFixedString>("getLevelComponent", "PluginScript", plugin::getLevelComponent, registry));
 
+		registry->RegisterFunction(
+			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getOutstandingLevel", "PluginScript", plugin::getOutstandingLevel, registry));
 		return true;
 
 	}

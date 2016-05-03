@@ -14,21 +14,23 @@
 
 namespace plugin
 {
-	
+
 	/**********************************************************************************************************
 	*	Globals
 	*/
 	int ENTRY = 0;
 	int EXIT = 1;
+	int WRITE = 2;
 	int WEIGHT = 0;
 	int HEALTH = 1;
 	int STAMINA = 2;
 	int MAGICKA = 3;
 	int SECONDS_PER_DAY = 86400;
+	int SECONDS_PER_WEEK = 604800;
 	char ITEM_SEPARATOR = ';';
 	char FIELD_SEPARATOR = ',';
 	std::string WEB_SERVICE_DIR = "Data\\webserviceTest\\Release";
-	
+
 	/**********************************************************************************************************
 	*	Debug
 	*/
@@ -42,11 +44,15 @@ namespace plugin
 		{
 			std::fstream debugFile;
 			debugFile.open("Debug.txt", std::fstream::in | std::fstream::out | std::fstream::app);
-			std::string lineStart = "<-";
+			std::string lineStart = "--";
 			if (type == ENTRY)
 			{
 				treeDepth++;
 				lineStart = "->";
+			}
+			else if (type == EXIT)
+			{
+				lineStart = "<-";
 			}
 
 			for (int i = 0; i < treeDepth - 1; i++)
@@ -72,7 +78,7 @@ namespace plugin
 			debugFile.close();
 		}
 	};
-	
+
 	DebugHandler debug;
 
 	/**********************************************************************************************************
@@ -146,7 +152,7 @@ namespace plugin
 		HRESULT hr = CoInitialize(NULL);
 		if (SUCCEEDED(hr))
 		{
-			try{
+			try {
 				hr = xmlDoc.CreateInstance(__uuidof(MSXML::DOMDocument60), NULL, CLSCTX_INPROC_SERVER);
 				if (xmlDoc->load(toBSTR(fileName)) == VARIANT_TRUE)
 				{
@@ -174,13 +180,30 @@ namespace plugin
 	public:
 		ConfigHandler()
 		{
+			if (!fileExists("Config.xml"))
+			{
+				std::ofstream outputFile("Config.xml");
+				outputFile << "<?xml version=\"1.0\"?><data>"
+					<< "<startDate>0</startDate>"
+					<< "<lastWorkoutDate>0</lastWorkoutDate>"
+					<< "<lastSyncDate>0</lastSyncDate>"
+					<< "<workoutCount>0</workoutCount>"
+					<< "<weeksWorkedOut>0</weeksWorkedOut>"
+					<< "<avgPointsPerWeek>0</avgPointsPerWeek>"
+					<< "<avgPointsPerWorkout>0</avgPointsPerWorkout>"
+					<< "<totalPoints>0</totalPoints>"
+					<< "<workoutsThisWeek>0</workoutsThisWeek>"
+					<< "<pointsThisWeek>0</pointsThisWeek>"
+					<< "</data>";
+				outputFile.close();
+			}
 			doc = getDoc("Config.xml");
 		}
 
 		std::string getConfigProperty(std::string propertyName)
 		{
 			debug.write(ENTRY, "ConfigHandler->getConfigProperty()");
-			std::string propertyValue = doc->selectSingleNode(toBSTR(propertyName))->Gettext();
+			std::string propertyValue = doc->selectSingleNode(toBSTR("/data/" + propertyName))->Gettext();
 			debug.write(EXIT, "ConfigHandler->getConfigProperty()");
 			return propertyValue;
 		}
@@ -188,7 +211,7 @@ namespace plugin
 		void setConfigProperty(std::string propertyName, std::string value)
 		{
 			debug.write(ENTRY, "ConfigHandler->setConfigProperty()");
-			doc->selectSingleNode(toBSTR(propertyName))->Puttext(toBSTR(value));
+			doc->selectSingleNode(toBSTR("/data/" + propertyName))->Puttext(toBSTR(value));
 			save();
 			debug.write(EXIT, "ConfigHandler->setConfigProperty()");
 		}
@@ -259,7 +282,7 @@ namespace plugin
 		return node;
 	}
 
-	class Workout{
+	class Workout {
 	public:
 		time_t date;
 		float weight;
@@ -269,7 +292,7 @@ namespace plugin
 
 		Workout(int workoutNumber)
 		{
-			date = _atoi64(rawData.getWorkoutProperty(workoutNumber, "workoutDate").c_str()) / 1000;
+			date = _atoi64(rawData.getWorkoutProperty(workoutNumber, "workoutDate").c_str());
 			health = std::stoi(rawData.getWorkoutProperty(workoutNumber, "health"));
 			stamina = std::stoi(rawData.getWorkoutProperty(workoutNumber, "stamina"));
 			magicka = std::stoi(rawData.getWorkoutProperty(workoutNumber, "magicka"));
@@ -277,7 +300,7 @@ namespace plugin
 
 		Workout(MSXML::IXMLDOMNodePtr node)
 		{
-			date = _atoi64(node->selectSingleNode("/date")->Gettext()) / 1000;
+			date = _atoi64(node->selectSingleNode("/date")->Gettext());
 			health = std::stoi(std::string(node->selectSingleNode("/h")->Gettext()));
 			stamina = std::stoi(std::string(node->selectSingleNode("/s")->Gettext()));
 			magicka = std::stoi(std::string(node->selectSingleNode("/m")->Gettext()));
@@ -288,6 +311,14 @@ namespace plugin
 			return std::to_string(weight) + "," + std::to_string(health) + "," + std::to_string(stamina) + "," + std::to_string(magicka);
 		}
 	};
+
+	/*
+	Returns the week number that the workout date passed is in
+	where week 1 is the week that the first workout was synced
+	*/
+	int getWeekForWorkout(long int firstTime, long int workoutTime) {
+		return (((workoutTime - firstTime) / 604800) + 1);
+	}
 
 	class WeekHandler
 	{
@@ -329,28 +360,39 @@ namespace plugin
 			return buffer;
 		}
 
-		time_t getDayOfWeek(time_t date)
+		//Returns the number of days from the day of the configs startDate eg. If the startDate is a wednesday and the date passed is a friday, it should return 2.
+		int getDaysIntoWeek(time_t date)
 		{
-			debug.write(ENTRY, "getDayOfWeek()");
-			time_t dayOfWeek = _atoi64(toFormattedDate(date, "%w").c_str());
-			debug.write(EXIT, "getDayOfWeek()");
-			return dayOfWeek;
+			debug.write(ENTRY, "getDaysIntoWeek()");
+			time_t startDate = _atoi64(config.getConfigProperty("startDate").c_str());
+			int days = ((date - startDate) / SECONDS_PER_DAY) % 7;
+			debug.write(EXIT, "getDaysIntoWeek()");
+			return days;
+		}
+
+		//Returns the week number that is the number of weeks since the start of the year that the week belongs to
+		int getWeekNumber(time_t date)
+		{
+			debug.write(ENTRY, "getWeekNumber()");
+			time_t startDate = _atoi64(config.getConfigProperty("startDate").c_str());
+			time_t timeDifference = date - startDate;
+
+			//timeDifference/SECONDS_PER_WEEK gives an integer by integer division that is the time difference in weeks
+			int weekNumber = timeDifference / SECONDS_PER_WEEK;
+			debug.write(EXIT, "getWeekNumber()");
+			return weekNumber;
 		}
 
 		//Returns the date that is the sunday of the week to which the given date belongs
 		time_t getStartOfWeekFromDate(time_t date)
 		{
 			debug.write(ENTRY, "getStartOfWeekFromDate()");
-			std::string startOfWeek;
-			time_t dayOfWeek = getDayOfWeek(date);
-			time_t untruncatedStartOfWeek = date - dayOfWeek*SECONDS_PER_DAY;
-			struct tm * timeinfo;
-			timeinfo = localtime(&untruncatedStartOfWeek);
-			timeinfo->tm_sec = 0;
-			timeinfo->tm_min = 0;
-			timeinfo->tm_hour = 0;
+			time_t startDate = _atoi64(config.getConfigProperty("startDate").c_str());
+
+			//timeDifference/SECONDS_PER_WEEK gives an integer by integer division that is the time difference in weeks
+			time_t startOfWeek = startDate + getWeekNumber(date)*SECONDS_PER_WEEK;
 			debug.write(EXIT, "getStartOfWeekFromDate()");
-			return mktime(timeinfo);
+			return startOfWeek;
 		}
 
 		//Returns the year component of the given date
@@ -360,15 +402,6 @@ namespace plugin
 			time_t year = _atoi64(toFormattedDate(date, "%Y").c_str());
 			debug.write(EXIT, "getYear()");
 			return year;
-		}
-
-		//Returns the week number that is the number of weeks since the start of the year that the week belongs to
-		time_t getWeekNumber(time_t date)
-		{
-			debug.write(ENTRY, "getWeekNumber()");
-			time_t weekNumber = _atoi64(toFormattedDate(date, "%U").c_str());
-			debug.write(EXIT, "getWeekNumber()");
-			return weekNumber;
 		}
 
 	public:
@@ -441,16 +474,15 @@ namespace plugin
 			int weekCount = getWeekCount();
 			time_t workoutDate = workout.date;
 
-			if (weekCount != 0){
+			if (weekCount != 0) {
 				for (int weekNumber = 0; weekNumber < getWeekCount(); weekNumber++)
 				{
 					time_t weekStartDate = getWeekStart(weekNumber);
-					if ((getYear(weekStartDate) == getYear(workoutDate)) && (getWeekNumber(weekStartDate) == getWeekNumber(workoutDate))){
+					if ((getYear(weekStartDate) == getYear(workoutDate)) && (getWeekNumber(weekStartDate) == getWeekNumber(workoutDate))) {
 						addWorkoutToWeek(weekNumber, workout);
 						debug.write(EXIT, "addWorkout()");
 						return;
 					}
-
 				}
 			}
 
@@ -466,13 +498,13 @@ namespace plugin
 			float bestWeeksWeight = 0;
 			std::string bestWeeksWorkouts = "";
 
-			if (weekCount != 0){
+			if (weekCount != 0) {
 				for (int weekNumber = 0; weekNumber < getWeekCount(); weekNumber++)
 				{
 					time_t weekStartDate = getWeekStart(weekNumber);
 
 					//if the week in frame is after the creation date or is the week the save was made
-					if ((getYear(weekStartDate) >= getYear(creationDate)) && (getWeekNumber(weekStartDate) >= getWeekNumber(creationDate))){
+					if ((getYear(weekStartDate) >= getYear(creationDate)) && (getWeekNumber(weekStartDate) >= getWeekNumber(creationDate))) {
 						float thisWeeksWeight;
 						std::string thisWeeksWorkouts = "";
 						MSXML::IXMLDOMNodeListPtr workouts = getWeek(weekNumber)->selectNodes("/workout");
@@ -482,7 +514,7 @@ namespace plugin
 						{
 							Workout workout(workouts->Getitem(workoutNumber));
 							//if it was done on a day of the week after that of the creation date add the weight to the total weight for this week
-							if (getDayOfWeek(workout.date) >= getDayOfWeek(creationDate)){
+							if (getDaysIntoWeek(workout.date) >= getDaysIntoWeek(creationDate)) {
 								thisWeeksWeight += workout.weight;
 								if (workoutNumber > 0)
 								{
@@ -514,16 +546,105 @@ namespace plugin
 	*	Plugin Helpers
 	*/
 
-	float configure(Workout workout)
+	/*
+	Returns a float representation of the number of levels gained from the workout passed to the method
+	*/
+	float configure(Workout workout, int level)
 	{
 		debug.write(ENTRY, "configure()");
-		//Hamish to replace
+		// the amount of extra experience (points) needed per specified number of levels needed 
+		float expIncreaseRate = 0.1;
+		// every x levels there should be improvement
+		int levelImprovement = 12;
+		int estimatedLevelsPerWeek = 3;
+		float levelsGained = 0;
+
+		__int64 startDate = _atoi64(config.getConfigProperty("startDate").c_str());
+		__int64 lastSyncDate = _atoi64(config.getConfigProperty("lastSyncDate").c_str());
+		__int64 lastWorkoutDate = _atoi64(config.getConfigProperty("lastWorkoutDate").c_str());
+
+		int workoutCount = std::stoi(config.getConfigProperty("workoutCount").c_str());
+		int weeksWorkedOut = std::stoi(config.getConfigProperty("weeksWorkedOut").c_str());
+		int avgPointsPerWorkout = std::stoi(config.getConfigProperty("avgPointsPerWorkout").c_str());
+		int totalPoints = std::stoi(config.getConfigProperty("totalPoints").c_str());
+		int workoutsThisWeek = std::stoi(config.getConfigProperty("workoutsThisWeek").c_str());
+
+		int workoutPoints = (workout.health) + (workout.stamina) + (workout.magicka);
+
+		int workoutsWeek = getWeekForWorkout(startDate, workout.date);
+		int lastWorkoutsWeek = getWeekForWorkout(startDate, lastWorkoutDate);
+
+		if (workoutsWeek < 1)
+		{//Workout is for before the player synced their account
+			levelsGained = 0;
+		}
+		else
+		{
+
+			totalPoints = totalPoints + workoutPoints;
+			workoutCount = workoutCount + 1;
+
+			if (workoutsWeek == 1)
+			{
+				if (weeksWorkedOut == 0)
+				{
+					weeksWorkedOut = 1;
+				}
+				/*When the workout is part of the first week*/
+				lastWorkoutDate = workout.date;
+				workoutsThisWeek = workoutsThisWeek + 1;
+
+				levelsGained = 1.0;
+
+			}
+			else if (workoutsWeek == lastWorkoutsWeek)
+			{
+				/*When the workout is part of the current week*/
+				lastWorkoutDate = workout.date;
+				workoutsThisWeek = workoutsThisWeek + 1;
+
+			}
+			else
+			{
+				avgPointsPerWorkout = (totalPoints / workoutCount);
+
+				if (workoutsWeek > lastWorkoutsWeek)
+				{
+					/*When the workout is in a new week*/
+					lastWorkoutDate = workout.date;
+					weeksWorkedOut = weeksWorkedOut + 1;
+					workoutsThisWeek = 1;
+				}
+			}
+
+		if (levelsGained == 0)
+		{
+			float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
+			levelsGained = ((estimatedLevelsPerWeek * workoutPoints) / (avgPointsPerWorkout * avgWorkoutsPerWeek));
+			levelsGained = levelsGained / (1 + ((level / levelImprovement) * expIncreaseRate));
+			
+		}
+
+		}
+
+		lastSyncDate = currentDate(NULL);
+
+		config.setConfigProperty("startDate", std::to_string(startDate));
+		config.setConfigProperty("lastSyncDate", std::to_string(lastSyncDate));
+		config.setConfigProperty("workoutCount", std::to_string(workoutCount));
+		config.setConfigProperty("weeksWorkedOut", std::to_string(weeksWorkedOut));
+		config.setConfigProperty("avgPointsPerWorkout", std::to_string(avgPointsPerWorkout));
+		config.setConfigProperty("totalPoints", std::to_string(totalPoints));
+		config.setConfigProperty("workoutsThisWeek", std::to_string(workoutsThisWeek));
+		config.setConfigProperty("lastWorkoutDate", std::to_string(lastWorkoutDate));
+
+		debug.write(WRITE, "Levels Gained: " + std::to_string(levelsGained));
 		debug.write(EXIT, "configure()");
-		return 1;
+		return levelsGained;
 	}
 
 	//Updates the Weeks.xml file to contain all workouts logged to date
-	std::string updateWeeks()
+	std::string updateWeeks(int level)
 	{
 		debug.write(ENTRY, "updateWeeks()");
 		rawData.refresh();
@@ -534,21 +655,23 @@ namespace plugin
 		//for each workout
 		for (int workoutNumber = 0; workoutNumber < workoutCount; workoutNumber++)
 		{
-			time_t date = _atoi64(rawData.getWorkoutProperty(workoutNumber, "workoutDate").c_str())/1000;
+			time_t date = _atoi64(rawData.getWorkoutProperty(workoutNumber, "workoutDate").c_str());
 
 			Workout workout(workoutNumber);
 
 			//adjust the config to account for the new workout and gets the workouts weight
-			workout.weight = configure(workout);
-
-			weekHandler.addWorkout(workout);
-
-			if (workoutNumber > 0)
+			workout.weight = configure(workout, level);
+			if (workout.weight > 0)
 			{
-				workoutsAsString = workoutsAsString + ";";
-			}
+				weekHandler.addWorkout(workout);
 
-			workoutsAsString = workoutsAsString + workout.to_string();
+				if (workoutNumber > 0)
+				{
+					workoutsAsString = workoutsAsString + ";";
+				}
+
+				workoutsAsString = workoutsAsString + workout.to_string();
+			}
 		}
 		debug.write(EXIT, "updateWeeks()");
 		return workoutsAsString;
