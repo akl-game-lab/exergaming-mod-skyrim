@@ -23,7 +23,7 @@ endEvent
 event OnPageReset(string page)
 	;Splash screen
 	if (page == "")
-		LoadCustomContent("testImage.swf")
+		LoadCustomContent("Exergame_Menu.dds",0,24)
 	;Settings page
 	elseif (page == "Settings")
 		UnloadCustomContent()

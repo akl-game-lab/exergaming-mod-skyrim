@@ -1,5 +1,4 @@
 DialogueViews/
-Interface/
 LSData/
 SKSE/Plugins/FISS/
 FISS.esp
@@ -148,3 +147,4 @@ plugin_example/test_suite/test_suite.VC.VC.opendb
 plugin_example/test_suite/test_suite.VC.db
 plugin_example/test_suite/test_suite.sln
 plugin_example/test_suite/test_suite.vcxproj.user
+Interface/Translate_ENGLISH.txt
