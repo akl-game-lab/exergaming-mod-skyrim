@@ -3,21 +3,15 @@ Scriptname ExergameConfigMenu extends ski_configbase
 import PluginScript
 import StringUtil
 
-;###################################################
-;MCM MENU CONFIGURATION
-;###################################################
-
 ;reference to the playerreference script
 P4PExergamingMCMPlayerAlias property playerReference auto
 
 ;option IDs
-int exergamingOID;
-int syncOID;
-int syncStatusOID;
-int inputTestOID;
+int exergameModOnSwitch
+int exergameModOffSwitch
 
 ;option values
-bool exergamingBool = false
+bool exergameModOn = false
 
 ;Defines the number of pages in the MCM
 event OnConfigInit()
@@ -25,203 +19,92 @@ event OnConfigInit()
 	Pages[0] = "Settings"
 endEvent
 
-
-;This event decides what the page looks like
+;Shows either the exergaming splash screen or the settings page
 event OnPageReset(string page)
-
-	;DEFAULT IMAGE
+	;Splash screen
 	if (page == "")
 		LoadCustomContent("testImage.swf")
-		return
-
-
-	;SETTINGS PAGE
+	;Settings page
 	elseif (page == "Settings")
 		UnloadCustomContent()
 		;initial options setup
-		SetCursorFillMode(TOP_TO_BOTTOM) 
+		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)
-		AddHeaderOption("Exergaming Mode")
-		if (exergamingBool)
-			exergamingOID = AddToggleOption("Turn off Exergaming Mode", exergamingBool)
-		else
-			exergamingOID = AddToggleOption("Turn On Exergaming Mode", exergamingBool)
+		AddHeaderOption("Exergame Mod")
+		
+		string syncedUserName = playerReference.syncedUserName
+		
+		if(syncedUserName != "")
+			exergameModOn = true;
 		endIf
-
-		;if exergaming mode is on, then show the rest of the options and turn off exp
-		if (exergamingBool)
-			;if the exergaming mode is on, show the rest of the options
-			if (playerReference.syncedUserName == "")
-				syncStatusOID = AddTextOption("Currently synced with: ", "Not Synced")
-			else
-				syncStatusOID = AddTextOption("Currently synced with: ", playerReference.syncedUserName)
-			endIf
-			SyncOID = AddInputOption("Click here to sync...", "")
+		
+		if (exergameModOn)
+			AddTextOption("Currently synced with ", syncedUserName)
+			exergameModOffSwitch = AddToggleOption("Turn Exergame Mode off", exergameModOn);runs code in OnOptionSelect()
 		else
-			Game.SetGameSettingFloat("fXPPerSkillRank", 1)
-		EndIf
+			exergameModOnSwitch = AddInputOption("Turn Exergame Mod on", "");runs code in OnOptionInputOpen();
+		endIf
 	endIf
 endEvent
 
-
-;This determines what will happen when an option is selected.
+;Handles toggling of exergaming mode.
 event OnOptionSelect(int option)
-	if (option == exergamingOID)
-		;if the option is off then turn it on and refresh the page
-		if (exergamingBool == false)
-			bool pressedYes = ShowMessage("You will not be able to gain experience in game in this mode. \nAre you sure you want to turn on exergaming mode?", true, "$Yes", "$No")
-			if (pressedYes)
-				Game.SetPlayerExperience(0)
-				Game.SetGameSettingFloat("fXPPerSkillRank", 0)
-				exergamingBool = !exergamingBool
-				SetToggleOptionValue(exergamingOID, exergamingBool)
-				ForcePageReset()
-			else
-				return
-			endIf
-		else
-			;otherwise the option is turned on so have to check if there is a currently synced account
-			if (playerReference.syncedUserName != "")
-				;if there is a currently synced account, then show the confirmation to unsync the account
-				;need to change this message prompt to use the implementation for a yes no message from the mcm github
-				bool chosenOption = ShowMessage("This will unsync the current account from this save file. \nAre you sure you want to turn off exergaming mode?", true, "$Yes", "$No")
-				if (!chosenOption)
-					Debug.messagebox("pressed no")
-					return
-				else 
-					Debug.messagebox("pressed yes")
-					;unsyncing the account
-					SetTextOptionValue(SyncStatusOID, "Not Synced")
-					;FISSInterface fiss = FISSFactory.getFISS()
-					;If !fiss
-					;	debug.MessageBox("Fiss is not installed, Please install Fiss before using this mod.")
-					;	return
-					;endif
-					exergamingBool = !exergamingBool
-					;fiss.beginLoad("SaveManager.txt")
-					;int saveID = fiss.loadInt("saveID")
-					playerReference.syncedUserName = ""
-					Debug.messageBox("the saveID is: " + saveID)
-					;fiss.endLoad()
-					;fiss.beginSave("SaveManager.txt", "P4P")
-					;fiss.saveBool("accountCurrentlySynced", false)
-					;fiss.saveInt("saveID", saveID)
-					;fiss.endSave()
+	if (option == exergameModOffSwitch)
+		if(exergameModOn)
+			;Show the confirmation to turn off Exergaming mode (need to change this message prompt to use the implementation for a yes no message from the mcm github)
+			bool turnOffExergaming = ShowMessage("Are you sure?\nThis will turn off Exergame Mod in the current save.", true, "$Yes", "$No")
+			if (turnOffExergaming)
+				exergameModOn = false
+				playerReference.syncedUserName = ""
 
-					;reset the exp variables
-					Game.SetGameSettingFloat("fXPLevelUpBase", 75)
-					Game.SetGameSettingFloat("fXPLevelUpMult", 25)
-					Game.SetPlayerExperience(0)
-					Game.SetGameSettingFloat("fXPPerSkillRank", 1)
-					ShowMessage("Successfully unsynced previous save.", false, "$Ok")
-					ForcePageReset()
-					game.requestsave()
-				endIf
-			else
-				;there is no synced account so can just turn off the exergaming mode
-				exergamingBool = !exergamingBool
-				SetToggleOptionValue(exergamingOID, exergamingBool)
+				;reset the exp variables
 				Game.SetGameSettingFloat("fXPLevelUpBase", 75)
 				Game.SetGameSettingFloat("fXPLevelUpMult", 25)
 				Game.SetPlayerExperience(0)
 				Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 				ForcePageReset()
+				game.requestsave()
 			endIf
 		endIf
 	endIf
 endEvent
 
-
-;this executes when the input menu first pops up
-Event OnOptionInputOpen( int option)
-	if (option == SyncOID )	
-		SetInputDialogStartText("Please enter your username...")
-	endIf
+;Executes when the user tries to turn the mod on
+Event OnOptionInputOpen(int option)
+	;show user username entry dislog
+	SetInputDialogStartText("Please enter your username...")
+	;runs OnOptionInputAccept()
 EndEvent
 
-
-;This executes when the user input window is closed
+;Executes once the user has entered a username
 Event OnOptionInputAccept(int option, string userInput)
-	
-	if (option == SyncOID)
-		string userName = userInput
-
-		;this will be executed when the sync button is pressed
-		;FISSInterface fiss = FISSFactory.getFISS()
-		
-		;if !fiss
-		;	debug.MessageBox("Fiss is not installed, Please install Fiss before using this mod.")
-		;	return
-		;endif
-		
-		;checking if the file exists
-		;fiss.beginLoad("SaveManager.txt")
-		;string readInSuccess = fiss.endLoad()
-
-
-		;#TODO#Check for config file (with data for user name)
-		;If data does not exist for this user
-		if readInSuccess != ""
-			;if the textfile does not exist, then make a file with boolean to true, and integer to 1. and set the name of sync.
-			;fiss.beginSave("SaveManager.txt", "P4P")
-			;fiss.saveBool("AccountCurrentlySynced", true)
-			;fiss.saveInt("saveID", 1)
-			;fiss.endSave()
-			playerReference.syncedUserName = userName
-
-			string workouts = fetchWorkouts("Skyrim",syncedUserName,Game.getPlayer().getLevel())
-			if(workouts != "")
-				showMessage("Prior workouts detected.")
-				doLevelUP(4,3,3)
-			endIf
-
-			SetTextOptionValue(SyncStatusOID, userName)
-			ShowMessage("Sync with " + userName + " Complete!", false, "$Ok")
-			game.requestsave()
-			
-		else
-			;otherwise there is already a file so we need to read it and check the state of the account sync
-			;fiss.beginLoad("SaveManager.txt")
-			;if (fiss.loadBool("AccountCurrentlySynced"))
-				;this means that there is already an account that is connected so we need to tell the user to unsync the other account before connecting this one.
-			;	Debug.messageBox("There is a save file already synced with this account. Please disconnect the other save file before syncing.")
-			;	fiss.endLoad()
-			;	return
-			;else
-				;this means that there is no account currently synced, so all we need to do is increment the integer and set the boolean to true.
-				;also need to make a clean exercise data txt file
-			;	int updatedSaveID = fiss.loadInt("saveID") + 1
-			;	fiss.endLoad()
-			;	fiss.beginSave("SaveManager.txt", "P4P")
-			;	fiss.saveInt("saveID", updatedSaveID)
-			;	fiss.savebool("AccountCurrentlySynced", true)
-			;	fiss.endSave()
-				playerReference.syncedUserName = userName
-				SetTextOptionValue(SyncStatusOID, userName)
-				;using the showmessage from the MCM api because it pauses the script until the user clicks yes
-				;otherwise saving doesn't work when there is a popup open
-				ShowMessage("Sync with " + userName + " Complete!", false, "$Ok")
-				game.requestsave()				
+	if (option == exergameModOnSwitch)
+		bool turnOnExergaming = ShowMessage("Are you sure?\nYou will not be able to gain levels in game while Exergame Mod is on.", true,  "$Yes", "$No")
+		if (turnOnExergaming == true)
+			string userName = userInput
+			if(validUsername(username))
+				playerReference.syncedUserName = username
+				debug.messageBox("Sync with " + username + " Complete!")
+				Game.SetPlayerExperience(0)
+				Game.SetGameSettingFloat("fXPPerSkillRank", 0)
+				exergameModOn = true
+				ForcePageReset()
+				game.requestsave()
+			else
+				debug.messageBox("Invalid username!")
 			endIf
 		endIf
 	endIf
 endEvent
 
-;This event determines the default value for each of the 
-event OnOptionDefault(int option)
-	;removed this default option at the moment as it doesn't make logical sense
-
-
-	; if (option == exergamingOID)
-	; 	exergamingBool = false;
-	; 	SetToggleOptionValue(exergamingOID, exergamingBool)
-	; 	ForcePageReset()
-	; endIf
-endEvent
-
-;This is the text that is showed at the bottom of the MCM menu.
+;Displayed when the user hovers over the mods on switch
 event OnOptionHighlight(int option)
-	if (option == exergamingOID)
+	if (option == exergameModOffSwitch)
 		SetInfoText("Turns off in-game experience and allows you to gain experience from logged workouts")
 	endIf
 endEvent
+
+;TODO validate username with backend
+bool Function validUsername(string username)
+	return true
+endFunction

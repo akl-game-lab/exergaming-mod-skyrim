@@ -7,9 +7,9 @@ int property creationDate auto
 string property outstandingLevel auto
 
 event OnPlayerLoadGame()
-	;when the player loads in, need to grab the previous exercisedata if there is a synced account
-	showMessage("Currently synced with " + syncedUserName)
 	if (syncedUserName != "")
+		;when the player loads in, need to grab the previous exercisedata if there is a synced account
+		showMessage("Currently synced with " + syncedUserName)
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
 		checkLevelUps()
 		creationDate = currentDate()
