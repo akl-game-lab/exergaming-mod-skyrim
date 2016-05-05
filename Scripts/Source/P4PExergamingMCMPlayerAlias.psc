@@ -13,7 +13,7 @@ event OnPlayerLoadGame()
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
 		checkLevelUps()
 		creationDate = currentDate()
-		game.requestSave()
+		Game.requestSave()
 	Else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 	endif
