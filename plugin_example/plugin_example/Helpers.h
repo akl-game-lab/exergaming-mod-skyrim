@@ -574,9 +574,12 @@ namespace plugin
 		int workoutsWeek = getWeekForWorkout(startDate, workout.date);
 		int lastWorkoutsWeek = getWeekForWorkout(startDate, lastWorkoutDate);
 
-		if (workoutsWeek < 1)
+		if (workout.date < startDate)
 		{//Workout is for before the player synced their account
-			levelsGained = 0;
+			config.setConfigProperty("lastSyncDate", std::to_string(currentDate(NULL)));
+			debug.write(WRITE, "Levels Gained: 0");
+			debug.write(EXIT, "configure()");
+			return 0;
 		}
 		else
 		{
@@ -617,19 +620,18 @@ namespace plugin
 				}
 			}
 
-		if (levelsGained == 0)
-		{
-			float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
-			levelsGained = ((estimatedLevelsPerWeek * workoutPoints) / (avgPointsPerWorkout * avgWorkoutsPerWeek));
-			levelsGained = levelsGained / (1 + ((level / levelImprovement) * expIncreaseRate));
-			
-		}
+			if (levelsGained == 0)
+			{
+				float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
+				levelsGained = ((estimatedLevelsPerWeek * workoutPoints) / (avgPointsPerWorkout * avgWorkoutsPerWeek));
+				levelsGained = levelsGained / (1 + ((level / levelImprovement) * expIncreaseRate));
+
+			}
 
 		}
 
 		lastSyncDate = currentDate(NULL);
 
-		config.setConfigProperty("startDate", std::to_string(startDate));
 		config.setConfigProperty("lastSyncDate", std::to_string(lastSyncDate));
 		config.setConfigProperty("workoutCount", std::to_string(workoutCount));
 		config.setConfigProperty("weeksWorkedOut", std::to_string(weeksWorkedOut));

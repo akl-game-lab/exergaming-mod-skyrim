@@ -1,14 +1,14 @@
 #include "Plugin.h"
 #include "Helpers.h"
 
-namespace plugin 
+namespace plugin
 {
 	/**********************************************************************************************************
 	*	Functions
 	*/
 
 	//Returns the current date to the calling papyrus script
-	UInt32 currentDate(StaticFunctionTag* base) 
+	UInt32 currentDate(StaticFunctionTag* base)
 	{
 		time_t t;
 		time(&t);
@@ -23,7 +23,7 @@ namespace plugin
 	}
 
 	//Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
-	BSFixedString fetchWorkouts(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName, UInt32 level) 
+	BSFixedString fetchWorkouts(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName, UInt32 level)
 	{
 		debug.clear();
 		debug.write(ENTRY, "fetchWorkouts()");
@@ -36,10 +36,9 @@ namespace plugin
 		if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
 		{
 			fromDate = "0";
-			//TODO write function for rounding day
 			toDate = std::to_string((currentDate(NULL) / SECONDS_PER_DAY)*SECONDS_PER_DAY);
 			firstFetch = TRUE;
-			config.setConfigProperty("startDate",toDate);
+			config.setConfigProperty("startDate", toDate);
 			debug.write(WRITE, "Start date was 0");
 		}
 		else
@@ -79,17 +78,18 @@ namespace plugin
 
 		BSFixedString workouts;
 
+		rawData.refresh();
 		if (firstFetch)
 		{
-			if(rawData.getWorkoutCount() > 0)
-			workouts = "Prior Workout";
+			if (rawData.getWorkoutCount() > 0)
+				workouts = "Prior Workout";
 			debug.write(WRITE, "firstFetch");
 		}
-		else 
+		else
 		{
 			workouts = updateWeeks(level).c_str();
 		}
-		 
+
 
 		debug.write(EXIT, "fetchWorkouts()");
 		return workouts;
@@ -98,7 +98,7 @@ namespace plugin
 	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
 	BSFixedString getWorkoutsFromBestWeek(StaticFunctionTag* base, BSFixedString creationDate)
 	{
-		debug.write(ENTRY,"getWorkoutsFromBestWeek()");
+		debug.write(ENTRY, "getWorkoutsFromBestWeek()");
 		return weekHandler.getWorkoutsFromBestWeek(_atoi64(creationDate.data)).c_str();
 		debug.write(EXIT, "getWorkoutsFromBestWeek()");
 	}
@@ -108,7 +108,7 @@ namespace plugin
 	{
 		debug.write(ENTRY, "getLevelUpsAsString()");
 		std::string levelUps = "";
-		
+
 		//initialise the level ditribution with the outstanding points
 		std::vector<std::string> outstandingLevelFields = split(outstandingLevel.data, FIELD_SEPARATOR);
 
@@ -146,7 +146,7 @@ namespace plugin
 				{
 					debug.write(WRITE, "Field(" + std::to_string(i) + ") : " + workoutFields.at(i));
 				}
-				
+
 				int weight = std::stoi(workoutFields.at(WEIGHT));
 				int health = std::stoi(workoutFields.at(HEALTH));
 				int stamina = std::stoi(workoutFields.at(STAMINA));
@@ -178,7 +178,7 @@ namespace plugin
 					//format the level up string
 					std::string newLevelUp = std::to_string(healthInt) + "," + std::to_string(staminaInt) + "," + std::to_string(magikaInt);
 
-					debug.write(WRITE,"newLevelUp : " + newLevelUp);
+					debug.write(WRITE, "newLevelUp : " + newLevelUp);
 
 					//add the new level up to the string of level ups
 					if (levelUps == "")
@@ -210,7 +210,7 @@ namespace plugin
 		//add the outstanding level to the start of the return string
 		levelUps = totals + ITEM_SEPARATOR + levelUps;
 
-		debug.write(WRITE,"levelUps : " + levelUps);
+		debug.write(WRITE, "levelUps : " + levelUps);
 
 		BSFixedString levelUpsBS = levelUps.c_str();
 
