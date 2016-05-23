@@ -7,7 +7,7 @@ int function currentDate() global native
 bool function isOldSave(string creationDate) global native
 
 ;Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
-string function fetchWorkouts(string gameID, string userName, int level) global native
+string function fetchWorkouts(string gameID, string username, int level) global native
 
 ;Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
 string function getWorkoutsFromBestWeek(string creationDate) global native
@@ -23,3 +23,12 @@ int function getLevelComponent(string levelUpsString, int n, string type) global
 
 ;Returns the outstanding level as a string
 string function getOutstandingLevel(string levelUpsString) global native
+
+;Starts the poll for new workouts when the user requests a check
+function startForceFetch(string gameID, string username) global native
+
+;Allows papyrus to read the config
+string function getConfigProperty(string propertyName) global native 
+
+;Allows papyrus to clear the debug
+function clearDebug() global native

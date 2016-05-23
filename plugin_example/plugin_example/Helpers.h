@@ -544,9 +544,15 @@ namespace plugin
 	*	Plugin Helpers
 	*/
 
-	/*
-	Returns a float representation of the number of levels gained from the workout passed to the method
-	*/
+	//Returns the current date
+	__int64 currentDate()
+	{
+		time_t t;
+		time(&t);
+		return t;
+	}
+
+	//Returns a float representation of the number of levels gained from the workout passed to the method
 	float configure(Workout workout, int level)
 	{
 		debug.write(ENTRY, "configure()");
@@ -574,7 +580,7 @@ namespace plugin
 
 		if (workout.date < startDate)
 		{//Workout is for before the player synced their account
-			config.setConfigProperty("lastSyncDate", std::to_string(currentDate(NULL)));
+			config.setConfigProperty("lastSyncDate", std::to_string(currentDate()));
 			debug.write(WRITE, "Levels Gained: 0");
 			debug.write(EXIT, "configure()");
 			return 0;
@@ -628,7 +634,7 @@ namespace plugin
 
 		}
 
-		lastSyncDate = currentDate(NULL);
+		lastSyncDate = currentDate();
 
 		config.setConfigProperty("lastSyncDate", std::to_string(lastSyncDate));
 		config.setConfigProperty("workoutCount", std::to_string(workoutCount));
@@ -641,6 +647,31 @@ namespace plugin
 		debug.write(WRITE, "Levels Gained: " + std::to_string(levelsGained));
 		debug.write(EXIT, "configure()");
 		return levelsGained;
+	}
+
+	//Makes the service call to get raw data from the server
+	void getRawData(int type, std::string gameID, std::string username, std::string fromDate, std::string toDate)
+	{
+		std::string exeParams = gameID + " " + username + " " + fromDate + " " + toDate;
+		LPCSTR swExeParams = exeParams.c_str();
+
+		//Set the executable path
+		std::string exePath = WEB_SERVICE_DIR + "\\webserviceTest.exe";
+		LPCSTR swExePath = exePath.c_str();
+
+		//Execute the code that fetches the xml and stores it in the skyrim folder.
+		SHELLEXECUTEINFO ShExecInfo = { 0 };
+		ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+		ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+		ShExecInfo.hwnd = NULL;
+		ShExecInfo.lpVerb = NULL;
+		ShExecInfo.lpFile = swExePath;
+		ShExecInfo.lpParameters = swExeParams;
+		ShExecInfo.lpDirectory = NULL;
+		ShExecInfo.nShow = SW_SHOWMINNOACTIVE;
+		ShExecInfo.hInstApp = NULL;
+		ShellExecuteEx(&ShExecInfo);
+		WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
 	}
 
 	//Updates the Weeks.xml file to contain all workouts logged to date

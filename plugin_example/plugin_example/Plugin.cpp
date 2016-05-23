@@ -3,6 +3,8 @@
 
 namespace plugin
 {
+	int NORMAL_FETCH = 0;
+	int FORCE_FETCH = 1;
 	/**********************************************************************************************************
 	*	Functions
 	*/
@@ -23,9 +25,8 @@ namespace plugin
 	}
 
 	//Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
-	BSFixedString fetchWorkouts(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName, UInt32 level)
+	BSFixedString fetchWorkouts(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username, UInt32 level)
 	{
-		debug.clear();
 		debug.write(ENTRY, "fetchWorkouts()");
 		ConfigHandler config;
 		std::string fromDate;
@@ -36,7 +37,7 @@ namespace plugin
 		if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
 		{
 			fromDate = "0";
-			toDate = std::to_string((currentDate(NULL) / SECONDS_PER_DAY)*SECONDS_PER_DAY);
+			toDate = std::to_string((currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY);
 			firstFetch = TRUE;
 			config.setConfigProperty("startDate", toDate);
 			debug.write(WRITE, "Start date was 0");
@@ -44,37 +45,12 @@ namespace plugin
 		else
 		{
 			fromDate = config.getConfigProperty("lastSyncDate");
-			toDate = std::to_string(currentDate(NULL));
+			toDate = std::to_string(currentDate());
 			debug.write(WRITE, "Start date was " + config.getConfigProperty("startDate"));
 		}
-
 		rawData.clear();
 
-		//Take the arguments and put them into a set of parameters for the executable
-		std::string sGameID = gameID.data;
-		std::string sUserName = userName.data;
-
-		std::string exeParams = sGameID + " " + sUserName + " " + fromDate + " " + toDate;
-
-		LPCSTR swExeParams = exeParams.c_str();
-
-		//Set the executable path
-		std::string exePath = WEB_SERVICE_DIR + "\\webserviceTest.exe";
-		LPCSTR swExePath = exePath.c_str();
-
-		//Execute the code that fetches the xml and stores it in the skyrim folder.
-		SHELLEXECUTEINFO ShExecInfo = { 0 };
-		ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-		ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-		ShExecInfo.hwnd = NULL;
-		ShExecInfo.lpVerb = NULL;
-		ShExecInfo.lpFile = swExePath;
-		ShExecInfo.lpParameters = swExeParams;
-		ShExecInfo.lpDirectory = NULL;
-		ShExecInfo.nShow = SW_SHOWMINNOACTIVE;
-		ShExecInfo.hInstApp = NULL;
-		ShellExecuteEx(&ShExecInfo);
-		WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+		getRawData(NORMAL_FETCH,gameID.data,username.data,fromDate,toDate);
 
 		BSFixedString workouts;
 
@@ -275,6 +251,28 @@ namespace plugin
 		return outstandingLevel;
 	}
 
+	//Starts the poll for new workouts when the user requests a check
+	void startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
+	{
+		debug.write(ENTRY, "startForceFetch");
+
+		//Start the headless browser by making the force fetch request
+		getRawData(FORCE_FETCH, gameID.data, username.data, "", "");
+		debug.write(EXIT, "startForceFetch");
+	}
+
+	//Allows papyrus to read the config
+	BSFixedString getConfigProperty(StaticFunctionTag* base, BSFixedString propertyName)
+	{
+		return config.getConfigProperty(propertyName.data).c_str();
+	}
+
+	//Allows papyrus to clear the debug
+	void clearDebug(StaticFunctionTag* base)
+	{
+		debug.clear();
+	}
+
 	/**********************************************************************************************************
 	*	Register
 	*/
@@ -305,7 +303,16 @@ namespace plugin
 
 		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getOutstandingLevel", "PluginScript", plugin::getOutstandingLevel, registry));
-		return true;
 
+		registry->RegisterFunction(
+			new NativeFunction2 <StaticFunctionTag, void, BSFixedString, BSFixedString>("startForceFetch", "PluginScript", plugin::startForceFetch, registry));
+		
+		registry->RegisterFunction(
+			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getConfigProperty", "PluginScript", plugin::getConfigProperty, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction0 <StaticFunctionTag, void>("clearDebug", "PluginScript", plugin::clearDebug, registry));
+
+		return true;
 	}
 }

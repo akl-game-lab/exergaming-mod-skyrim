@@ -15,6 +15,9 @@ using namespace web::http;                  // Common HTTP functionality
 using namespace web::http::client;          // HTTP client features
 using namespace concurrency::streams;       // Asynchronous streams
 
+int NORMAL_FETCH = 0;
+int FORCE_FETCH = 1;
+
 /*======================
 	Helper functions
 ======================*/
@@ -95,14 +98,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 		return 10;
 	}
 
-	std::string gameID = toString(szArgList[1]);
-	std::string userName = toString(szArgList[2]);
-	std::string fromDate = toString(szArgList[3]);
-	std::string toDate = toString(szArgList[4]);
+	int type = (int)szArgList[1];
+	std::string gameID = toString(szArgList[2]);
+	std::string userName = toString(szArgList[3]);
+	std::string fromDate = toString(szArgList[4]);
+	std::string toDate = toString(szArgList[5]);
 
 	LocalFree(szArgList);
-	
-	std::string url = "http://ec2-54-252-163-152.ap-southeast-2.compute.amazonaws.com:3000/users/paul@paulralph.name/workouts/" + fromDate + "/" + toDate;
+	std::string url;
+	if (type == NORMAL_FETCH){
+		 url = "http://ec2-54-252-163-152.ap-southeast-2.compute.amazonaws.com:3000/users/paul@paulralph.name/workouts/" + fromDate + "/" + toDate;
+	}
+	else
+	{
+		//TO_DO add service call to start force fetch
+	}
 	uri fullUri(conversions::to_string_t(url));
 
 	auto fileStream = std::make_shared<ostream>();
