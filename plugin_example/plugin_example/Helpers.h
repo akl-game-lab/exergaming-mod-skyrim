@@ -189,11 +189,9 @@ namespace plugin
 					<< "<lastSyncDate>0</lastSyncDate>"
 					<< "<workoutCount>0</workoutCount>"
 					<< "<weeksWorkedOut>0</weeksWorkedOut>"
-					<< "<avgPointsPerWeek>0</avgPointsPerWeek>"
 					<< "<avgPointsPerWorkout>0</avgPointsPerWorkout>"
 					<< "<totalPoints>0</totalPoints>"
 					<< "<workoutsThisWeek>0</workoutsThisWeek>"
-					<< "<pointsThisWeek>0</pointsThisWeek>"
 					<< "</data>";
 				outputFile.close();
 			}

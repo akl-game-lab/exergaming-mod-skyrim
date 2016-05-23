@@ -80,7 +80,7 @@ endEvent
 
 ;Executes when the user tries to turn the mod on
 Event OnOptionInputOpen(int option)
-	;show user username entry dislog
+	;show user username entry dialog
 	SetInputDialogStartText("Please enter your username...")
 EndEvent
 
@@ -109,9 +109,13 @@ endEvent
 ;Displayed when the user hovers over the mods on switch
 event OnOptionHighlight(int option)
 	if (option == exergameModOnSwitch)
-		SetInfoText("Turns off in-game experience and allows you to gain experience from logged workouts.")
-	elseIf (option == exergameModOnSwitch)
+		if (!exergameModOn)
+			SetInfoText("Turns off in-game experience and allows you to gain experience from logged workouts.")
+		endIf
+	elseIf (option == exergameModOffSwitch)
 		SetInfoText("Turns off Exergame Mod and allows you to gain experience in game.")
+	elseIf (option == checkForWorkoutsButton)
+		SetInfoText("Check for workouts that were not detected when the game launched.")
 	endIf
 endEvent
 

@@ -24,7 +24,7 @@ function checkLevelUps()
 	int weekNumber
 	workouts = fetchWorkouts("Skyrim",syncedUserName,Game.getPlayer().getLevel())
 	;if(isOldSave(creationDate))
-		;showMessage("Old save detected.");
+		;showMessage("Old save detected.")
 		;workouts = getWorkoutsFromBestWeek(weekNumber)
 	;endIf
 	if(workouts != "")
