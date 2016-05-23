@@ -107,11 +107,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	LocalFree(szArgList);
 	std::string url;
 	if (type == NORMAL_FETCH){
-		 url = "http://ec2-54-252-163-152.ap-southeast-2.compute.amazonaws.com:3000/users/paul@paulralph.name/workouts/" + fromDate + "/" + toDate;
+		 url = "http://128.199.227.40:3000/users/paul@paulralph.name/workouts/" + fromDate + "/" + toDate;
 	}
 	else
 	{
-		//TO_DO add service call to start force fetch
+	//TO_DO add service call to start force fetch
+		url = "http://128.199.227.40:3000/users/paul@paulralph.name/forceUpdate";
 	}
 	uri fullUri(conversions::to_string_t(url));
 

@@ -7,6 +7,9 @@ int property creationDate auto
 string property outstandingLevel auto
 bool property forceFetchMade auto
 
+int pollDuration = 120
+int property pollStartTime auto
+
 event OnPlayerLoadGame()
 	clearDebug()
 	forceFetchMade = false
@@ -14,19 +17,19 @@ event OnPlayerLoadGame()
 		;when the player loads in, need to grab the previous exercisedata if there is a synced account
 		showDebugMessage("Currently synced with " + syncedUserName)
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
-		checkLevelUps()
+		string workouts = fetchWorkouts("Skyrim",syncedUserName,Game.getPlayer().getLevel())
+		;if(isOldSave(creationDate))
+			;showDebugMessage("Old save detected.")
+			;workouts = getWorkoutsFromBestWeek(weekNumber)
+		;endIf
+		checkLevelUps(workouts)
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 	endif
+	RegisterForUpdate(10)
 endEvent
 
-function checkLevelUps()
-	string workouts
-	workouts = fetchWorkouts("Skyrim",syncedUserName,Game.getPlayer().getLevel())
-	;if(isOldSave(creationDate))
-		;showDebugMessage("Old save detected.")
-		;workouts = getWorkoutsFromBestWeek(weekNumber)
-	;endIf
+function checkLevelUps(string workouts)
 	int weekNumber
 	if(workouts != "")
 		if(workouts == "Prior Workout")
@@ -52,7 +55,7 @@ function checkLevelUps()
 			outstandingLevel = getOutstandingLevel(levelUpsString)
 			updateXpBar(levelUpsString)
 		endIf
-	else
+	elseIf(forceFetchMade == false)
 		showDebugMessage("No workouts found this time")
 	endIf
 	creationDate = currentDate()
@@ -87,3 +90,20 @@ function updateXpBar(string levelUpsString)
 	float outstandingWeight = outstandingHealth + outstandingStamina + outstandingMagicka
 	Game.setPlayerExperience(outstandingWeight)
 endFunction
+
+event onUpdate()
+	if (forceFetchMade == true)
+		if (currentDate() - pollStartTime < pollDuration)
+			debug.Notification("Checking for recent workouts.")
+			int workoutCount = getConfigProperty("workoutCount") as int
+			string workouts = fetchWorkouts("Skyrim",syncedUserName,Game.getPlayer().getLevel())
+			if (workoutCount < getConfigProperty("workoutCount") as int)
+				checkLevelUps(workouts)
+				forceFetchMade = false
+			endIf
+		else
+			showDebugMessage("No recent workouts found.")
+			forceFetchMade = false
+		endIf
+	endIf
+endEvent
