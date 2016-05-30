@@ -25,10 +25,16 @@ int function getLevelComponent(string levelUpsString, int n, string type) global
 string function getOutstandingLevel(string levelUpsString) global native
 
 ;Starts the poll for new workouts when the user requests a check
-function startForceFetch(string gameID, string username) global native
+bool function startForceFetch(string gameID, string username) global native
 
 ;Allows papyrus to read the config
 string function getConfigProperty(string propertyName) global native 
 
 ;Allows papyrus to clear the debug
 function clearDebug() global native
+
+;Checks if the given username is valid
+bool function validUsername(string gameID, string username) global native
+
+;Returns a shortened username to fit in the menu screen
+string function getShortenedUsername(string username) global native

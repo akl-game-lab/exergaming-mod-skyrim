@@ -15,8 +15,8 @@ using namespace web::http;                  // Common HTTP functionality
 using namespace web::http::client;          // HTTP client features
 using namespace concurrency::streams;       // Asynchronous streams
 
-int NORMAL_FETCH = 0;
-int FORCE_FETCH = 1;
+std::string NORMAL_FETCH = "0";
+std::string FORCE_FETCH = "1";
 
 /*======================
 	Helper functions
@@ -98,21 +98,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 		return 10;
 	}
 
-	int type = (int)szArgList[1];
+	std::string type = toString(szArgList[1]);
 	std::string gameID = toString(szArgList[2]);
-	std::string userName = toString(szArgList[3]);
+	std::string username = toString(szArgList[3]);
 	std::string fromDate = toString(szArgList[4]);
 	std::string toDate = toString(szArgList[5]);
 
 	LocalFree(szArgList);
 	std::string url;
-	if (type == NORMAL_FETCH){
-		 url = "http://128.199.227.40:3000/users/paul@paulralph.name/workouts/" + fromDate + "/" + toDate;
+
+	if (type == "0"){
+		 url = "http://128.199.227.40:3000/users/" + username + "/workouts/" + fromDate + "/" + toDate;
 	}
 	else
 	{
-	//TO_DO add service call to start force fetch
-		url = "http://128.199.227.40:3000/users/paul@paulralph.name/forceUpdate";
+		url = "http://128.199.227.40:3000/users/" + username + "/forceUpdate";
 	}
 	uri fullUri(conversions::to_string_t(url));
 
@@ -122,7 +122,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	pplx::task<void> requestTask = fstream::open_ostream(U("Raw_Data.xml")).then([=](ostream outFile)
 	{
 		*fileStream = outFile;
-
 		// Create http_client to send the request.
 		http_client client(fullUri);
 

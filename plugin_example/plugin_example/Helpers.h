@@ -240,6 +240,26 @@ namespace plugin
 			debugFile.close();
 		}
 
+		std::string getResponseCode()
+		{
+			std::string reponse = "200";
+			MSXML::IXMLDOMNodePtr started = doc->selectSingleNode("data/started");
+			if (started != NULL)
+			{
+				std::string startedText = started->Gettext();
+				if (startedText == "true")
+				{
+					return reponse;
+				}
+			}
+			MSXML::IXMLDOMNodePtr errorCode = doc->selectSingleNode("data/errorCode");
+			if (errorCode != NULL)
+			{
+				return errorCode->Gettext();
+			}
+			return reponse;
+		}
+
 		int getWorkoutCount()
 		{
 			debug.write(ENTRY, "RawDataHandler->getWorkoutCount()");
@@ -652,7 +672,8 @@ namespace plugin
 	//Makes the service call to get raw data from the server
 	void getRawData(int type, std::string gameID, std::string username, std::string fromDate, std::string toDate)
 	{
-		std::string exeParams = gameID + " " + username + " " + fromDate + " " + toDate;
+		rawData.clear();
+		std::string exeParams = std::to_string(type) + " " + gameID + " " + username + " " + fromDate + " " + toDate;
 		LPCSTR swExeParams = exeParams.c_str();
 
 		//Set the executable path
@@ -672,6 +693,8 @@ namespace plugin
 		ShExecInfo.hInstApp = NULL;
 		ShellExecuteEx(&ShExecInfo);
 		WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+
+		rawData.refresh();
 	}
 
 	//Updates the Weeks.xml file to contain all workouts logged to date

@@ -44,9 +44,11 @@ event OnPageReset(string page)
 		endIf
 
 		if (exergameModOn)
-			syncStatus = AddTextOption("Currently synced with ", syncedUserName)
+			string shortenedUsername = getShortenedUsername(syncedUserName)
+			syncStatus = AddTextOption("Currently synced with ", shortenedUsername)
 			if (playerReference.forceFetchMade == true)
-				forceFetchCancelButton = AddToggleOption("Checking for workouts...\t\tCancel",forceFetchCancel)
+				AddTextOption("Close the menu while checking for workouts.","");
+				forceFetchCancelButton = AddToggleOption("Cancel",forceFetchCancel)
 			else
 				forceFetchButton = AddToggleOption("Check for recent workouts",forceFetch)
 				exergameModOffSwitch = AddToggleOption("Turn Exergame Mode off", exergameModOn)
@@ -74,9 +76,12 @@ event OnOptionSelect(int option)
 				Game.requestSave()
 			endIf
 		elseIf (option == forceFetchButton)
-			startForceFetch("Skyrim",playerReference.syncedUserName)
-			playerReference.forceFetchMade = true
-			playerReference.pollStartTime = currentDate()
+			if( startForceFetch("Skyrim",playerReference.syncedUserName) == true )
+				playerReference.forceFetchMade = true
+				playerReference.pollStartTime = currentDate()
+			else
+				ShowMessage("Something went wrong.\nPlease try again later.", false)
+			endIf
 		endIf
 	elseIf (option == forceFetchCancelButton)
 		playerReference.forceFetchMade = false
@@ -86,28 +91,28 @@ endEvent
 
 ;Executes when the user tries to turn the mod on
 Event OnOptionInputOpen(int option)
-	;show user username entry dialog
-	SetInputDialogStartText("Please enter your username...")
+	bool turnOnExergaming = ShowMessage("Are you sure?\nYou will not be able to gain levels in game while Exergame Mod is on.", true,  "$Yes", "$No")
+	if (turnOnExergaming == true)
+		;show user username entry dialog
+		SetInputDialogStartText("Please enter your username...")
+	endIf
 EndEvent
 
 ;Executes once the user has entered a username
 Event OnOptionInputAccept(int option, string userInput)
 	if (option == exergameModOnSwitch)
-		bool turnOnExergaming = ShowMessage("Are you sure?\nYou will not be able to gain levels in game while Exergame Mod is on.", true,  "$Yes", "$No")
-		if (turnOnExergaming == true)
-			string username = userInput
-			if(validUsername(username))
-				playerReference.syncedUserName = username
-				Game.SetPlayerExperience(0)
-				Game.SetGameSettingFloat("fXPPerSkillRank", 0)
-				exergameModOn = true
-				ForcePageReset()
-				string msg = "Sync with " + username + " complete."
-				ShowMessage(msg, false, "$Ok")
-				Game.requestSave()
-			else
-				debug.messageBox("Invalid username!")
-			endIf
+		string username = userInput
+		if(validUsername("Skyrim",username))	
+			playerReference.syncedUserName = username
+			Game.SetPlayerExperience(0)
+			Game.SetGameSettingFloat("fXPPerSkillRank", 0)
+			exergameModOn = true
+			ForcePageReset()
+			string msg = "Sync with " + username + " complete."
+			ShowMessage(msg, false, "$Ok")
+			Game.requestSave()
+		else
+			ShowMessage("Invalid username", false)
 		endIf
 	endIf
 endEvent
@@ -130,8 +135,3 @@ event OnOptionHighlight(int option)
 		endIf
 	endIf
 endEvent
-
-;TODO validate username with backend
-bool function validUsername(string username)
-	return true
-endFunction

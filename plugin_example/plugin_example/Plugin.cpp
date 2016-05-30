@@ -48,13 +48,11 @@ namespace plugin
 			toDate = std::to_string(currentDate());
 			debug.write(WRITE, "Start date was " + config.getConfigProperty("startDate"));
 		}
-		rawData.clear();
 
 		getRawData(NORMAL_FETCH,gameID.data,username.data,fromDate,toDate);
 
 		BSFixedString workouts;
 
-		rawData.refresh();
 		if (firstFetch)
 		{
 			if (rawData.getWorkoutCount() > 0)
@@ -252,13 +250,19 @@ namespace plugin
 	}
 
 	//Starts the poll for new workouts when the user requests a check
-	void startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
+	bool startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
 	{
 		debug.write(ENTRY, "startForceFetch");
 
 		//Start the headless browser by making the force fetch request
-		getRawData(FORCE_FETCH, gameID.data, username.data, "", "");
+		getRawData(FORCE_FETCH, gameID.data, username.data, "0", "0");
+
+		if (rawData.getResponseCode() == "200")
+		{
+			return true;
+		}
 		debug.write(EXIT, "startForceFetch");
+		return false;
 	}
 
 	//Allows papyrus to read the config
@@ -271,6 +275,30 @@ namespace plugin
 	void clearDebug(StaticFunctionTag* base)
 	{
 		debug.clear();
+	}
+
+	//Checks if the given username is valid
+	bool validUsername(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
+	{
+		getRawData(NORMAL_FETCH, gameID.data, username.data, "0","0");
+		if (rawData.getResponseCode() == "404")
+		{
+			return false;
+		}
+		return true;
+	}
+
+	//Returns a shortened username to fit in the menu screen
+	BSFixedString getShortenedUsername(StaticFunctionTag* base, BSFixedString username)
+	{
+		std::string usernameString = username.data;
+		std::string shortenedUsername = usernameString;
+		if (usernameString.length() > 10)
+		{
+			shortenedUsername = usernameString.substr(0, 8) + "...";
+		}
+		debug.write(WRITE,shortenedUsername);
+		return shortenedUsername.c_str();
 	}
 
 	/**********************************************************************************************************
@@ -305,13 +333,19 @@ namespace plugin
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getOutstandingLevel", "PluginScript", plugin::getOutstandingLevel, registry));
 
 		registry->RegisterFunction(
-			new NativeFunction2 <StaticFunctionTag, void, BSFixedString, BSFixedString>("startForceFetch", "PluginScript", plugin::startForceFetch, registry));
+			new NativeFunction2 <StaticFunctionTag, bool, BSFixedString, BSFixedString>("startForceFetch", "PluginScript", plugin::startForceFetch, registry));
 		
 		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getConfigProperty", "PluginScript", plugin::getConfigProperty, registry));
 
 		registry->RegisterFunction(
 			new NativeFunction0 <StaticFunctionTag, void>("clearDebug", "PluginScript", plugin::clearDebug, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction2 <StaticFunctionTag, bool, BSFixedString, BSFixedString>("validUsername", "PluginScript", plugin::validUsername, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getShortenedUsername", "PluginScript", plugin::getShortenedUsername, registry));
 
 		return true;
 	}

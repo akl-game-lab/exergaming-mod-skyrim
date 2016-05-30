@@ -32,13 +32,19 @@ namespace plugin
 	BSFixedString getOutstandingLevel(StaticFunctionTag* base, BSFixedString levelUpsString);
 
 	//Starts the poll for new workouts when the user requests a check
-	void startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username, UInt32 level);
+	bool startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username, UInt32 level);
 
 	//Allows papyrus to read the config
 	BSFixedString getConfigProperty(StaticFunctionTag* base, BSFixedString propertyName);
 
 	//Allows papyrus to clear the debug
 	void clearDebug(StaticFunctionTag* base);
+
+	//Checks if the given username is valid
+	bool validUsername(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username);
+
+	//Returns a shortened username to fit in the menu screen
+	BSFixedString getShortenedUsername(StaticFunctionTag* base, BSFixedString username);
 
 	/**********************************************************************************************************
 	*	Register
