@@ -598,6 +598,11 @@ namespace plugin
 		int workoutsWeek = getWeekForWorkout(startDate, workout.date);
 		int lastWorkoutsWeek = getWeekForWorkout(startDate, lastWorkoutDate);
 
+		if (workoutCount == -1)
+		{
+			workoutCount = 0;
+		}
+
 		if (workout.date < startDate)
 		{//Workout is for before the player synced their account
 			config.setConfigProperty("lastSyncDate", std::to_string(currentDate()));
@@ -670,10 +675,10 @@ namespace plugin
 	}
 
 	//Makes the service call to get raw data from the server
-	void getRawData(int type, std::string gameID, std::string username, std::string fromDate, std::string toDate)
+	void getRawData(std::string type, std::string username, std::string fromDate, std::string toDate)
 	{
 		rawData.clear();
-		std::string exeParams = std::to_string(type) + " " + gameID + " " + username + " " + fromDate + " " + toDate;
+		std::string exeParams = type + " " + username + " " + fromDate + " " + toDate;
 		LPCSTR swExeParams = exeParams.c_str();
 
 		//Set the executable path
@@ -693,7 +698,6 @@ namespace plugin
 		ShExecInfo.hInstApp = NULL;
 		ShellExecuteEx(&ShExecInfo);
 		WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
-
 		rawData.refresh();
 	}
 

@@ -13,9 +13,6 @@ namespace plugin
 	//Checks if the current save is old
 	bool isOldSave(StaticFunctionTag* base, BSFixedString creationDate);
 
-	//Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
-	BSFixedString fetchWorkouts(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName, UInt32 level);
-
 	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
 	BSFixedString getWorkoutsFromBestWeek(StaticFunctionTag* base, BSFixedString creationDate);
 
@@ -31,8 +28,14 @@ namespace plugin
 	//Returns the outstanding level as a string
 	BSFixedString getOutstandingLevel(StaticFunctionTag* base, BSFixedString levelUpsString);
 
+	//Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
+	void startNormalFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName);
+
 	//Starts the poll for new workouts when the user requests a check
 	bool startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username, UInt32 level);
+	
+	//Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
+	BSFixedString getWorkoutsString(StaticFunctionTag* base, UInt32 level);
 
 	//Allows papyrus to read the config
 	BSFixedString getConfigProperty(StaticFunctionTag* base, BSFixedString propertyName);

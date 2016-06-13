@@ -3,8 +3,6 @@
 
 namespace plugin
 {
-	int NORMAL_FETCH = 0;
-	int FORCE_FETCH = 1;
 	/**********************************************************************************************************
 	*	Functions
 	*/
@@ -22,51 +20,6 @@ namespace plugin
 	{
 		std::string lastSyncDate = config.getConfigProperty("lastSyncDate");
 		return _atoi64(creationDate.data) < _atoi64(lastSyncDate.c_str());
-	}
-
-	//Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
-	BSFixedString fetchWorkouts(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username, UInt32 level)
-	{
-		debug.write(ENTRY, "fetchWorkouts()");
-		ConfigHandler config;
-		std::string fromDate;
-		std::string toDate;
-
-		bool firstFetch = FALSE;
-
-		if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
-		{
-			fromDate = "0";
-			toDate = std::to_string((currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY);
-			firstFetch = TRUE;
-			config.setConfigProperty("startDate", toDate);
-			debug.write(WRITE, "Start date was 0");
-		}
-		else
-		{
-			fromDate = config.getConfigProperty("lastSyncDate");
-			toDate = std::to_string(currentDate());
-			debug.write(WRITE, "Start date was " + config.getConfigProperty("startDate"));
-		}
-
-		getRawData(NORMAL_FETCH,gameID.data,username.data,fromDate,toDate);
-
-		BSFixedString workouts;
-
-		if (firstFetch)
-		{
-			if (rawData.getWorkoutCount() > 0)
-				workouts = "Prior Workout";
-			debug.write(WRITE, "firstFetch");
-		}
-		else
-		{
-			workouts = updateWeeks(level).c_str();
-		}
-
-
-		debug.write(EXIT, "fetchWorkouts()");
-		return workouts;
 	}
 
 	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
@@ -249,13 +202,29 @@ namespace plugin
 		return outstandingLevel;
 	}
 
+	//;Makes a service call to fetch workouts
+	void startNormalFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
+	{
+		debug.write(ENTRY, "startNormalFetch()");
+		ConfigHandler config;
+		std::string fromDate = config.getConfigProperty("lastSyncDate");
+		std::string toDate = std::to_string(currentDate());
+		if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
+		{
+			toDate = std::to_string((currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY);
+			config.setConfigProperty("startDate", toDate);
+		}
+		getRawData("NORMAL", username.data, fromDate, toDate);
+		debug.write(EXIT, "startNormalFetch()");
+	}
+
 	//Starts the poll for new workouts when the user requests a check
 	bool startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
 	{
 		debug.write(ENTRY, "startForceFetch");
 
 		//Start the headless browser by making the force fetch request
-		getRawData(FORCE_FETCH, gameID.data, username.data, "0", "0");
+		getRawData("FORCE_FETCH", username.data, "0", "0");
 
 		if (rawData.getResponseCode() == "200")
 		{
@@ -263,6 +232,29 @@ namespace plugin
 		}
 		debug.write(EXIT, "startForceFetch");
 		return false;
+	}
+
+	//Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
+	BSFixedString getWorkoutsString(StaticFunctionTag* base, UInt32 level)
+	{
+		rawData.refresh();
+		BSFixedString workouts;
+		if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
+		{
+			std::string startDate = std::to_string((currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY);
+			config.setConfigProperty("startDate", startDate);
+			if (rawData.getWorkoutCount() > 0)
+			{
+				workouts = "Prior Workout";
+			}
+			debug.write(WRITE, "firstFetch");
+		}
+		else
+		{
+			workouts = updateWeeks(level).c_str();
+		}
+		debug.write(EXIT, "getWorkoutsString()");
+		return workouts;
 	}
 
 	//Allows papyrus to read the config
@@ -280,7 +272,7 @@ namespace plugin
 	//Checks if the given username is valid
 	bool validUsername(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
 	{
-		getRawData(NORMAL_FETCH, gameID.data, username.data, "0","0");
+		getRawData("NORMAL", username.data, "0","0");
 		if (rawData.getResponseCode() == "404")
 		{
 			return false;
@@ -315,9 +307,6 @@ namespace plugin
 			new NativeFunction1 <StaticFunctionTag, bool, BSFixedString>("isOldSave", "PluginScript", plugin::isOldSave, registry));
 
 		registry->RegisterFunction(
-			new NativeFunction3 <StaticFunctionTag, BSFixedString, BSFixedString, BSFixedString, UInt32>("fetchWorkouts", "PluginScript", plugin::fetchWorkouts, registry));
-
-		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getWorkoutsFromBestWeek", "PluginScript", plugin::getWorkoutsFromBestWeek, registry));
 
 		registry->RegisterFunction(
@@ -333,7 +322,13 @@ namespace plugin
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getOutstandingLevel", "PluginScript", plugin::getOutstandingLevel, registry));
 
 		registry->RegisterFunction(
+			new NativeFunction2 <StaticFunctionTag, void, BSFixedString, BSFixedString>("startNormalFetch", "PluginScript", plugin::startNormalFetch, registry));
+
+		registry->RegisterFunction(
 			new NativeFunction2 <StaticFunctionTag, bool, BSFixedString, BSFixedString>("startForceFetch", "PluginScript", plugin::startForceFetch, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction1 <StaticFunctionTag, BSFixedString, UInt32>("getWorkoutsString", "PluginScript", plugin::getWorkoutsString, registry));
 		
 		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getConfigProperty", "PluginScript", plugin::getConfigProperty, registry));

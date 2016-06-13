@@ -6,60 +6,86 @@ string property syncedUserName auto
 int property creationDate auto
 string property outstandingLevel auto
 bool property forceFetchMade auto
-
-int pollDuration = 120
+bool property normalFetchMade auto
+bool property saveRequested auto
 int property pollStartTime auto
+int pollDuration = 120
+int workoutCount = 0;
+int pollInterval = 1;
+int pollCount = 0;
 
 event OnPlayerLoadGame()
+	creationDate = currentDate()
 	clearDebug()
 	forceFetchMade = false
 	if (syncedUserName != "")
-		;when the player loads in, need to grab the previous exercisedata if there is a synced account
 		showDebugMessage("Currently synced with " + syncedUserName)
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
-		string workouts = fetchWorkouts("Skyrim",syncedUserName,Game.getPlayer().getLevel())
+		workoutCount = getConfigProperty("workoutCount") as int
+		startNormalFetch("Skyrim",syncedUserName)
+		normalFetchMade = true
 		;if(isOldSave(creationDate))
 			;showDebugMessage("Old save detected.")
 			;workouts = getWorkoutsFromBestWeek(weekNumber)
 		;endIf
-		checkLevelUps(workouts)
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 	endif
-	RegisterForUpdate(10)
+	RegisterForUpdate(pollInterval)
 endEvent
 
-function checkLevelUps(string workouts)
-	int weekNumber
-	if(workouts != "")
-		if(workouts == "Prior Workout")
-			showDebugMessage("Prior workouts detected.")
-			doLevelUP(4,3,3)
-		else
-			string levelUpsString = getLevelUpsAsString(outstandingLevel,workouts)
-
-			;level ups start at index 1 as index 0 holds the outstanding level up
-			int n = 1
-			int health = 0
-			int stamina = 0
-			int magicka = 0
-			bool levelUp = isNthLevelUp(levelUpsString,n)
-			while (levelUp)
-				health = getLevelComponent(levelUpsString,n,"H")
-				stamina = getLevelComponent(levelUpsString,n,"S")
-				magicka = getLevelComponent(levelUpsString,n,"M")
-				doLevelUp(health,stamina,magicka)
-				n = n + 1
-				levelUp = isNthLevelUp(levelUpsString,n)
-			endWhile
-			outstandingLevel = getOutstandingLevel(levelUpsString)
-			updateXpBar(levelUpsString)
-		endIf
-	elseIf(forceFetchMade == false)
-		showDebugMessage("No workouts found this time")
+event onUpdate()
+	if(saveRequested == true)
+		saveRequested = false
+		Game.requestSave()
 	endIf
-	creationDate = currentDate()
-	Game.requestSave()
+	if (normalFetchMade == true && pollCount % 5 == 0)
+		if (workoutCount < getConfigProperty("workoutCount") as int)
+			checkLevelUps()
+			forceFetchMade = false
+		elseIf (forceFetchMade == false)
+			showDebugMessage("No workouts found.")
+		endIf
+		normalFetchMade = false
+	endIf
+	if (forceFetchMade == true && pollCount % 10 == 0)
+		pollCount = 0;
+		normalFetchMade = false
+		if (currentDate() - pollStartTime < pollDuration)
+			workoutCount = getConfigProperty("workoutCount") as int
+			debug.Notification("Checking for recent workouts.")
+			startNormalFetch("Skyrim",syncedUserName)
+			normalFetchMade = true;
+		else
+			showDebugMessage("No recent workouts found.")
+			forceFetchMade = false
+		endIf
+	endIf
+	pollCount = pollCount + 1;
+endEvent
+
+function checkLevelUps()
+	string workouts = getWorkoutsString(Game.getPlayer().getLevel());
+	if(workouts == "Prior Workout")
+		showDebugMessage("Prior workouts detected.")
+		doLevelUp(4,3,3)
+	else
+		string levelUpsString = getLevelUpsAsString(outstandingLevel,workouts)
+		;level ups start at index 1 as index 0 holds the outstanding level up
+		int n = 1
+		bool shouldContinue = isNthLevelUp(levelUpsString,n)
+		while (shouldContinue)
+			int health = getLevelComponent(levelUpsString,n,"H")
+			int stamina = getLevelComponent(levelUpsString,n,"S")
+			int magicka = getLevelComponent(levelUpsString,n,"M")
+			doLevelUp(health,stamina,magicka)
+			n = n + 1
+			shouldContinue = isNthLevelUp(levelUpsString,n)
+		endWhile
+		outstandingLevel = getOutstandingLevel(levelUpsString)
+		updateXpBar(levelUpsString)
+	endIf
+	saveRequested = true
 endFunction
 
 ;Increment the player level and give the player a perk point
@@ -90,20 +116,3 @@ function updateXpBar(string levelUpsString)
 	float outstandingWeight = outstandingHealth + outstandingStamina + outstandingMagicka
 	Game.setPlayerExperience(outstandingWeight)
 endFunction
-
-event onUpdate()
-	if (forceFetchMade == true)
-		if (currentDate() - pollStartTime < pollDuration)
-			debug.Notification("Checking for recent workouts.")
-			int workoutCount = getConfigProperty("workoutCount") as int
-			string workouts = fetchWorkouts("Skyrim",syncedUserName,Game.getPlayer().getLevel())
-			if (workoutCount < getConfigProperty("workoutCount") as int)
-				checkLevelUps(workouts)
-				forceFetchMade = false
-			endIf
-		else
-			showDebugMessage("No recent workouts found.")
-			forceFetchMade = false
-		endIf
-	endIf
-endEvent

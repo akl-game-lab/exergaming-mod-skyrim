@@ -3,7 +3,7 @@ Scriptname ExergameConfigMenu extends ski_configbase
 import PluginScript
 import StringUtil
 
-;reference to the playerreference script
+;reference to the playerReference script
 P4PExergamingMCMPlayerAlias property playerReference auto
 
 ;option IDs
@@ -73,7 +73,7 @@ event OnOptionSelect(int option)
 				Game.SetPlayerExperience(0)
 				Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 				ShowMessage("Unsync complete.", false, "$Ok")
-				Game.requestSave()
+				playerReference.saveRequested = true
 			endIf
 		elseIf (option == forceFetchButton)
 			if( startForceFetch("Skyrim",playerReference.syncedUserName) == true )
@@ -110,7 +110,9 @@ Event OnOptionInputAccept(int option, string userInput)
 			ForcePageReset()
 			string msg = "Sync with " + username + " complete."
 			ShowMessage(msg, false, "$Ok")
-			Game.requestSave()
+			startNormalFetch("Skyrim",username)
+			playerReference.normalFetchMade = true
+			playerReference.saveRequested = true
 		else
 			ShowMessage("Invalid username", false)
 		endIf

@@ -92,6 +92,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	LPWSTR *szArgList;
 	int argCount;
 
+	std::ofstream reportFile("Service_Report.txt");
+
 	szArgList = CommandLineToArgvW(GetCommandLine(), &argCount);
 	if (szArgList == NULL)
 	{
@@ -99,22 +101,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	}
 
 	std::string type = toString(szArgList[1]);
-	std::string gameID = toString(szArgList[2]);
-	std::string username = toString(szArgList[3]);
-	std::string fromDate = toString(szArgList[4]);
-	std::string toDate = toString(szArgList[5]);
+	std::string username = toString(szArgList[2]);
+	std::string url = "http://128.199.227.40:3000/users/" + username + "/forceUpdate";
+
+	if (type == "NORMAL"){
+		std::string fromDate = toString(szArgList[3]);
+		std::string toDate = toString(szArgList[4]);
+		url = "http://128.199.227.40:3000/users/" + username + "/workouts/" + fromDate + "/" + toDate;
+	}
 
 	LocalFree(szArgList);
-	std::string url;
 
-	if (type == "0"){
-		 url = "http://128.199.227.40:3000/users/" + username + "/workouts/" + fromDate + "/" + toDate;
-	}
-	else
-	{
-		url = "http://128.199.227.40:3000/users/" + username + "/forceUpdate";
-	}
 	uri fullUri(conversions::to_string_t(url));
+
+	reportFile << "url:" + url + "\n";
 
 	auto fileStream = std::make_shared<ostream>();
 
@@ -122,6 +122,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	pplx::task<void> requestTask = fstream::open_ostream(U("Raw_Data.xml")).then([=](ostream outFile)
 	{
 		*fileStream = outFile;
+
 		// Create http_client to send the request.
 		http_client client(fullUri);
 
@@ -150,5 +151,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	catch (const std::exception &e)
 	{
 	}
+	reportFile << "finished";
+	reportFile.close();
 	return 0;
 }
