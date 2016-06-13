@@ -10,9 +10,8 @@ bool property normalFetchMade auto
 bool property saveRequested auto
 int property pollStartTime auto
 int pollDuration = 120
-int workoutCount = 0;
 int pollInterval = 1;
-int pollCount = 0;
+int pollCount = 1;
 
 event OnPlayerLoadGame()
 	creationDate = currentDate()
@@ -21,7 +20,6 @@ event OnPlayerLoadGame()
 	if (syncedUserName != "")
 		showDebugMessage("Currently synced with " + syncedUserName)
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
-		workoutCount = getConfigProperty("workoutCount") as int
 		startNormalFetch("Skyrim",syncedUserName)
 		normalFetchMade = true
 		;if(isOldSave(creationDate))
@@ -39,8 +37,9 @@ event onUpdate()
 		saveRequested = false
 		Game.requestSave()
 	endIf
-	if (normalFetchMade == true && pollCount % 5 == 0)
-		if (workoutCount < getConfigProperty("workoutCount") as int)
+	if (normalFetchMade == true && pollCount % 6 == 0)
+		showDebugMessage("workouts in raw data : " + (getRawDataWorkoutCount() > 0))
+		if (0 < getRawDataWorkoutCount())
 			checkLevelUps()
 			forceFetchMade = false
 		elseIf (forceFetchMade == false)
@@ -48,11 +47,10 @@ event onUpdate()
 		endIf
 		normalFetchMade = false
 	endIf
-	if (forceFetchMade == true && pollCount % 10 == 0)
-		pollCount = 0;
+	if (forceFetchMade == true && pollCount % 11 == 0)
+		pollCount = 1;
 		normalFetchMade = false
 		if (currentDate() - pollStartTime < pollDuration)
-			workoutCount = getConfigProperty("workoutCount") as int
 			debug.Notification("Checking for recent workouts.")
 			startNormalFetch("Skyrim",syncedUserName)
 			normalFetchMade = true;

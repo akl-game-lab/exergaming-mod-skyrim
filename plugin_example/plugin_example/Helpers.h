@@ -675,7 +675,7 @@ namespace plugin
 	}
 
 	//Makes the service call to get raw data from the server
-	void getRawData(std::string type, std::string username, std::string fromDate, std::string toDate)
+	void makeServiceCall(std::string type, std::string username, std::string fromDate, std::string toDate)
 	{
 		rawData.clear();
 		std::string exeParams = type + " " + username + " " + fromDate + " " + toDate;

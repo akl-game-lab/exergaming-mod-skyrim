@@ -30,6 +30,9 @@ bool function startForceFetch(string gameID, string username) global native
 ;Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
 string function getWorkoutsString(int level) global native
 
+;Returns the number of workouts in the raw data file
+int function getRawDataWorkoutCount() global native
+
 ;Allows papyrus to read the config
 string function getConfigProperty(string propertyName) global native 
 
