@@ -202,7 +202,7 @@ namespace plugin
 		return outstandingLevel;
 	}
 
-	//;Makes a service call to fetch workouts
+	//Makes a service call to fetch workouts
 	void startNormalFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
 	{
 		debug.write(ENTRY, "startNormalFetch()");

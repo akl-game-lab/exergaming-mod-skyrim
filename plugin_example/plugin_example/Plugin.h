@@ -28,11 +28,11 @@ namespace plugin
 	//Returns the outstanding level as a string
 	BSFixedString getOutstandingLevel(StaticFunctionTag* base, BSFixedString levelUpsString);
 
-	//Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
+	//Makes a service call to fetch workouts
 	void startNormalFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName);
 
 	//Starts the poll for new workouts when the user requests a check
-	bool startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username, UInt32 level);
+	bool startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username);
 	
 	//Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
 	BSFixedString getWorkoutsString(StaticFunctionTag* base, UInt32 level);
