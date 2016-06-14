@@ -9,13 +9,18 @@ bool property forceFetchMade auto
 bool property normalFetchMade auto
 bool property saveRequested auto
 int property pollStartTime auto
+
 int pollDuration = 120
-int pollInterval = 1;
-int pollCount = 1;
+float pollInterval = 0.5
+int pollCount = 1
+int producerIndex = 0
+int consumerIndex = 0
+string[] messageList
 
 event OnPlayerLoadGame()
 	creationDate = currentDate()
 	clearDebug()
+	messageList = new string[100]
 	forceFetchMade = false
 	if (syncedUserName != "")
 		showDebugMessage("Currently synced with " + syncedUserName)
@@ -33,12 +38,18 @@ event OnPlayerLoadGame()
 endEvent
 
 event onUpdate()
+	;if next position of array is not empty, 
+	if(producerIndex > consumerIndex)
+		debug.messageBox(messageList[consumerIndex])
+		;ShowMessage(messageList[consumerIndex], false, "$Ok")
+		consumerIndex = consumerIndex + 1
+	endIf
 	if(saveRequested == true)
 		saveRequested = false
 		Game.requestSave()
 	endIf
 	if (normalFetchMade == true && pollCount % 6 == 0)
-		showDebugMessage("workouts in raw data : " + (getRawDataWorkoutCount() > 0))
+		pollCount = 1;
 		if (0 < getRawDataWorkoutCount())
 			checkLevelUps()
 			forceFetchMade = false
@@ -47,19 +58,13 @@ event onUpdate()
 		endIf
 		normalFetchMade = false
 	endIf
-	if (forceFetchMade == true && pollCount % 11 == 0)
-		pollCount = 1;
-		normalFetchMade = false
-		if (currentDate() - pollStartTime < pollDuration)
-			debug.Notification("Checking for recent workouts.")
-			startNormalFetch("Skyrim",syncedUserName)
-			normalFetchMade = true;
-		else
-			showDebugMessage("No recent workouts found.")
-			forceFetchMade = false
-		endIf
+	if (forceFetchMade == true && currentDate() - pollStartTime == pollDuration)
+		showDebugMessage("Search for recent workouts complete.");
+		forceFetchMade = false
+		startNormalFetch("Skyrim",syncedUserName)
+		normalFetchMade = true
 	endIf
-	pollCount = pollCount + 1;
+	pollCount = pollCount + 1
 endEvent
 
 function checkLevelUps()
@@ -102,8 +107,8 @@ function doLevelUp(int health, int stamina, int magicka)
 endFunction
 
 function showDebugMessage(string msg)
-	debug.messageBox(msg)
-	Utility.wait(0.1)
+	messageList[producerIndex] = msg
+	producerIndex = producerIndex + 1
 endFunction
 
 ;update the xp bar to show the progress gained

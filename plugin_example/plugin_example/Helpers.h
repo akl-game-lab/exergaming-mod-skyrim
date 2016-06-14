@@ -187,6 +187,7 @@ namespace plugin
 					<< "<startDate>0</startDate>"
 					<< "<lastWorkoutDate>0</lastWorkoutDate>"
 					<< "<lastSyncDate>0</lastSyncDate>"
+					<< "<firstWorkoutDate>0</firstWorkoutDate>"
 					<< "<workoutCount>0</workoutCount>"
 					<< "<weeksWorkedOut>0</weeksWorkedOut>"
 					<< "<avgPointsPerWorkout>0</avgPointsPerWorkout>"
@@ -586,6 +587,7 @@ namespace plugin
 		__int64 startDate = _atoi64(config.getConfigProperty("startDate").c_str());
 		__int64 lastSyncDate = _atoi64(config.getConfigProperty("lastSyncDate").c_str());
 		__int64 lastWorkoutDate = _atoi64(config.getConfigProperty("lastWorkoutDate").c_str());
+		__int64 firstWorkoutDate = _atoi64(config.getConfigProperty("firstWorkoutDate").c_str());
 
 		int workoutCount = std::stoi(config.getConfigProperty("workoutCount").c_str());
 		int weeksWorkedOut = std::stoi(config.getConfigProperty("weeksWorkedOut").c_str());
@@ -595,15 +597,16 @@ namespace plugin
 
 		int workoutPoints = (workout.health) + (workout.stamina) + (workout.magicka);
 
-		int workoutsWeek = getWeekForWorkout(startDate, workout.date);
-		int lastWorkoutsWeek = getWeekForWorkout(startDate, lastWorkoutDate);
-
-		if (workoutCount == -1)
+		if (firstWorkoutDate == 0 && workoutCount == 0 && workout.date > startDate)
 		{
-			workoutCount = 0;
+			firstWorkoutDate = workout.date;
+			config.setConfigProperty("firstWorkoutDate", std::to_string(firstWorkoutDate));
 		}
 
-		if (workout.date < startDate)
+		int workoutsWeek = getWeekForWorkout(firstWorkoutDate, workout.date);
+		int lastWorkoutsWeek = getWeekForWorkout(firstWorkoutDate, lastWorkoutDate);
+
+		if (workout.date < startDate || workout.date < firstWorkoutDate)
 		{//Workout is for before the player synced their account
 			config.setConfigProperty("lastSyncDate", std::to_string(currentDate()));
 			debug.write(WRITE, "Levels Gained: 0");
