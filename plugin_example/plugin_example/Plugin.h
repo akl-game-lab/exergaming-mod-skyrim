@@ -37,6 +37,9 @@ namespace plugin
 	//Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
 	BSFixedString getWorkoutsString(StaticFunctionTag* base, UInt32 level);
 
+	//Returns the number of workouts in the raw data file
+	UInt32 getRawDataWorkoutCount(StaticFunctionTag* base);
+
 	//Allows papyrus to read the config
 	BSFixedString getConfigProperty(StaticFunctionTag* base, BSFixedString propertyName);
 

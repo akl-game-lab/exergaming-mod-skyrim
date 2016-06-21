@@ -18,6 +18,8 @@ using namespace concurrency::streams;       // Asynchronous streams
 std::string NORMAL_FETCH = "0";
 std::string FORCE_FETCH = "1";
 
+std::string URL_BASE = "http://ec2-54-252-163-152.ap-southeast-2.compute.amazonaws.com:3000/users/";
+
 /*======================
 	Helper functions
 ======================*/
@@ -102,12 +104,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 
 	std::string type = toString(szArgList[1]);
 	std::string username = toString(szArgList[2]);
-	std::string url = "http://128.199.227.40:3000/users/" + username + "/forceUpdate";
+	std::string url = URL_BASE + username + "/forceUpdate";
 
 	if (type == "NORMAL"){
 		std::string fromDate = toString(szArgList[3]);
 		std::string toDate = toString(szArgList[4]);
-		url = "http://128.199.227.40:3000/users/" + username + "/workouts/" + fromDate + "/" + toDate;
+		url = URL_BASE + username + "/workouts/" + fromDate + "/" + toDate;
 	}
 
 	LocalFree(szArgList);

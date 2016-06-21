@@ -207,7 +207,7 @@ namespace plugin
 			toDate = std::to_string((currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY);
 			config.setConfigProperty("startDate", toDate);
 		}
-		getRawData("NORMAL", username.data, fromDate, toDate);
+		makeServiceCall("NORMAL", username.data, fromDate, toDate);
 		debug.write(EXIT, "startNormalFetch()");
 	}
 
@@ -217,7 +217,7 @@ namespace plugin
 		debug.write(ENTRY, "startForceFetch");
 
 		//Start the headless browser by making the force fetch request
-		getRawData("FORCE_FETCH", username.data, "0", "0");
+		makeServiceCall("FORCE_FETCH", username.data, "0", "0");
 
 		if (rawData.getResponseCode() == "200")
 		{
@@ -230,6 +230,7 @@ namespace plugin
 	//Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
 	BSFixedString getWorkoutsString(StaticFunctionTag* base, UInt32 level)
 	{
+		debug.write(ENTRY, "getWorkoutsString()");
 		rawData.refresh();
 		BSFixedString workouts;
 		if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
@@ -250,6 +251,13 @@ namespace plugin
 		return workouts;
 	}
 
+	//Returns the number of workouts in the raw data file
+	UInt32 getRawDataWorkoutCount(StaticFunctionTag* base)
+	{
+		rawData.refresh();
+		return rawData.getWorkoutCount();
+	}
+
 	//Allows papyrus to read the config
 	BSFixedString getConfigProperty(StaticFunctionTag* base, BSFixedString propertyName)
 	{
@@ -265,7 +273,7 @@ namespace plugin
 	//Checks if the given username is valid
 	bool validUsername(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
 	{
-		getRawData("NORMAL", username.data, "0","0");
+		makeServiceCall("NORMAL", username.data, "0","0");
 		if (rawData.getResponseCode() == "404")
 		{
 			return false;
@@ -322,6 +330,9 @@ namespace plugin
 
 		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, UInt32>("getWorkoutsString", "PluginScript", plugin::getWorkoutsString, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction0 <StaticFunctionTag, UInt32>("getRawDataWorkoutCount", "PluginScript", plugin::getRawDataWorkoutCount, registry));
 		
 		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getConfigProperty", "PluginScript", plugin::getConfigProperty, registry));

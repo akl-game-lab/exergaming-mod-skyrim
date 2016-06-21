@@ -10,14 +10,18 @@ bool property normalFetchMade auto
 bool property saveRequested auto
 int property pollStartTime auto
 bool property oldSaveLoaded auto
+
 int pollDuration = 120
-int workoutCount = 0;
-int pollInterval = 1;
-int pollCount = 0;
+float pollInterval = 0.5
+int pollCount = 1
+int producerIndex = 0
+int consumerIndex = 0
+string[] messageList
 
 event OnPlayerLoadGame()
 	creationDate = currentDate()
 	clearDebug()
+	messageList = new string[100]
 	forceFetchMade = false
 	oldSaveLoaded = false
 	if (syncedUserName != "")
@@ -27,7 +31,6 @@ event OnPlayerLoadGame()
 			oldSaveLoaded = true
 			getLevelUps(getWorkoutsFromBestWeek(creationDate))
 		else
-			workoutCount = getConfigProperty("workoutCount") as int
 			startNormalFetch("Skyrim",syncedUserName)
 			normalFetchMade = true
 		endIf
@@ -38,12 +41,19 @@ event OnPlayerLoadGame()
 endEvent
 
 event onUpdate()
+	;if next position of array is not empty, 
+	if(producerIndex > consumerIndex)
+		debug.messageBox(messageList[consumerIndex])
+		;ShowMessage(messageList[consumerIndex], false, "$Ok")
+		consumerIndex = consumerIndex + 1
+	endIf
 	if(saveRequested == true)
 		saveRequested = false
 		Game.requestSave()
 	endIf
-	if (normalFetchMade == true && pollCount % 5 == 0)
-		if (workoutCount < getConfigProperty("workoutCount") as int)
+	if (normalFetchMade == true && pollCount % 6 == 0)
+		pollCount = 1;
+		if (0 < getRawDataWorkoutCount())
 			getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
 			forceFetchMade = false
 		elseIf (forceFetchMade == false)
@@ -51,20 +61,13 @@ event onUpdate()
 		endIf
 		normalFetchMade = false
 	endIf
-	if (forceFetchMade == true && pollCount % 10 == 0)
-		pollCount = 0;
-		normalFetchMade = false
-		if (currentDate() - pollStartTime < pollDuration)
-			workoutCount = getConfigProperty("workoutCount") as int
-			debug.Notification("Checking for recent workouts.")
-			startNormalFetch("Skyrim",syncedUserName)
-			normalFetchMade = true;
-		else
-			showDebugMessage("No recent workouts found.")
-			forceFetchMade = false
-		endIf
+	if (forceFetchMade == true && currentDate() - pollStartTime == pollDuration)
+		showDebugMessage("Search for recent workouts complete.");
+		forceFetchMade = false
+		startNormalFetch("Skyrim",syncedUserName)
+		normalFetchMade = true
 	endIf
-	pollCount = pollCount + 1;
+	pollCount = pollCount + 1
 endEvent
 
 function getLevelUps(string workouts)
@@ -106,8 +109,8 @@ function doLevelUp(int health, int stamina, int magicka)
 endFunction
 
 function showDebugMessage(string msg)
-	debug.messageBox(msg)
-	Utility.wait(0.1)
+	messageList[producerIndex] = msg
+	producerIndex = producerIndex + 1
 endFunction
 
 ;update the xp bar to show the progress gained
