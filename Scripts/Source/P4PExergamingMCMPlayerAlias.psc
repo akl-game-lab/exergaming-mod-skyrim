@@ -29,11 +29,9 @@ event OnPlayerLoadGame()
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
 		if(isOldSave(creationDate))
 			oldSaveLoaded = true
-			getLevelUps(getWorkoutsFromBestWeek(creationDate))
-		else
-			startNormalFetch("Skyrim",syncedUserName)
-			normalFetchMade = true
 		endIf
+		startNormalFetch("Skyrim",syncedUserName)
+		normalFetchMade = true
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 	endif
@@ -54,7 +52,11 @@ event onUpdate()
 	if (normalFetchMade == true && pollCount % 6 == 0)
 		pollCount = 1;
 		if (0 < getRawDataWorkoutCount())
-			getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
+			if(oldSaveLoaded)
+				getLevelUps(getWorkoutsFromBestWeek(creationDate))
+			else
+				getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
+			endIf
 			forceFetchMade = false
 		elseIf (forceFetchMade == false)
 			showDebugMessage("No workouts found.")
