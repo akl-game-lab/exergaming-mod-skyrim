@@ -50,7 +50,9 @@ event OnPageReset(string page)
 				AddTextOption("Close the menu while checking for workouts.","");
 				forceFetchCancelButton = AddToggleOption("Cancel",forceFetchCancel)
 			else
-				forceFetchButton = AddToggleOption("Check for recent workouts",forceFetch)
+				if(playerReference.oldSaveLoaded == false)
+					forceFetchButton = AddToggleOption("Check for recent workouts",forceFetch)
+				endIf
 				exergameModOffSwitch = AddToggleOption("Turn Exergame Mode off", exergameModOn)
 			endIf
 		else

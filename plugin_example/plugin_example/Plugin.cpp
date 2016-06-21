@@ -10,9 +10,7 @@ namespace plugin
 	//Returns the current date to the calling papyrus script
 	UInt32 currentDate(StaticFunctionTag* base)
 	{
-		time_t t;
-		time(&t);
-		return t;
+		return currentDate();
 	}
 
 	//Checks if the current save is old
@@ -23,10 +21,10 @@ namespace plugin
 	}
 
 	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
-	BSFixedString getWorkoutsFromBestWeek(StaticFunctionTag* base, BSFixedString creationDate)
+	BSFixedString getWorkoutsFromBestWeek(StaticFunctionTag* base, UInt32 creationDate)
 	{
 		debug.write(ENTRY, "getWorkoutsFromBestWeek()");
-		return weekHandler.getWorkoutsFromBestWeek(_atoi64(creationDate.data)).c_str();
+		return weekHandler.getWorkoutsFromBestWeek(creationDate).c_str();
 		debug.write(EXIT, "getWorkoutsFromBestWeek()");
 	}
 
@@ -38,6 +36,10 @@ namespace plugin
 
 		//initialise the level ditribution with the outstanding points
 		std::vector<std::string> outstandingLevelFields = split(outstandingLevel.data, FIELD_SEPARATOR);
+
+		/*TO-DO
+			Improve health, stamina, magicka reptition with a loop from 0-2;
+		*/
 
 		float totalHealth = 0;
 		float totalStamina = 0;
@@ -154,15 +156,12 @@ namespace plugin
 			debug.write(EXIT, "isNthLevelUp()");
 			return FALSE;
 		}
-
 		std::vector<std::string> levelUps = split(levelUpsString.data, ITEM_SEPARATOR);
-
 		if (n >= levelUps.size())
 		{
 			debug.write(EXIT, "isNthLevelUp()");
 			return FALSE;
 		}
-
 		debug.write(EXIT, "isNthLevelUp()");
 		return TRUE;
 	}
@@ -173,9 +172,7 @@ namespace plugin
 		debug.write(ENTRY, "getLevelComponent()");
 		std::vector<std::string> levelUps = split(levelUpsString.data, ITEM_SEPARATOR);
 		std::vector<std::string> levelUpComponents = split(levelUps.at(n), FIELD_SEPARATOR);
-
-		int levelComponent = 0;
-
+		int levelComponent = std::stoi(levelUpComponents.at(2));
 		if (type == "H")
 		{
 			levelComponent = std::stoi(levelUpComponents.at(0));
@@ -183,10 +180,6 @@ namespace plugin
 		else if (type == "S")
 		{
 			levelComponent = std::stoi(levelUpComponents.at(1));
-		}
-		else
-		{
-			levelComponent = std::stoi(levelUpComponents.at(2));
 		}
 		debug.write(EXIT, "getLevelComponent()");
 		return levelComponent;
@@ -307,7 +300,7 @@ namespace plugin
 			new NativeFunction1 <StaticFunctionTag, bool, BSFixedString>("isOldSave", "PluginScript", plugin::isOldSave, registry));
 
 		registry->RegisterFunction(
-			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getWorkoutsFromBestWeek", "PluginScript", plugin::getWorkoutsFromBestWeek, registry));
+			new NativeFunction1 <StaticFunctionTag, BSFixedString, UInt32>("getWorkoutsFromBestWeek", "PluginScript", plugin::getWorkoutsFromBestWeek, registry));
 
 		registry->RegisterFunction(
 			new NativeFunction2 <StaticFunctionTag, BSFixedString, BSFixedString, BSFixedString>("getLevelUpsAsString", "PluginScript", plugin::getLevelUpsAsString, registry));

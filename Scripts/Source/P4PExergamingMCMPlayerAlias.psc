@@ -9,6 +9,7 @@ bool property forceFetchMade auto
 bool property normalFetchMade auto
 bool property saveRequested auto
 int property pollStartTime auto
+bool property oldSaveLoaded auto
 int pollDuration = 120
 int workoutCount = 0;
 int pollInterval = 1;
@@ -18,16 +19,18 @@ event OnPlayerLoadGame()
 	creationDate = currentDate()
 	clearDebug()
 	forceFetchMade = false
+	oldSaveLoaded = false
 	if (syncedUserName != "")
 		showDebugMessage("Currently synced with " + syncedUserName)
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
-		workoutCount = getConfigProperty("workoutCount") as int
-		startNormalFetch("Skyrim",syncedUserName)
-		normalFetchMade = true
-		;if(isOldSave(creationDate))
-			;showDebugMessage("Old save detected.")
-			;workouts = getWorkoutsFromBestWeek(weekNumber)
-		;endIf
+		if(isOldSave(creationDate))
+			oldSaveLoaded = true
+			getLevelUps(getWorkoutsFromBestWeek(creationDate))
+		else
+			workoutCount = getConfigProperty("workoutCount") as int
+			startNormalFetch("Skyrim",syncedUserName)
+			normalFetchMade = true
+		endIf
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 	endif
@@ -41,7 +44,7 @@ event onUpdate()
 	endIf
 	if (normalFetchMade == true && pollCount % 5 == 0)
 		if (workoutCount < getConfigProperty("workoutCount") as int)
-			checkLevelUps()
+			getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
 			forceFetchMade = false
 		elseIf (forceFetchMade == false)
 			showDebugMessage("No workouts found.")
@@ -64,8 +67,7 @@ event onUpdate()
 	pollCount = pollCount + 1;
 endEvent
 
-function checkLevelUps()
-	string workouts = getWorkoutsString(Game.getPlayer().getLevel());
+function getLevelUps(string workouts)
 	if(workouts == "Prior Workout")
 		showDebugMessage("Prior workouts detected.")
 		doLevelUp(4,3,3)

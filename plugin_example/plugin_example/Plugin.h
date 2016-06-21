@@ -14,7 +14,7 @@ namespace plugin
 	bool isOldSave(StaticFunctionTag* base, BSFixedString creationDate);
 
 	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
-	BSFixedString getWorkoutsFromBestWeek(StaticFunctionTag* base, BSFixedString creationDate);
+	BSFixedString getWorkoutsFromBestWeek(StaticFunctionTag* base, UInt32 creationDate);
 
 	//Returns a string representation of the levels gained in the given week (format is "H,S,M;H,S,M...")
 	BSFixedString getLevelUpsAsString(StaticFunctionTag* base, BSFixedString outstandingLevel, BSFixedString workoutsString);

@@ -4,10 +4,10 @@ scriptName PluginScript Hidden
 int function currentDate() global native
 
 ;Checks if the current save is old
-bool function isOldSave(string creationDate) global native
+bool function isOldSave(int creationDate) global native
 
 ;Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
-string function getWorkoutsFromBestWeek(string creationDate) global native
+string function getWorkoutsFromBestWeek(int creationDate) global native
 
 ;Returns a string representation of the levels gained in the given week (format is "H,S,M;H,S,M...")
 string function getLevelUpsAsString(string outstandingLevel, string workoutsString) global native
