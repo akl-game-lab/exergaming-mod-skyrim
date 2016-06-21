@@ -475,6 +475,10 @@ namespace plugin
 		{
 			debug.write(ENTRY, "WeekHandler->addWorkoutToWeek(" + std::to_string(weekNumber) + ")");
 			MSXML::IXMLDOMNodePtr week = getWeek(weekNumber);
+			if (week->selectNodes(toBSTR("//workout[date = " + std::to_string(workout.date) + "]"))->length != 0)
+			{
+				return;
+			}
 			MSXML::IXMLDOMNodePtr workoutNode = doc->createNode(MSXML::NODE_ELEMENT, _T("workout"), _T(""));
 			workoutNode->appendChild(createAndFillNode(doc, "date", std::to_string(workout.date)));
 			workoutNode->appendChild(createAndFillNode(doc, "weight", std::to_string(workout.weight)));
