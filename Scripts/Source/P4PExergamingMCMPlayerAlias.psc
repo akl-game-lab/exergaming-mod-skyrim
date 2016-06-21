@@ -19,8 +19,10 @@ int consumerIndex = 0
 string[] messageList
 
 event OnPlayerLoadGame()
-	creationDate = currentDate()
 	clearDebug()
+	Utility.wait(3)
+	openSkillsMenu()
+	creationDate = currentDate()
 	messageList = new string[100]
 	forceFetchMade = false
 	oldSaveLoaded = false
@@ -122,4 +124,14 @@ function updateXpBar(string levelUpsString)
 	float outstandingMagicka = getLevelComponent(levelUpsString,0,"M")
 	float outstandingWeight = outstandingHealth + outstandingStamina + outstandingMagicka
 	Game.setPlayerExperience(outstandingWeight)
+endFunction
+
+function openSkillsMenu()
+	pressKey("VK_TAB")
+	Utility.WaitMenuMode(0.05)
+	pressKey("VK_UP")
+	Utility.WaitMenuMode(0.05)
+	pressKey("VK_RETURN")
+	Utility.WaitMenuMode(1)
+	showDebugMessage("Test")
 endFunction

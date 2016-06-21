@@ -44,3 +44,6 @@ bool function validUsername(string gameID, string username) global native
 
 ;Returns a shortened username to fit in the menu screen
 string function getShortenedUsername(string username) global native
+
+;Opens the skills menu
+function pressKey(string key) global native

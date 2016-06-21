@@ -294,6 +294,43 @@ namespace plugin
 		return shortenedUsername.c_str();
 	}
 
+	//Virtually presses the given key
+	void pressKey(StaticFunctionTag* base, BSFixedString key)
+	{
+		debug.write(ENTRY, "pressKey()");
+		INPUT input;
+		WORD vkey = 0x57;
+		if (std::string("VK_TAB").compare(key.data) == 0)
+		{
+			vkey = VK_TAB;
+			debug.write(WRITE, "TAB");
+		}
+		else if (std::string("VK_UP").compare(key.data) == 0)
+		{
+			vkey = 0x57;
+			debug.write(WRITE, "UP");
+		}
+		else
+		{
+			debug.write(WRITE, "ENTER");
+		}
+
+		input.type = INPUT_KEYBOARD;
+		input.ki.wScan = MapVirtualKey(vkey, MAPVK_VK_TO_VSC);
+		input.ki.time = 0;
+		input.ki.dwExtraInfo = 0;
+
+		//Press Key
+		input.ki.wVk = vkey;
+		input.ki.dwFlags = 0;
+		SendInput(1, &input, sizeof(INPUT));
+
+		//Release Key
+		input.ki.dwFlags = KEYEVENTF_KEYUP;
+		SendInput(1, &input, sizeof(INPUT));
+		debug.write(EXIT, "pressKey()");
+	}
+
 	/**********************************************************************************************************
 	*	Register
 	*/
@@ -345,6 +382,9 @@ namespace plugin
 
 		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getShortenedUsername", "PluginScript", plugin::getShortenedUsername, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction1 <StaticFunctionTag, void, BSFixedString>("pressKey", "PluginScript", plugin::pressKey, registry));
 
 		return true;
 	}

@@ -52,6 +52,9 @@ namespace plugin
 	//Returns a shortened username to fit in the menu screen
 	BSFixedString getShortenedUsername(StaticFunctionTag* base, BSFixedString username);
 
+	//Virtually presses the given key
+	void pressKey(BSFixedString key);
+
 	/**********************************************************************************************************
 	*	Register
 	*/

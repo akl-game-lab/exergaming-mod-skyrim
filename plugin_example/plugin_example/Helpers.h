@@ -331,10 +331,7 @@ namespace plugin
 		}
 	};
 
-	/*
-	Returns the week number that the workout date passed is in
-	where week 1 is the week that the first workout was synced
-	*/
+	//Returns the week number that the workout date passed is in where week 1 is the week that the first workout was synced
 	int getWeekForWorkout(long int firstTime, long int workoutTime) {
 		return (((workoutTime - firstTime) / 604800) + 1);
 	}
