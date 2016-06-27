@@ -14,13 +14,9 @@ bool property oldSaveLoaded auto
 int pollDuration = 120
 float pollInterval = 0.5
 int pollCount = 1
-int producerIndex = 0
-int consumerIndex = 0
-string[] messageList
 
 event OnPlayerLoadGame()
 	clearDebug()
-	messageList = new string[100]
 	forceFetchMade = false
 	oldSaveLoaded = false
 	if (syncedUserName != "")
@@ -40,16 +36,9 @@ event OnPlayerLoadGame()
 endEvent
 
 event onUpdate()
-	;if next position of array is not empty, 
-	if(producerIndex > consumerIndex)
-		debug.messageBox(messageList[consumerIndex])
-		;ShowMessage(messageList[consumerIndex], false, "$Ok")
-		consumerIndex = consumerIndex + 1
-	endIf
 	if(saveRequested == true)
 		creationDate = currentDate()
 		saveRequested = false
-		showDebugMessage("Saving.")
 		Utility.WaitMenuMode(1)
 		Game.requestSave()
 	endIf
@@ -94,7 +83,6 @@ function getLevelUps(string workouts)
 		outstandingLevel = getOutstandingLevel(levelUpsString)
 		updateXpBar(levelUpsString)
 	endIf
-	showDebugMessage("Requesting Save.")
 	saveRequested = true
 endFunction
 
@@ -114,8 +102,8 @@ function doLevelUp(int health, int stamina, int magicka)
 endFunction
 
 function showDebugMessage(string msg)
-	messageList[producerIndex] = msg
-	producerIndex = producerIndex + 1
+	Utility.WaitMenuMode(1)
+	debug.messageBox(msg)
 endFunction
 
 ;update the xp bar to show the progress gained
@@ -125,14 +113,4 @@ function updateXpBar(string levelUpsString)
 	float outstandingMagicka = getLevelComponent(levelUpsString,0,"M")
 	float outstandingWeight = outstandingHealth + outstandingStamina + outstandingMagicka
 	Game.setPlayerExperience(outstandingWeight)
-endFunction
-
-function openSkillsMenu()
-	pressKey("VK_TAB")
-	Utility.WaitMenuMode(0.05)
-	pressKey("VK_UP")
-	Utility.WaitMenuMode(0.05)
-	pressKey("VK_RETURN")
-	Utility.WaitMenuMode(1)
-	showDebugMessage("Test")
 endFunction
