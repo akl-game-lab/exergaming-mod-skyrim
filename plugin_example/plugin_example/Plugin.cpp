@@ -14,18 +14,25 @@ namespace plugin
 	}
 
 	//Checks if the current save is old
-	bool isOldSave(StaticFunctionTag* base, BSFixedString creationDate)
+	bool isOldSave(StaticFunctionTag* base, UInt32 creationDate)
 	{
+		debug.write(ENTRY, "isOldSave()");
 		std::string lastSyncDate = config.getConfigProperty("lastSyncDate");
-		return _atoi64(creationDate.data) < _atoi64(lastSyncDate.c_str());
+		if (creationDate < _atoi64(lastSyncDate.c_str()))
+		{
+			debug.write(WRITE, "old save");
+		}
+		debug.write(EXIT, "isOldSave()");
+		return creationDate < _atoi64(lastSyncDate.c_str());
 	}
 
 	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
 	BSFixedString getWorkoutsFromBestWeek(StaticFunctionTag* base, UInt32 creationDate)
 	{
 		debug.write(ENTRY, "getWorkoutsFromBestWeek()");
-		return weekHandler.getWorkoutsFromBestWeek(creationDate).c_str();
+		BSFixedString workouts = weekHandler.getWorkoutsFromBestWeek(creationDate).c_str();
 		debug.write(EXIT, "getWorkoutsFromBestWeek()");
+		return workouts;
 	}
 
 	//Returns a string representation of the levels gained in the given week (format is "H,S,M;H,S,M...")
@@ -342,7 +349,7 @@ namespace plugin
 			new NativeFunction0 <StaticFunctionTag, UInt32>("currentDate", "PluginScript", plugin::currentDate, registry));
 
 		registry->RegisterFunction(
-			new NativeFunction1 <StaticFunctionTag, bool, BSFixedString>("isOldSave", "PluginScript", plugin::isOldSave, registry));
+			new NativeFunction1 <StaticFunctionTag, bool, UInt32>("isOldSave", "PluginScript", plugin::isOldSave, registry));
 
 		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, UInt32>("getWorkoutsFromBestWeek", "PluginScript", plugin::getWorkoutsFromBestWeek, registry));

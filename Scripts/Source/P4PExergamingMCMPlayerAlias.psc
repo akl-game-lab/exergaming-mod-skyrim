@@ -20,17 +20,16 @@ string[] messageList
 
 event OnPlayerLoadGame()
 	clearDebug()
-	Utility.wait(3)
-	openSkillsMenu()
-	creationDate = currentDate()
 	messageList = new string[100]
 	forceFetchMade = false
 	oldSaveLoaded = false
 	if (syncedUserName != "")
 		showDebugMessage("Currently synced with " + syncedUserName)
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
-		if(isOldSave(creationDate))
-			oldSaveLoaded = true
+		showDebugMessage(creationDate)
+		oldSaveLoaded = isOldSave(creationDate as int)
+		if(oldSaveLoaded == true)
+			showDebugMessage("Old save detected.")
 		endIf
 		startNormalFetch("Skyrim",syncedUserName)
 		normalFetchMade = true
@@ -48,17 +47,18 @@ event onUpdate()
 		consumerIndex = consumerIndex + 1
 	endIf
 	if(saveRequested == true)
+		creationDate = currentDate()
 		saveRequested = false
+		showDebugMessage("Saving.")
+		Utility.WaitMenuMode(1)
 		Game.requestSave()
 	endIf
 	if (normalFetchMade == true && pollCount % 6 == 0)
 		pollCount = 1;
-		if (0 < getRawDataWorkoutCount())
-			if(oldSaveLoaded)
-				getLevelUps(getWorkoutsFromBestWeek(creationDate))
-			else
-				getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
-			endIf
+		if(oldSaveLoaded == true)
+			getLevelUps(getWorkoutsFromBestWeek(creationDate))
+		elseIf (0 < getRawDataWorkoutCount())
+			getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
 			forceFetchMade = false
 		elseIf (forceFetchMade == false)
 			showDebugMessage("No workouts found.")
@@ -94,6 +94,7 @@ function getLevelUps(string workouts)
 		outstandingLevel = getOutstandingLevel(levelUpsString)
 		updateXpBar(levelUpsString)
 	endIf
+	showDebugMessage("Requesting Save.")
 	saveRequested = true
 endFunction
 

@@ -11,7 +11,7 @@ namespace plugin
 	UInt32 currentDate(StaticFunctionTag* base);
 
 	//Checks if the current save is old
-	bool isOldSave(StaticFunctionTag* base, BSFixedString creationDate);
+	bool isOldSave(StaticFunctionTag* base, UInt32 creationDate);
 
 	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
 	BSFixedString getWorkoutsFromBestWeek(StaticFunctionTag* base, UInt32 creationDate);

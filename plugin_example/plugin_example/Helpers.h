@@ -380,7 +380,7 @@ namespace plugin
 		int getDaysIntoWeek(time_t date)
 		{
 			debug.write(ENTRY, "getDaysIntoWeek()");
-			time_t startDate = _atoi64(config.getConfigProperty("startDate").c_str());
+			time_t startDate = _atoi64(config.getConfigProperty("firstWorkoutDate").c_str());
 			int days = ((date - startDate) / SECONDS_PER_DAY) % 7;
 			debug.write(EXIT, "getDaysIntoWeek()");
 			return days;
@@ -519,13 +519,14 @@ namespace plugin
 			std::string bestWeeksWorkouts = "";
 
 			if (weekCount != 0) {
-				for (int weekNumber = 0; weekNumber < getWeekCount(); weekNumber++)
+				for (int weekNumber = 0; weekNumber < weekCount; weekNumber++)
 				{
+					debug.write(WRITE, std::to_string(weekNumber));
 					time_t weekStartDate = getWeekStart(weekNumber);
 
 					//if the week in frame is after the creation date or is the week the save was made
 					if ((getYear(weekStartDate) >= getYear(creationDate)) && (getWeekNumber(weekStartDate) >= getWeekNumber(creationDate))) {
-						float thisWeeksWeight;
+						float thisWeeksWeight = 0;
 						std::string thisWeeksWorkouts = "";
 						MSXML::IXMLDOMNodeListPtr workouts = getWeek(weekNumber)->selectNodes("/workout");
 
