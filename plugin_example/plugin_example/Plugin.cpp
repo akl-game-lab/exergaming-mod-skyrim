@@ -1,106 +1,38 @@
 #include "Plugin.h"
 #include "Helpers.h"
 
-namespace plugin 
+namespace plugin
 {
 	/**********************************************************************************************************
 	*	Functions
 	*/
 
 	//Returns the current date to the calling papyrus script
-	UInt32 currentDate(StaticFunctionTag* base) 
+	UInt32 currentDate(StaticFunctionTag* base)
 	{
-		time_t t;
-		time(&t);
-		return t;
+		return currentDate();
 	}
 
 	//Checks if the current save is old
-	bool isOldSave(StaticFunctionTag* base, BSFixedString creationDate)
+	bool isOldSave(StaticFunctionTag* base, UInt32 creationDate)
 	{
+		debug.write(ENTRY, "isOldSave()");
 		std::string lastSyncDate = config.getConfigProperty("lastSyncDate");
-		return _atoi64(creationDate.data) < _atoi64(lastSyncDate.c_str());
-	}
-
-	//Returns workouts logged between the given date to now as a string (format is "W,H,S,M;W,H,S,M...")
-	BSFixedString fetchWorkouts(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName, UInt32 level) 
-	{
-		debug.clear();
-		debug.write(ENTRY, "fetchWorkouts()");
-		ConfigHandler config;
-		std::string fromDate;
-		std::string toDate;
-
-		bool firstFetch = FALSE;
-
-		if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
+		if (creationDate < _atoi64(lastSyncDate.c_str()))
 		{
-			fromDate = "0";
-			//TODO write function for rounding day
-			toDate = std::to_string((currentDate(NULL) / SECONDS_PER_DAY)*SECONDS_PER_DAY);
-			firstFetch = TRUE;
-			config.setConfigProperty("startDate",toDate);
-			debug.write(WRITE, "Start date was 0");
+			debug.write(WRITE, "old save");
 		}
-		else
-		{
-			fromDate = config.getConfigProperty("lastSyncDate");
-			toDate = std::to_string(currentDate(NULL));
-			debug.write(WRITE, "Start date was " + config.getConfigProperty("startDate"));
-		}
-
-		rawData.clear();
-
-		//Take the arguments and put them into a set of parameters for the executable
-		std::string sGameID = gameID.data;
-		std::string sUserName = userName.data;
-
-		std::string exeParams = sGameID + " " + sUserName + " " + fromDate + " " + toDate;
-
-		LPCSTR swExeParams = exeParams.c_str();
-
-		//Set the executable path
-		std::string exePath = WEB_SERVICE_DIR + "\\webserviceTest.exe";
-		LPCSTR swExePath = exePath.c_str();
-
-		//Execute the code that fetches the xml and stores it in the skyrim folder.
-		SHELLEXECUTEINFO ShExecInfo = { 0 };
-		ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-		ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-		ShExecInfo.hwnd = NULL;
-		ShExecInfo.lpVerb = NULL;
-		ShExecInfo.lpFile = swExePath;
-		ShExecInfo.lpParameters = swExeParams;
-		ShExecInfo.lpDirectory = NULL;
-		ShExecInfo.nShow = SW_SHOWMINNOACTIVE;
-		ShExecInfo.hInstApp = NULL;
-		ShellExecuteEx(&ShExecInfo);
-		WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
-
-		BSFixedString workouts;
-
-		if (firstFetch)
-		{
-			if(rawData.getWorkoutCount() > 0)
-			workouts = "Prior Workout";
-			debug.write(WRITE, "firstFetch");
-		}
-		else 
-		{
-			workouts = updateWeeks(level).c_str();
-		}
-		 
-
-		debug.write(EXIT, "fetchWorkouts()");
-		return workouts;
+		debug.write(EXIT, "isOldSave()");
+		return creationDate < _atoi64(lastSyncDate.c_str());
 	}
 
 	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
-	BSFixedString getWorkoutsFromBestWeek(StaticFunctionTag* base, BSFixedString creationDate)
+	BSFixedString getWorkoutsFromBestWeek(StaticFunctionTag* base, UInt32 creationDate)
 	{
-		debug.write(ENTRY,"getWorkoutsFromBestWeek()");
-		return weekHandler.getWorkoutsFromBestWeek(_atoi64(creationDate.data)).c_str();
+		debug.write(ENTRY, "getWorkoutsFromBestWeek()");
+		BSFixedString workouts = weekHandler.getWorkoutsFromBestWeek(creationDate).c_str();
 		debug.write(EXIT, "getWorkoutsFromBestWeek()");
+		return workouts;
 	}
 
 	//Returns a string representation of the levels gained in the given week (format is "H,S,M;H,S,M...")
@@ -108,9 +40,13 @@ namespace plugin
 	{
 		debug.write(ENTRY, "getLevelUpsAsString()");
 		std::string levelUps = "";
-		
+
 		//initialise the level ditribution with the outstanding points
 		std::vector<std::string> outstandingLevelFields = split(outstandingLevel.data, FIELD_SEPARATOR);
+
+		/*TO-DO
+			Improve health, stamina, magicka reptition with a loop from 0-2;
+		*/
 
 		float totalHealth = 0;
 		float totalStamina = 0;
@@ -146,12 +82,17 @@ namespace plugin
 				{
 					debug.write(WRITE, "Field(" + std::to_string(i) + ") : " + workoutFields.at(i));
 				}
-				
+
 				int weight = std::stoi(workoutFields.at(WEIGHT));
 				int health = std::stoi(workoutFields.at(HEALTH));
 				int stamina = std::stoi(workoutFields.at(STAMINA));
 				int magicka = std::stoi(workoutFields.at(MAGICKA));
 				int total = health + stamina + magicka;
+
+				if (total == 0)
+				{
+					break;
+				}
 
 				//get how much weight is needed to level up
 				int weightNeeded = 1 - totalWeight;
@@ -178,10 +119,10 @@ namespace plugin
 					//format the level up string
 					std::string newLevelUp = std::to_string(healthInt) + "," + std::to_string(staminaInt) + "," + std::to_string(magikaInt);
 
-					debug.write(WRITE,"newLevelUp : " + newLevelUp);
+					debug.write(WRITE, "newLevelUp : " + newLevelUp);
 
 					//add the new level up to the string of level ups
-					if (levelUps == "")
+					if (levelUps.compare("") == 0)
 					{
 						levelUps = newLevelUp;
 					}
@@ -208,11 +149,15 @@ namespace plugin
 		std::string totals = std::to_string(totalHealth) + FIELD_SEPARATOR + std::to_string(totalStamina) + FIELD_SEPARATOR + std::to_string(totalMagicka);
 
 		//add the outstanding level to the start of the return string
-		levelUps = totals + ITEM_SEPARATOR + levelUps;
+		std::string levelUpsFinal = totals;
+		if (levelUps.compare("") == 0)
+		{
+			levelUpsFinal = levelUpsFinal + ITEM_SEPARATOR + levelUps;
+		}
 
-		debug.write(WRITE,"levelUps : " + levelUps);
+		debug.write(WRITE, "levelUps : " + levelUpsFinal);
 
-		BSFixedString levelUpsBS = levelUps.c_str();
+		BSFixedString levelUpsBS = levelUpsFinal.c_str();
 
 		debug.write(EXIT, "getLevelUpsAsString()");
 		return levelUpsBS;
@@ -227,15 +172,12 @@ namespace plugin
 			debug.write(EXIT, "isNthLevelUp()");
 			return FALSE;
 		}
-
 		std::vector<std::string> levelUps = split(levelUpsString.data, ITEM_SEPARATOR);
-
 		if (n >= levelUps.size())
 		{
 			debug.write(EXIT, "isNthLevelUp()");
 			return FALSE;
 		}
-
 		debug.write(EXIT, "isNthLevelUp()");
 		return TRUE;
 	}
@@ -246,9 +188,7 @@ namespace plugin
 		debug.write(ENTRY, "getLevelComponent()");
 		std::vector<std::string> levelUps = split(levelUpsString.data, ITEM_SEPARATOR);
 		std::vector<std::string> levelUpComponents = split(levelUps.at(n), FIELD_SEPARATOR);
-
-		int levelComponent = 0;
-
+		int levelComponent = std::stoi(levelUpComponents.at(2));
 		if (type == "H")
 		{
 			levelComponent = std::stoi(levelUpComponents.at(0));
@@ -256,10 +196,6 @@ namespace plugin
 		else if (type == "S")
 		{
 			levelComponent = std::stoi(levelUpComponents.at(1));
-		}
-		else
-		{
-			levelComponent = std::stoi(levelUpComponents.at(2));
 		}
 		debug.write(EXIT, "getLevelComponent()");
 		return levelComponent;
@@ -275,6 +211,142 @@ namespace plugin
 		return outstandingLevel;
 	}
 
+	//Makes a service call to fetch workouts
+	void startNormalFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
+	{
+		debug.write(ENTRY, "startNormalFetch()");
+		ConfigHandler config;
+		std::string fromDate = config.getConfigProperty("lastSyncDate");
+		std::string toDate = std::to_string(currentDate());
+		if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
+		{
+			toDate = std::to_string((currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY);
+			config.setConfigProperty("startDate", toDate);
+		}
+		makeServiceCall("NORMAL", username.data, fromDate, toDate);
+		debug.write(EXIT, "startNormalFetch()");
+	}
+
+	//Starts the poll for new workouts when the user requests a check
+	bool startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
+	{
+		debug.write(ENTRY, "startForceFetch");
+
+		//Start the headless browser by making the force fetch request
+		makeServiceCall("FORCE_FETCH", username.data, "0", "0");
+
+		if (rawData.getResponseCode() == "200")
+		{
+			return true;
+		}
+		debug.write(EXIT, "startForceFetch");
+		return false;
+	}
+
+	//Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
+	BSFixedString getWorkoutsString(StaticFunctionTag* base, UInt32 level)
+	{
+		debug.write(ENTRY, "getWorkoutsString()");
+		rawData.refresh();
+		BSFixedString workouts;
+		if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
+		{
+			std::string startDate = std::to_string((currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY);
+			config.setConfigProperty("startDate", startDate);
+			if (rawData.getWorkoutCount() > 0)
+			{
+				workouts = "Prior Workout";
+			}
+			debug.write(WRITE, "firstFetch");
+		}
+		else
+		{
+			workouts = updateWeeks(level).c_str();
+		}
+		debug.write(EXIT, "getWorkoutsString()");
+		return workouts;
+	}
+
+	//Returns the number of workouts in the raw data file
+	UInt32 getRawDataWorkoutCount(StaticFunctionTag* base)
+	{
+		rawData.refresh();
+		return rawData.getWorkoutCount();
+	}
+
+	//Allows papyrus to read the config
+	BSFixedString getConfigProperty(StaticFunctionTag* base, BSFixedString propertyName)
+	{
+		return config.getConfigProperty(propertyName.data).c_str();
+	}
+
+	//Allows papyrus to clear the debug
+	void clearDebug(StaticFunctionTag* base)
+	{
+		debug.clear();
+	}
+
+	//Checks if the given username is valid
+	bool validUsername(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
+	{
+		makeServiceCall("NORMAL", username.data, "0","0");
+		if (rawData.getResponseCode() == "404")
+		{
+			return false;
+		}
+		return true;
+	}
+
+	//Returns a shortened username to fit in the menu screen
+	BSFixedString getShortenedUsername(StaticFunctionTag* base, BSFixedString username)
+	{
+		std::string usernameString = username.data;
+		std::string shortenedUsername = usernameString;
+		if (usernameString.length() > 10)
+		{
+			shortenedUsername = usernameString.substr(0, 8) + "...";
+		}
+		debug.write(WRITE,shortenedUsername);
+		return shortenedUsername.c_str();
+	}
+
+	//Virtually presses the given key
+	void pressKey(StaticFunctionTag* base, BSFixedString key)
+	{
+		debug.write(ENTRY, "pressKey()");
+		INPUT input;
+		WORD vkey = 0x57;
+		if (std::string("VK_TAB").compare(key.data) == 0)
+		{
+			vkey = VK_TAB;
+			debug.write(WRITE, "TAB");
+		}
+		else if (std::string("VK_UP").compare(key.data) == 0)
+		{
+			vkey = 0x57;
+			debug.write(WRITE, "UP");
+		}
+		else
+		{
+			debug.write(WRITE, "ENTER");
+		}
+
+		input.type = INPUT_KEYBOARD;
+		input.ki.wScan = MapVirtualKey(vkey, MAPVK_VK_TO_VSC);
+		input.ki.time = 0;
+		input.ki.dwExtraInfo = 0;
+
+		//Press Key
+		input.ki.wVk = vkey;
+		input.ki.dwFlags = 0;
+		SendInput(1, &input, sizeof(INPUT));
+
+		//Release Key
+		input.ki.dwFlags = KEYEVENTF_KEYUP;
+		SendInput(1, &input, sizeof(INPUT));
+		debug.write(EXIT, "pressKey()");
+	}
+
 	/**********************************************************************************************************
 	*	Register
 	*/
@@ -286,13 +358,10 @@ namespace plugin
 			new NativeFunction0 <StaticFunctionTag, UInt32>("currentDate", "PluginScript", plugin::currentDate, registry));
 
 		registry->RegisterFunction(
-			new NativeFunction1 <StaticFunctionTag, bool, BSFixedString>("isOldSave", "PluginScript", plugin::isOldSave, registry));
+			new NativeFunction1 <StaticFunctionTag, bool, UInt32>("isOldSave", "PluginScript", plugin::isOldSave, registry));
 
 		registry->RegisterFunction(
-			new NativeFunction3 <StaticFunctionTag, BSFixedString, BSFixedString, BSFixedString, UInt32>("fetchWorkouts", "PluginScript", plugin::fetchWorkouts, registry));
-
-		registry->RegisterFunction(
-			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getWorkoutsFromBestWeek", "PluginScript", plugin::getWorkoutsFromBestWeek, registry));
+			new NativeFunction1 <StaticFunctionTag, BSFixedString, UInt32>("getWorkoutsFromBestWeek", "PluginScript", plugin::getWorkoutsFromBestWeek, registry));
 
 		registry->RegisterFunction(
 			new NativeFunction2 <StaticFunctionTag, BSFixedString, BSFixedString, BSFixedString>("getLevelUpsAsString", "PluginScript", plugin::getLevelUpsAsString, registry));
@@ -305,7 +374,34 @@ namespace plugin
 
 		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getOutstandingLevel", "PluginScript", plugin::getOutstandingLevel, registry));
-		return true;
 
+		registry->RegisterFunction(
+			new NativeFunction2 <StaticFunctionTag, void, BSFixedString, BSFixedString>("startNormalFetch", "PluginScript", plugin::startNormalFetch, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction2 <StaticFunctionTag, bool, BSFixedString, BSFixedString>("startForceFetch", "PluginScript", plugin::startForceFetch, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction1 <StaticFunctionTag, BSFixedString, UInt32>("getWorkoutsString", "PluginScript", plugin::getWorkoutsString, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction0 <StaticFunctionTag, UInt32>("getRawDataWorkoutCount", "PluginScript", plugin::getRawDataWorkoutCount, registry));
+		
+		registry->RegisterFunction(
+			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getConfigProperty", "PluginScript", plugin::getConfigProperty, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction0 <StaticFunctionTag, void>("clearDebug", "PluginScript", plugin::clearDebug, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction2 <StaticFunctionTag, bool, BSFixedString, BSFixedString>("validUsername", "PluginScript", plugin::validUsername, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getShortenedUsername", "PluginScript", plugin::getShortenedUsername, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction1 <StaticFunctionTag, void, BSFixedString>("pressKey", "PluginScript", plugin::pressKey, registry));
+
+		return true;
 	}
 }

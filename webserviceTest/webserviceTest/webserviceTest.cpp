@@ -15,6 +15,11 @@ using namespace web::http;                  // Common HTTP functionality
 using namespace web::http::client;          // HTTP client features
 using namespace concurrency::streams;       // Asynchronous streams
 
+std::string NORMAL_FETCH = "0";
+std::string FORCE_FETCH = "1";
+
+std::string URL_BASE = "http://ec2-54-252-163-152.ap-southeast-2.compute.amazonaws.com:3000/users/";
+
 /*======================
 	Helper functions
 ======================*/
@@ -89,21 +94,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	LPWSTR *szArgList;
 	int argCount;
 
+	std::ofstream reportFile("Service_Report.txt");
+
 	szArgList = CommandLineToArgvW(GetCommandLine(), &argCount);
 	if (szArgList == NULL)
 	{
 		return 10;
 	}
 
-	std::string gameID = toString(szArgList[1]);
-	std::string userName = toString(szArgList[2]);
-	std::string fromDate = toString(szArgList[3]);
-	std::string toDate = toString(szArgList[4]);
+	std::string type = toString(szArgList[1]);
+	std::string username = toString(szArgList[2]);
+	std::string url = URL_BASE + username + "/forceUpdate";
+
+	if (type == "NORMAL"){
+		std::string fromDate = toString(szArgList[3]);
+		std::string toDate = toString(szArgList[4]);
+		url = URL_BASE + username + "/workouts/" + fromDate + "/" + toDate;
+	}
 
 	LocalFree(szArgList);
-	
-	std::string url = "http://ec2-54-252-163-152.ap-southeast-2.compute.amazonaws.com:3000/users/paul@paulralph.name/workouts/" + fromDate + "/" + toDate;
+
 	uri fullUri(conversions::to_string_t(url));
+
+	reportFile << "url:" + url + "\n";
 
 	auto fileStream = std::make_shared<ostream>();
 
@@ -140,5 +153,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	catch (const std::exception &e)
 	{
 	}
+	reportFile << "finished";
+	reportFile.close();
 	return 0;
 }

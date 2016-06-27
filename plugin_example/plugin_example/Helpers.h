@@ -187,13 +187,12 @@ namespace plugin
 					<< "<startDate>0</startDate>"
 					<< "<lastWorkoutDate>0</lastWorkoutDate>"
 					<< "<lastSyncDate>0</lastSyncDate>"
+					<< "<firstWorkoutDate>0</firstWorkoutDate>"
 					<< "<workoutCount>0</workoutCount>"
 					<< "<weeksWorkedOut>0</weeksWorkedOut>"
-					<< "<avgPointsPerWeek>0</avgPointsPerWeek>"
 					<< "<avgPointsPerWorkout>0</avgPointsPerWorkout>"
 					<< "<totalPoints>0</totalPoints>"
 					<< "<workoutsThisWeek>0</workoutsThisWeek>"
-					<< "<pointsThisWeek>0</pointsThisWeek>"
 					<< "</data>";
 				outputFile.close();
 			}
@@ -242,6 +241,26 @@ namespace plugin
 			debugFile.close();
 		}
 
+		std::string getResponseCode()
+		{
+			std::string reponse = "200";
+			MSXML::IXMLDOMNodePtr started = doc->selectSingleNode("data/started");
+			if (started != NULL)
+			{
+				std::string startedText = started->Gettext();
+				if (startedText == "true")
+				{
+					return reponse;
+				}
+			}
+			MSXML::IXMLDOMNodePtr errorCode = doc->selectSingleNode("data/errorCode");
+			if (errorCode != NULL)
+			{
+				return errorCode->Gettext();
+			}
+			return reponse;
+		}
+
 		int getWorkoutCount()
 		{
 			debug.write(ENTRY, "RawDataHandler->getWorkoutCount()");
@@ -285,7 +304,7 @@ namespace plugin
 	class Workout {
 	public:
 		time_t date;
-		float weight;
+		float weight = 0;
 		int health;
 		int stamina;
 		int magicka;
@@ -300,10 +319,12 @@ namespace plugin
 
 		Workout(MSXML::IXMLDOMNodePtr node)
 		{
+			debug.write(ENTRY, "Workout()");
 			date = _atoi64(node->selectSingleNode("/date")->Gettext());
 			health = std::stoi(std::string(node->selectSingleNode("/h")->Gettext()));
 			stamina = std::stoi(std::string(node->selectSingleNode("/s")->Gettext()));
 			magicka = std::stoi(std::string(node->selectSingleNode("/m")->Gettext()));
+			debug.write(EXIT, "Workout()");
 		}
 
 		std::string to_string()
@@ -312,10 +333,7 @@ namespace plugin
 		}
 	};
 
-	/*
-	Returns the week number that the workout date passed is in
-	where week 1 is the week that the first workout was synced
-	*/
+	//Returns the week number that the workout date passed is in where week 1 is the week that the first workout was synced
 	int getWeekForWorkout(long int firstTime, long int workoutTime) {
 		return (((workoutTime - firstTime) / 604800) + 1);
 	}
@@ -364,7 +382,7 @@ namespace plugin
 		int getDaysIntoWeek(time_t date)
 		{
 			debug.write(ENTRY, "getDaysIntoWeek()");
-			time_t startDate = _atoi64(config.getConfigProperty("startDate").c_str());
+			time_t startDate = _atoi64(config.getConfigProperty("firstWorkoutDate").c_str());
 			int days = ((date - startDate) / SECONDS_PER_DAY) % 7;
 			debug.write(EXIT, "getDaysIntoWeek()");
 			return days;
@@ -456,6 +474,25 @@ namespace plugin
 		{
 			debug.write(ENTRY, "WeekHandler->addWorkoutToWeek(" + std::to_string(weekNumber) + ")");
 			MSXML::IXMLDOMNodePtr week = getWeek(weekNumber);
+			MSXML::IXMLDOMNodeListPtr currentWorkouts = week->selectNodes("//workout");
+			for (int i = 0; i < currentWorkouts->Getlength(); i++)
+			{
+				MSXML::IXMLDOMNodePtr currentWorkout = currentWorkouts->Getitem(i);
+				if (std::atoi(currentWorkout->selectSingleNode("//date")->Gettext()) == workout.date)
+				{
+					if (std::atoi(currentWorkout->selectSingleNode("//weight")->Gettext()) == workout.weight)
+					{
+						if (std::atoi(currentWorkout->selectSingleNode("//h")->Gettext()) == workout.health)
+						{
+							if (std::atoi(currentWorkout->selectSingleNode("//s")->Gettext()) == workout.stamina)
+							{
+								debug.write(EXIT, "WeekHandler->addWorkoutToWeek()");
+								return;
+							}
+						}
+					}
+				}
+			}
 			MSXML::IXMLDOMNodePtr workoutNode = doc->createNode(MSXML::NODE_ELEMENT, _T("workout"), _T(""));
 			workoutNode->appendChild(createAndFillNode(doc, "date", std::to_string(workout.date)));
 			workoutNode->appendChild(createAndFillNode(doc, "weight", std::to_string(workout.weight)));
@@ -496,26 +533,32 @@ namespace plugin
 		{
 			int weekCount = getWeekCount();
 			float bestWeeksWeight = 0;
-			std::string bestWeeksWorkouts = "";
+			std::string bestWeeksWorkouts = "0,0,0,0";
 
 			if (weekCount != 0) {
-				for (int weekNumber = 0; weekNumber < getWeekCount(); weekNumber++)
+				for (int weekNumber = 0; weekNumber < weekCount; weekNumber++)
 				{
 					time_t weekStartDate = getWeekStart(weekNumber);
 
 					//if the week in frame is after the creation date or is the week the save was made
 					if ((getYear(weekStartDate) >= getYear(creationDate)) && (getWeekNumber(weekStartDate) >= getWeekNumber(creationDate))) {
-						float thisWeeksWeight;
+						float thisWeeksWeight = 0;
 						std::string thisWeeksWorkouts = "";
-						MSXML::IXMLDOMNodeListPtr workouts = getWeek(weekNumber)->selectNodes("/workout");
+						MSXML::IXMLDOMNodePtr week = getWeek(weekNumber);
+						debug.write(WRITE, "Candidate week found(" + std::to_string(weekNumber) + ")");
+						MSXML::IXMLDOMNodeListPtr workouts = week->selectNodes("/workout");
+						debug.write(WRITE, "Found " + std::to_string(workouts->Getlength()) + " workouts.");
 
 						//for each workout
 						for (int workoutNumber = 0; workoutNumber < workouts->Getlength(); workoutNumber++)
 						{
+							debug.write(WRITE, "Reading workout " + std::to_string(workoutNumber));
 							Workout workout(workouts->Getitem(workoutNumber));
+							debug.write(WRITE, workout.to_string());
 							//if it was done on a day of the week after that of the creation date add the weight to the total weight for this week
 							if (getDaysIntoWeek(workout.date) >= getDaysIntoWeek(creationDate)) {
 								thisWeeksWeight += workout.weight;
+								debug.write(WRITE, "Viable workout found (" + workout.to_string() + ")");
 								if (workoutNumber > 0)
 								{
 									thisWeeksWorkouts = thisWeeksWorkouts + ";";
@@ -546,9 +589,15 @@ namespace plugin
 	*	Plugin Helpers
 	*/
 
-	/*
-	Returns a float representation of the number of levels gained from the workout passed to the method
-	*/
+	//Returns the current date
+	__int64 currentDate()
+	{
+		time_t t;
+		time(&t);
+		return t;
+	}
+
+	//Returns a float representation of the number of levels gained from the workout passed to the method
 	float configure(Workout workout, int level)
 	{
 		debug.write(ENTRY, "configure()");
@@ -562,6 +611,7 @@ namespace plugin
 		__int64 startDate = _atoi64(config.getConfigProperty("startDate").c_str());
 		__int64 lastSyncDate = _atoi64(config.getConfigProperty("lastSyncDate").c_str());
 		__int64 lastWorkoutDate = _atoi64(config.getConfigProperty("lastWorkoutDate").c_str());
+		__int64 firstWorkoutDate = _atoi64(config.getConfigProperty("firstWorkoutDate").c_str());
 
 		int workoutCount = std::stoi(config.getConfigProperty("workoutCount").c_str());
 		int weeksWorkedOut = std::stoi(config.getConfigProperty("weeksWorkedOut").c_str());
@@ -571,12 +621,21 @@ namespace plugin
 
 		int workoutPoints = (workout.health) + (workout.stamina) + (workout.magicka);
 
-		int workoutsWeek = getWeekForWorkout(startDate, workout.date);
-		int lastWorkoutsWeek = getWeekForWorkout(startDate, lastWorkoutDate);
+		if (firstWorkoutDate == 0 && workoutCount == 0 && workout.date > startDate)
+		{
+			firstWorkoutDate = workout.date;
+			config.setConfigProperty("firstWorkoutDate", std::to_string(firstWorkoutDate));
+		}
 
-		if (workoutsWeek < 1)
+		int workoutsWeek = getWeekForWorkout(firstWorkoutDate, workout.date);
+		int lastWorkoutsWeek = getWeekForWorkout(firstWorkoutDate, lastWorkoutDate);
+
+		if (workout.date < startDate || workout.date < firstWorkoutDate)
 		{//Workout is for before the player synced their account
-			levelsGained = 0;
+			config.setConfigProperty("lastSyncDate", std::to_string(currentDate()));
+			debug.write(WRITE, "Levels Gained: 0");
+			debug.write(EXIT, "configure()");
+			return 0;
 		}
 		else
 		{
@@ -617,19 +676,18 @@ namespace plugin
 				}
 			}
 
-		if (levelsGained == 0)
-		{
-			float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
-			levelsGained = ((estimatedLevelsPerWeek * workoutPoints) / (avgPointsPerWorkout * avgWorkoutsPerWeek));
-			levelsGained = levelsGained / (1 + ((level / levelImprovement) * expIncreaseRate));
-			
-		}
+			if (levelsGained == 0)
+			{
+				float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
+				levelsGained = ((estimatedLevelsPerWeek * workoutPoints) / (avgPointsPerWorkout * avgWorkoutsPerWeek));
+				levelsGained = levelsGained / (1 + ((level / levelImprovement) * expIncreaseRate));
+
+			}
 
 		}
 
-		lastSyncDate = currentDate(NULL);
+		lastSyncDate = currentDate();
 
-		config.setConfigProperty("startDate", std::to_string(startDate));
 		config.setConfigProperty("lastSyncDate", std::to_string(lastSyncDate));
 		config.setConfigProperty("workoutCount", std::to_string(workoutCount));
 		config.setConfigProperty("weeksWorkedOut", std::to_string(weeksWorkedOut));
@@ -641,6 +699,33 @@ namespace plugin
 		debug.write(WRITE, "Levels Gained: " + std::to_string(levelsGained));
 		debug.write(EXIT, "configure()");
 		return levelsGained;
+	}
+
+	//Makes the service call to get raw data from the server
+	void makeServiceCall(std::string type, std::string username, std::string fromDate, std::string toDate)
+	{
+		rawData.clear();
+		std::string exeParams = type + " " + username + " " + fromDate + " " + toDate;
+		LPCSTR swExeParams = exeParams.c_str();
+
+		//Set the executable path
+		std::string exePath = WEB_SERVICE_DIR + "\\webserviceTest.exe";
+		LPCSTR swExePath = exePath.c_str();
+
+		//Execute the code that fetches the xml and stores it in the skyrim folder.
+		SHELLEXECUTEINFO ShExecInfo = { 0 };
+		ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+		ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+		ShExecInfo.hwnd = NULL;
+		ShExecInfo.lpVerb = NULL;
+		ShExecInfo.lpFile = swExePath;
+		ShExecInfo.lpParameters = swExeParams;
+		ShExecInfo.lpDirectory = NULL;
+		ShExecInfo.nShow = SW_SHOWMINNOACTIVE;
+		ShExecInfo.hInstApp = NULL;
+		ShellExecuteEx(&ShExecInfo);
+		WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+		rawData.refresh();
 	}
 
 	//Updates the Weeks.xml file to contain all workouts logged to date
