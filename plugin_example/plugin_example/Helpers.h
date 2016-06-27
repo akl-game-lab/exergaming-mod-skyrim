@@ -304,7 +304,7 @@ namespace plugin
 	class Workout {
 	public:
 		time_t date;
-		float weight;
+		float weight = 0;
 		int health;
 		int stamina;
 		int magicka;
@@ -319,10 +319,12 @@ namespace plugin
 
 		Workout(MSXML::IXMLDOMNodePtr node)
 		{
+			debug.write(ENTRY, "Workout()");
 			date = _atoi64(node->selectSingleNode("/date")->Gettext());
 			health = std::stoi(std::string(node->selectSingleNode("/h")->Gettext()));
 			stamina = std::stoi(std::string(node->selectSingleNode("/s")->Gettext()));
 			magicka = std::stoi(std::string(node->selectSingleNode("/m")->Gettext()));
+			debug.write(EXIT, "Workout()");
 		}
 
 		std::string to_string()
@@ -531,27 +533,32 @@ namespace plugin
 		{
 			int weekCount = getWeekCount();
 			float bestWeeksWeight = 0;
-			std::string bestWeeksWorkouts = "";
+			std::string bestWeeksWorkouts = "0,0,0,0";
 
 			if (weekCount != 0) {
 				for (int weekNumber = 0; weekNumber < weekCount; weekNumber++)
 				{
-					debug.write(WRITE, std::to_string(weekNumber));
 					time_t weekStartDate = getWeekStart(weekNumber);
 
 					//if the week in frame is after the creation date or is the week the save was made
 					if ((getYear(weekStartDate) >= getYear(creationDate)) && (getWeekNumber(weekStartDate) >= getWeekNumber(creationDate))) {
 						float thisWeeksWeight = 0;
 						std::string thisWeeksWorkouts = "";
-						MSXML::IXMLDOMNodeListPtr workouts = getWeek(weekNumber)->selectNodes("/workout");
+						MSXML::IXMLDOMNodePtr week = getWeek(weekNumber);
+						debug.write(WRITE, "Candidate week found(" + std::to_string(weekNumber) + ")");
+						MSXML::IXMLDOMNodeListPtr workouts = week->selectNodes("/workout");
+						debug.write(WRITE, "Found " + std::to_string(workouts->Getlength()) + " workouts.");
 
 						//for each workout
 						for (int workoutNumber = 0; workoutNumber < workouts->Getlength(); workoutNumber++)
 						{
+							debug.write(WRITE, "Reading workout " + std::to_string(workoutNumber));
 							Workout workout(workouts->Getitem(workoutNumber));
+							debug.write(WRITE, workout.to_string());
 							//if it was done on a day of the week after that of the creation date add the weight to the total weight for this week
 							if (getDaysIntoWeek(workout.date) >= getDaysIntoWeek(creationDate)) {
 								thisWeeksWeight += workout.weight;
+								debug.write(WRITE, "Viable workout found (" + workout.to_string() + ")");
 								if (workoutNumber > 0)
 								{
 									thisWeeksWorkouts = thisWeeksWorkouts + ";";

@@ -89,6 +89,11 @@ namespace plugin
 				int magicka = std::stoi(workoutFields.at(MAGICKA));
 				int total = health + stamina + magicka;
 
+				if (total == 0)
+				{
+					break;
+				}
+
 				//get how much weight is needed to level up
 				int weightNeeded = 1 - totalWeight;
 
@@ -117,7 +122,7 @@ namespace plugin
 					debug.write(WRITE, "newLevelUp : " + newLevelUp);
 
 					//add the new level up to the string of level ups
-					if (levelUps == "")
+					if (levelUps.compare("") == 0)
 					{
 						levelUps = newLevelUp;
 					}
@@ -144,11 +149,15 @@ namespace plugin
 		std::string totals = std::to_string(totalHealth) + FIELD_SEPARATOR + std::to_string(totalStamina) + FIELD_SEPARATOR + std::to_string(totalMagicka);
 
 		//add the outstanding level to the start of the return string
-		levelUps = totals + ITEM_SEPARATOR + levelUps;
+		std::string levelUpsFinal = totals;
+		if (levelUps.compare("") == 0)
+		{
+			levelUpsFinal = levelUpsFinal + ITEM_SEPARATOR + levelUps;
+		}
 
-		debug.write(WRITE, "levelUps : " + levelUps);
+		debug.write(WRITE, "levelUps : " + levelUpsFinal);
 
-		BSFixedString levelUpsBS = levelUps.c_str();
+		BSFixedString levelUpsBS = levelUpsFinal.c_str();
 
 		debug.write(EXIT, "getLevelUpsAsString()");
 		return levelUpsBS;
