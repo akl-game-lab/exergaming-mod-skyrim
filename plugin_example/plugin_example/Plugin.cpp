@@ -150,7 +150,7 @@ namespace plugin
 
 		//add the outstanding level to the start of the return string
 		std::string levelUpsFinal = totals;
-		if (levelUps.compare("") == 0)
+		if (levelUps.compare("") != 0)
 		{
 			levelUpsFinal = levelUpsFinal + ITEM_SEPARATOR + levelUps;
 		}
