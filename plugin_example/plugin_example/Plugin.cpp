@@ -4,6 +4,16 @@
 namespace plugin
 {
 	/**********************************************************************************************************
+	*	Globals
+	*/
+	int WEIGHT = 0;
+	int HEALTH = 1;
+	int STAMINA = 2;
+	int MAGICKA = 3;
+	char ITEM_SEPARATOR = ';';
+	char FIELD_SEPARATOR = ',';
+	
+	/**********************************************************************************************************
 	*	Functions
 	*/
 
@@ -16,29 +26,20 @@ namespace plugin
 	//Checks if the current save is old
 	bool isOldSave(StaticFunctionTag* base, UInt32 creationDate)
 	{
-		debug.write(ENTRY, "isOldSave()");
 		std::string lastSyncDate = config.getConfigProperty("lastSyncDate");
-		if (creationDate < _atoi64(lastSyncDate.c_str()))
-		{
-			debug.write(WRITE, "old save");
-		}
-		debug.write(EXIT, "isOldSave()");
 		return creationDate < _atoi64(lastSyncDate.c_str());
 	}
 
 	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
 	BSFixedString getWorkoutsFromBestWeek(StaticFunctionTag* base, UInt32 creationDate)
 	{
-		debug.write(ENTRY, "getWorkoutsFromBestWeek()");
-		BSFixedString workouts = weekHandler.getWorkoutsFromBestWeek(creationDate).c_str();
-		debug.write(EXIT, "getWorkoutsFromBestWeek()");
+		BSFixedString workouts = getWorkoutsFromBestWeek(creationDate).c_str();
 		return workouts;
 	}
 
 	//Returns a string representation of the levels gained in the given week (format is "H,S,M;H,S,M...")
 	BSFixedString getLevelUpsAsString(StaticFunctionTag* base, BSFixedString outstandingLevel, BSFixedString workoutsString)
 	{
-		debug.write(ENTRY, "getLevelUpsAsString()");
 		std::string levelUps = "";
 
 		//initialise the level ditribution with the outstanding points
@@ -77,12 +78,6 @@ namespace plugin
 
 			try
 			{
-
-				for (int i = 0; i < workoutFields.size(); i++)
-				{
-					debug.write(WRITE, "Field(" + std::to_string(i) + ") : " + workoutFields.at(i));
-				}
-
 				int weight = std::stoi(workoutFields.at(WEIGHT));
 				int health = std::stoi(workoutFields.at(HEALTH));
 				int stamina = std::stoi(workoutFields.at(STAMINA));
@@ -119,8 +114,6 @@ namespace plugin
 					//format the level up string
 					std::string newLevelUp = std::to_string(healthInt) + "," + std::to_string(staminaInt) + "," + std::to_string(magikaInt);
 
-					debug.write(WRITE, "newLevelUp : " + newLevelUp);
-
 					//add the new level up to the string of level ups
 					if (levelUps.compare("") == 0)
 					{
@@ -155,37 +148,30 @@ namespace plugin
 			levelUpsFinal = levelUpsFinal + ITEM_SEPARATOR + levelUps;
 		}
 
-		debug.write(WRITE, "levelUps : " + levelUpsFinal);
-
 		BSFixedString levelUpsBS = levelUpsFinal.c_str();
 
-		debug.write(EXIT, "getLevelUpsAsString()");
 		return levelUpsBS;
 	}
 
 	//Returns true if there is another level up and sets the health,stamina and magicka values
 	bool isNthLevelUp(StaticFunctionTag* base, BSFixedString levelUpsString, UInt32 n)
 	{
-		debug.write(ENTRY, "isNthLevelUp()");
+
 		if (std::string(levelUpsString.data) == "")
 		{
-			debug.write(EXIT, "isNthLevelUp()");
 			return FALSE;
 		}
 		std::vector<std::string> levelUps = split(levelUpsString.data, ITEM_SEPARATOR);
 		if (n >= levelUps.size())
 		{
-			debug.write(EXIT, "isNthLevelUp()");
 			return FALSE;
 		}
-		debug.write(EXIT, "isNthLevelUp()");
 		return TRUE;
 	}
 
 	//Returns the health, stamina or magicka component of the given level up
 	UInt32 getLevelComponent(StaticFunctionTag* base, BSFixedString levelUpsString, UInt32 n, BSFixedString type)
 	{
-		debug.write(ENTRY, "getLevelComponent()");
 		std::vector<std::string> levelUps = split(levelUpsString.data, ITEM_SEPARATOR);
 		std::vector<std::string> levelUpComponents = split(levelUps.at(n), FIELD_SEPARATOR);
 		int levelComponent = std::stoi(levelUpComponents.at(2));
@@ -197,24 +183,20 @@ namespace plugin
 		{
 			levelComponent = std::stoi(levelUpComponents.at(1));
 		}
-		debug.write(EXIT, "getLevelComponent()");
 		return levelComponent;
 	}
 
 	//Returns the outstanding level as a string
 	BSFixedString getOutstandingLevel(StaticFunctionTag* base, BSFixedString levelUpsString)
 	{
-		debug.write(ENTRY, "getOutstandingLevel()");
 		std::vector<std::string> levelUps = split(levelUpsString.data, ITEM_SEPARATOR);
 		BSFixedString outstandingLevel = levelUps.at(0).c_str();
-		debug.write(EXIT, "getOutstandingLevel()");
 		return outstandingLevel;
 	}
 
 	//Makes a service call to fetch workouts
 	void startNormalFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
 	{
-		debug.write(ENTRY, "startNormalFetch()");
 		ConfigHandler config;
 		std::string fromDate = config.getConfigProperty("lastSyncDate");
 		std::string toDate = std::to_string(currentDate());
@@ -224,13 +206,11 @@ namespace plugin
 			config.setConfigProperty("startDate", toDate);
 		}
 		makeServiceCall("NORMAL", username.data, fromDate, toDate);
-		debug.write(EXIT, "startNormalFetch()");
 	}
 
 	//Starts the poll for new workouts when the user requests a check
 	bool startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
 	{
-		debug.write(ENTRY, "startForceFetch");
 
 		//Start the headless browser by making the force fetch request
 		makeServiceCall("FORCE_FETCH", username.data, "0", "0");
@@ -239,14 +219,12 @@ namespace plugin
 		{
 			return true;
 		}
-		debug.write(EXIT, "startForceFetch");
 		return false;
 	}
 
 	//Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
 	BSFixedString getWorkoutsString(StaticFunctionTag* base, UInt32 level)
 	{
-		debug.write(ENTRY, "getWorkoutsString()");
 		rawData.refresh();
 		BSFixedString workouts;
 		if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
@@ -257,13 +235,11 @@ namespace plugin
 			{
 				workouts = "Prior Workout";
 			}
-			debug.write(WRITE, "firstFetch");
 		}
 		else
 		{
 			workouts = updateWeeks(level).c_str();
 		}
-		debug.write(EXIT, "getWorkoutsString()");
 		return workouts;
 	}
 
@@ -274,16 +250,10 @@ namespace plugin
 		return rawData.getWorkoutCount();
 	}
 
-	//Allows papyrus to read the config
-	BSFixedString getConfigProperty(StaticFunctionTag* base, BSFixedString propertyName)
-	{
-		return config.getConfigProperty(propertyName.data).c_str();
-	}
-
 	//Allows papyrus to clear the debug
 	void clearDebug(StaticFunctionTag* base)
 	{
-		debug.clear();
+
 	}
 
 	//Checks if the given username is valid
@@ -306,29 +276,24 @@ namespace plugin
 		{
 			shortenedUsername = usernameString.substr(0, 8) + "...";
 		}
-		debug.write(WRITE,shortenedUsername);
 		return shortenedUsername.c_str();
 	}
 
 	//Virtually presses the given key
 	void pressKey(StaticFunctionTag* base, BSFixedString key)
 	{
-		debug.write(ENTRY, "pressKey()");
 		INPUT input;
 		WORD vkey = 0x57;
 		if (std::string("VK_TAB").compare(key.data) == 0)
 		{
 			vkey = VK_TAB;
-			debug.write(WRITE, "TAB");
 		}
 		else if (std::string("VK_UP").compare(key.data) == 0)
 		{
 			vkey = 0x57;
-			debug.write(WRITE, "UP");
 		}
 		else
 		{
-			debug.write(WRITE, "ENTER");
 		}
 
 		input.type = INPUT_KEYBOARD;
@@ -344,7 +309,6 @@ namespace plugin
 		//Release Key
 		input.ki.dwFlags = KEYEVENTF_KEYUP;
 		SendInput(1, &input, sizeof(INPUT));
-		debug.write(EXIT, "pressKey()");
 	}
 
 	/**********************************************************************************************************
@@ -386,9 +350,6 @@ namespace plugin
 
 		registry->RegisterFunction(
 			new NativeFunction0 <StaticFunctionTag, UInt32>("getRawDataWorkoutCount", "PluginScript", plugin::getRawDataWorkoutCount, registry));
-		
-		registry->RegisterFunction(
-			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getConfigProperty", "PluginScript", plugin::getConfigProperty, registry));
 
 		registry->RegisterFunction(
 			new NativeFunction0 <StaticFunctionTag, void>("clearDebug", "PluginScript", plugin::clearDebug, registry));

@@ -40,9 +40,6 @@ namespace plugin
 	//Returns the number of workouts in the raw data file
 	UInt32 getRawDataWorkoutCount(StaticFunctionTag* base);
 
-	//Allows papyrus to read the config
-	BSFixedString getConfigProperty(StaticFunctionTag* base, BSFixedString propertyName);
-
 	//Allows papyrus to clear the debug
 	void clearDebug(StaticFunctionTag* base);
 
