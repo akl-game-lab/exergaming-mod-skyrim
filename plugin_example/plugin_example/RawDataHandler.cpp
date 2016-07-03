@@ -21,7 +21,11 @@ void RawDataHandler::clear()
 
 int RawDataHandler::getWorkoutCount()
 {
-	return data["data"]["workouts"].size();
+	debug.entry();
+	int count = data["data"]["workouts"].size();
+	debug.write(std::to_string(count));
+	debug.exit();
+	return count;
 }
 
 json RawDataHandler::getWorkout(int workoutNumber)

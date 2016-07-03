@@ -1,5 +1,8 @@
 #include <fstream>
 #include <sstream>
+
+#ifndef __DEBUGHANDLER_H_INCLUDED__
+#define __DEBUGHANDLER_H_INCLUDED__
 class DebugHandler {
 private:
 	int treeDepth;
@@ -21,3 +24,4 @@ public:
 	//Clears the debug log
 	void clear();
 };
+#endif

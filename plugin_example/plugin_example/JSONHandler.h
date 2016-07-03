@@ -1,5 +1,6 @@
 #include "fstream"
 #include "json.hpp"
+#include "DebugHandler.h"
 using json = nlohmann::json;
 
 #ifndef __JSONHANDLER_H_INCLUDED__
@@ -9,11 +10,11 @@ class JSONHandler
 protected:
 	std::string filePath;
 	json data;
+	DebugHandler debug;
 
-public:
 	//Checks if the given file exists
 	bool fileExists(const std::string& name);
-
+	
 	//Gets a json object from the given file
 	json getJSON(std::string fileName);
 

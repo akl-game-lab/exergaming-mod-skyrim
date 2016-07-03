@@ -167,3 +167,6 @@ Interface/test1.dds
 Interface/test2.dds
 Interface/testImage.swf
 *.xml
+plugin_example/test_suite/
+!plugin_example/test_suite/test_suite.cpp
+*.ipch

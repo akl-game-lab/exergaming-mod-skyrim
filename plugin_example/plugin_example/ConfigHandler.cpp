@@ -1,5 +1,4 @@
 #include "ConfigHandler.h"
-
 ConfigHandler::ConfigHandler()
 {
 	filePath = "Config.json";

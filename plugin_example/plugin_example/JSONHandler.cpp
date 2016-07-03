@@ -28,7 +28,7 @@ json JSONHandler::getJSON(std::string fileName)
 //Saves the given json object to the given file
 void JSONHandler::saveJSON(std::string fileName, json data)
 {
-	std::ofstream outputFile(fileName + ".json");
+	std::ofstream outputFile(fileName);
 	outputFile << data.dump(4).c_str();
 	outputFile.close();
 }

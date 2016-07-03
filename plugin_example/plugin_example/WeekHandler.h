@@ -1,5 +1,7 @@
 #include "JSONHandler.h"
 
+#ifndef __WEEKHANDLER_H_INCLUDED__
+#define __WEEKHANDLER_H_INCLUDED__
 namespace
 {
 	int SECONDS_PER_DAY = 86400;
@@ -27,3 +29,4 @@ public:
 	//Returns the number of weeks currently stored
 	int getWeekCount();
 };
+#endif

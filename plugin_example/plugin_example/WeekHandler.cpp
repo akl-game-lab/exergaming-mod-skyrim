@@ -1,5 +1,4 @@
 #include "WeekHandler.h"
-
 WeekHandler::WeekHandler()
 {
 	filePath = "Weeks.json";

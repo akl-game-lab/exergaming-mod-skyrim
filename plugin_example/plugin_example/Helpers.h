@@ -1,10 +1,11 @@
 #include "Windows.h"
 #include "ShellApi.h"
 #include "ctime"
+#include "tchar.h"
 #include "vector"
 #include "json.hpp"
-#include "DebugHandler.h"
 #include "ConfigHandler.h"
+#include "DebugHandler.h"
 #include "RawDataHandler.h"
 #include "WeekHandler.h"
 
@@ -12,6 +13,8 @@ using json = nlohmann::json;
 
 namespace plugin
 {
+
+	DebugHandler debug;
 	/**********************************************************************************************************
 	*	Globals
 	*/
@@ -50,54 +53,6 @@ namespace plugin
 		std::string stamina = workout["stamina"];
 		std::string magicka = workout["magicka"];
 		return weight + "," + health + "," + stamina + "," + magicka;
-	}
-
-	std::string getWorkoutsFromBestWeek(time_t creationDate)
-	{
-		int weekCount = weekHandler.getWeekCount();
-		float bestWeeksWeight = 0;
-		std::string bestWeeksWorkouts = "0,0,0,0";
-
-		if (weekCount != 0) {
-			for (int weekNumber = 0; weekNumber < weekCount; weekNumber++)
-			{
-				time_t weekStartDate = weekHandler.getWeekStart(weekNumber);
-
-				//if the week in frame is after the creation date or is the week the save was made
-				if(weekHandler.getWeekStart(weekNumber) > creationDate || 
-					(weekHandler.getWeekStart(weekNumber) < creationDate && creationDate - weekHandler.getWeekStart(weekNumber) < SECONDS_PER_WEEK))
-				{
-					float thisWeeksWeight = 0;
-					std::string thisWeeksWorkouts = "";
-					json workouts = weekHandler.getWorkoutsFromWeek(weekNumber);
-
-					//for each workout
-					for (int workoutNumber = 0; workoutNumber < workouts.size(); workoutNumber++)
-					{
-						json workout(workouts[workoutNumber]);
-						//if it was done on a day of the week after that of the creation date add the weight to the total weight for this week
-						if ((time_t)workout["workoutDate"] >= creationDate) {
-							thisWeeksWeight += workout["weight"];
-							if (workoutNumber > 0)
-							{
-								thisWeeksWorkouts = thisWeeksWorkouts + ";";
-							}
-							thisWeeksWorkouts = thisWeeksWorkouts + workoutToString(workout);
-						}
-					}
-
-					//if this week is better update the best week
-					if (thisWeeksWeight > bestWeeksWeight)
-					{
-						bestWeeksWeight = thisWeeksWeight;
-						bestWeeksWorkouts = thisWeeksWorkouts;
-					}
-				}
-			}
-		}
-
-		//return the selected best weeks workouts as a string from the day of the week the save was made (format is W,H,S,M;W,H,S,M...).
-		return bestWeeksWorkouts;
 	}
 
 	//Returns the week number that the workout date passed is in where week 1 is the week that the first workout was synced
@@ -207,6 +162,7 @@ namespace plugin
 	void makeServiceCall(std::string type, std::string username, std::string fromDate, std::string toDate)
 	{
 		rawData.clear();
+		
 		std::string exeParams = type + " " + username + " " + fromDate + " " + toDate;
 		LPCSTR swExeParams = exeParams.c_str();
 
@@ -214,19 +170,52 @@ namespace plugin
 		std::string exePath = WEB_SERVICE_DIR + "\\webserviceTest.exe";
 		LPCSTR swExePath = exePath.c_str();
 
+		
 		//Execute the code that fetches the xml and stores it in the skyrim folder.
 		SHELLEXECUTEINFO ShExecInfo = { 0 };
 		ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 		ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
 		ShExecInfo.hwnd = NULL;
 		ShExecInfo.lpVerb = NULL;
-		ShExecInfo.lpFile = swExePath;
-		ShExecInfo.lpParameters = swExeParams;
+		ShExecInfo.lpFile = (LPCTSTR)swExePath;
+		ShExecInfo.lpParameters = (LPCTSTR)swExeParams;
 		ShExecInfo.lpDirectory = NULL;
 		ShExecInfo.nShow = SW_SHOWMINNOACTIVE;
 		ShExecInfo.hInstApp = NULL;
 		ShellExecuteEx(&ShExecInfo);
 		WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+		
+
+
+		/*
+		// additional information
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+
+		// set the size of the structures
+		ZeroMemory(&si, sizeof(si));
+		si.cb = sizeof(si);
+		ZeroMemory(&pi, sizeof(pi));
+		std::string cmdString = "\"" + exePath + "\" " + exeParams;
+		LPCWSTR cmd = s2ws(cmdString);
+
+		// start the program up
+		CreateProcess(
+			NULL,   // the path
+			TEXT(cmd),        // Command line
+			NULL,           // Process handle not inheritable
+			NULL,           // Thread handle not inheritable
+			FALSE,          // Set handle inheritance to FALSE
+			0,              // No creation flags
+			NULL,           // Use parent's environment block
+			NULL,           // Use parent's starting directory 
+			&si,            // Pointer to STARTUPINFO structure
+			&pi           // Pointer to PROCESS_INFORMATION structure
+			);
+			// Close process and thread handles. 
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);*/
+
 		rawData.refresh();
 	}
 
@@ -246,7 +235,7 @@ namespace plugin
 			workout["weight"] = configure(workout, level);
 			if ((int)workout["weight"] > 0)
 			{
-				weekHandler.addWorkout(std::stoi(config.getConfigProperty("startDate")),workout);
+				weekHandler.addWorkout(std::stoi(config.getConfigProperty("startDate")), workout);
 
 				if (workoutNumber > 0)
 				{

@@ -1,5 +1,7 @@
 #include "JSONHandler.h"
 
+#ifndef __CONFIGHANDLER_H_INCLUDED__
+#define __CONFIGHANDLER_H_INCLUDED__
 class ConfigHandler : public JSONHandler{
 public:
 	ConfigHandler();
@@ -8,3 +10,4 @@ public:
 
 	void setConfigProperty(std::string propertyName, std::string value);
 };
+#endif
