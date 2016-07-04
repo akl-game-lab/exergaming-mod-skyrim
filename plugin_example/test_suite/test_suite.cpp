@@ -1,13 +1,23 @@
 // test_suite.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
+#include "plugin_library\PluginLibrary.h"
 #include "iostream"
-#include "PluginFunctions.h"
+#include "string"
 
-using namespace plugin;
+PluginFunctions pluginFunctions;
+
 int main()
 {
+	std::cout << "Testing isOldSave()\n";
+	if (pluginFunctions.isOldSave(pluginFunctions.currentDate()))
+	{
+		std::cout << "Failure";
+	}
+	else
+	{
+		std::cout << "Success";
+	}
 	getchar();
 }
 

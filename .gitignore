@@ -170,3 +170,14 @@ Interface/testImage.swf
 plugin_example/test_suite/
 !plugin_example/test_suite/test_suite.cpp
 *.ipch
+plugin_example/Release/
+*.vcxproj
+*.filters
+plugin_example/plugin_library/dllmain.cpp
+plugin_example/plugin_library/json.hpp
+plugin_example/plugin_library/stdafx.cpp
+plugin_example/plugin_library/stdafx.h
+plugin_example/plugin_library/targetver.h
+*.idb
+*.pdb
+*.txt
