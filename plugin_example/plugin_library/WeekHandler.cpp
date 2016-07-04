@@ -4,6 +4,12 @@ WeekHandler::WeekHandler()
 {
 	filePath = "Weeks.json";
 	data = getJSON(filePath);
+	if (!fileExists(filePath))
+	{
+		data = {
+			"weeks"
+		};
+	}
 }
 
 void WeekHandler::addWeek(time_t startDate, time_t workoutDate)

@@ -1,4 +1,4 @@
-﻿  ConfigHandler.cpp
+﻿  WeekHandler.cpp
 c:\program files (x86)\steam\steamapps\common\skyrim\data\plugin_example\plugin_library\debughandler.h(15): warning C4251: 'DebugHandler::lineStart': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
   c:\program files (x86)\microsoft visual studio 14.0\vc\include\xstring(2633): note: see declaration of 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'
 c:\program files (x86)\steam\steamapps\common\skyrim\data\plugin_example\plugin_library\debughandler.h(16): warning C4251: 'DebugHandler::debugFile': class 'std::basic_fstream<char,std::char_traits<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'

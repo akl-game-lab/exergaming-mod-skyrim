@@ -13,8 +13,8 @@ class MYLIBRARY_EXPORT ConfigHandler : public JSONHandler{
 public:
 	ConfigHandler();
 
-	std::string getConfigProperty(std::string propertyName);
+	__int64 getConfigProperty(std::string propertyName);
 
-	void setConfigProperty(std::string propertyName, std::string value);
+	void setConfigProperty(std::string propertyName, int value);
 };
 #endif

@@ -48,22 +48,22 @@ float PluginFunctions::configure(json workout, int level)
 	int estimatedLevelsPerWeek = 3;
 	float levelsGained = 0;
 
-	__int64 startDate = _atoi64(config.getConfigProperty("startDate").c_str());
-	__int64 lastWorkoutDate = _atoi64(config.getConfigProperty("lastWorkoutDate").c_str());
-	__int64 firstWorkoutDate = _atoi64(config.getConfigProperty("firstWorkoutDate").c_str());
+	time_t startDate = config.getConfigProperty("startDate");
+	time_t lastWorkoutDate = config.getConfigProperty("lastWorkoutDate");
+	time_t firstWorkoutDate = config.getConfigProperty("firstWorkoutDate");
 
-	int workoutCount = std::stoi(config.getConfigProperty("workoutCount").c_str());
-	int weeksWorkedOut = std::stoi(config.getConfigProperty("weeksWorkedOut").c_str());
-	int avgPointsPerWorkout = std::stoi(config.getConfigProperty("avgPointsPerWorkout").c_str());
-	int totalPoints = std::stoi(config.getConfigProperty("totalPoints").c_str());
-	int workoutsThisWeek = std::stoi(config.getConfigProperty("workoutsThisWeek").c_str());
+	int workoutCount = config.getConfigProperty("workoutCount");
+	int weeksWorkedOut = config.getConfigProperty("weeksWorkedOut");
+	int avgPointsPerWorkout = config.getConfigProperty("avgPointsPerWorkout");
+	int totalPoints = config.getConfigProperty("totalPoints");
+	int workoutsThisWeek = config.getConfigProperty("workoutsThisWeek");
 
 	int workoutPoints = (int)workout["health"] + (int)workout["stamina"] + (int)workout["magicka"];
 
 	if (firstWorkoutDate == 0 && workoutCount == 0 && (int)workout["workoutDate"] > startDate)
 	{
 		firstWorkoutDate = workout["workoutDate"];
-		config.setConfigProperty("firstWorkoutDate", std::to_string(firstWorkoutDate));
+		config.setConfigProperty("firstWorkoutDate", firstWorkoutDate);
 	}
 
 	int workoutsWeek = getWeekForWorkout(firstWorkoutDate, workout["workoutDate"]);
@@ -72,7 +72,7 @@ float PluginFunctions::configure(json workout, int level)
 	//if workout is for before the player synced their account
 	if ((int)workout["workoutDate"] < startDate || (int)workout["workoutDate"] < firstWorkoutDate)
 	{
-		config.setConfigProperty("lastSyncDate", std::to_string(currentDate()));
+		config.setConfigProperty("lastSyncDate", currentDate());
 		return 0;
 	}
 	else
@@ -118,13 +118,13 @@ float PluginFunctions::configure(json workout, int level)
 		}
 	}
 
-	config.setConfigProperty("lastSyncDate", std::to_string(currentDate()));
-	config.setConfigProperty("workoutCount", std::to_string(workoutCount));
-	config.setConfigProperty("weeksWorkedOut", std::to_string(weeksWorkedOut));
-	config.setConfigProperty("avgPointsPerWorkout", std::to_string(avgPointsPerWorkout));
-	config.setConfigProperty("totalPoints", std::to_string(totalPoints));
-	config.setConfigProperty("workoutsThisWeek", std::to_string(workoutsThisWeek));
-	config.setConfigProperty("lastWorkoutDate", std::to_string(lastWorkoutDate));
+	config.setConfigProperty("lastSyncDate", currentDate());
+	config.setConfigProperty("workoutCount", workoutCount);
+	config.setConfigProperty("weeksWorkedOut", weeksWorkedOut);
+	config.setConfigProperty("avgPointsPerWorkout", avgPointsPerWorkout);
+	config.setConfigProperty("totalPoints", totalPoints);
+	config.setConfigProperty("workoutsThisWeek", workoutsThisWeek);
+	config.setConfigProperty("lastWorkoutDate", lastWorkoutDate);
 	return levelsGained;
 }
 
@@ -171,9 +171,9 @@ std::string PluginFunctions::updateWeeks(int level)
 		json workout = rawData.getWorkout(workoutNumber);
 		//adjust the config to account for the new workout and gets the workouts weight
 		workout["weight"] = configure(workout, level);
-		if ((int)workout["weight"] > 0)
+		if ((float)workout["weight"] > 0)
 		{
-			weekHandler.addWorkout(std::stoi(config.getConfigProperty("startDate")), workout);
+			weekHandler.addWorkout((time_t)config.getConfigProperty("startDate"), workout);
 
 			if (workoutNumber > 0)
 			{
@@ -193,8 +193,8 @@ std::string PluginFunctions::updateWeeks(int level)
 //Checks if the current save is old
 bool PluginFunctions::isOldSave(int creationDate)
 {
-	std::string lastSyncDate = config.getConfigProperty("lastSyncDate");
-	return creationDate < _atoi64(lastSyncDate.c_str());
+	int lastSyncDate = config.getConfigProperty("lastSyncDate");
+	return creationDate < lastSyncDate;
 }
 
 //Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
@@ -404,12 +404,12 @@ void PluginFunctions::startNormalFetch(std::string gameID, std::string username)
 {
 	debug.entry();
 	ConfigHandler config;
-	std::string fromDate = config.getConfigProperty("lastSyncDate");
+	std::string fromDate = std::to_string(config.getConfigProperty("lastSyncDate"));
 	std::string toDate = std::to_string(currentDate());
-	if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
+	if (config.getConfigProperty("startDate") == 0)
 	{
 		toDate = std::to_string((currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY);
-		config.setConfigProperty("startDate", toDate);
+		config.setConfigProperty("startDate", currentDate());
 	}
 	//makeServiceCall("NORMAL", username, fromDate, toDate);
 	debug.exit();
@@ -433,9 +433,9 @@ std::string PluginFunctions::getWorkoutsString(int level)
 {
 	rawData.refresh();
 	std::string workouts;
-	if (_atoi64(config.getConfigProperty("startDate").c_str()) == 0)
+	if (config.getConfigProperty("startDate") == 0)
 	{
-		std::string startDate = std::to_string((currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY);
+		int startDate = (currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY;
 		config.setConfigProperty("startDate", startDate);
 		if (rawData.getWorkoutCount() > 0)
 		{
@@ -459,7 +459,7 @@ int PluginFunctions::getRawDataWorkoutCount()
 //Allows papyrus to clear the debug
 void PluginFunctions::clearDebug()
 {
-
+	debug.clear();
 }
 
 //Checks if the given username is valid
