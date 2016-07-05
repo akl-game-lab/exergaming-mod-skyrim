@@ -181,3 +181,4 @@ plugin_example/plugin_library/targetver.h
 *.idb
 *.pdb
 *.txt
+plugin_example/plugin_library/Debug/

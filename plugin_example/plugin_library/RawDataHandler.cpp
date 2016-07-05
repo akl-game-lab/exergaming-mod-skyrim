@@ -9,14 +9,36 @@ RawDataHandler::RawDataHandler()
 void RawDataHandler::refresh()
 {
 	data = getJSON(filePath);
+	if (data.empty())
+	{
+		getDefaultRawData();
+	}
+}
+
+void RawDataHandler::getDefaultRawData()
+{
+	json workout = {
+		{"health",0},
+		{"magicka",0},
+		{"stamina",0},
+		{"syncDate",0},
+		{"workoutDate",0}
+	};
+
+	json workouts = {
+		{"workouts",json::array({workout})}
+	};
+
+	data = {
+		{"data",workouts}
+	};
+
+	saveJSON(filePath,data);
 }
 
 void RawDataHandler::clear()
 {
-	std::ofstream rawDataFile;
-	rawDataFile.open(filePath);
-	rawDataFile << "";
-	rawDataFile.close();
+	data = {};
 }
 
 int RawDataHandler::getWorkoutCount()
@@ -46,4 +68,11 @@ std::string RawDataHandler::getResponseCode()
 		return errorCode;
 	}
 	return "200";
+}
+
+void RawDataHandler::setData(json newData)
+{
+	clear();
+	data = newData;
+	saveJSON(filePath, newData);
 }

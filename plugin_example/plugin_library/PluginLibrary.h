@@ -27,7 +27,7 @@ int STAMINA = 2;
 int MAGICKA = 3;
 char ITEM_SEPARATOR = ';';
 char FIELD_SEPARATOR = ',';
-std::string WEB_SERVICE_DIR = "Data\\webserviceTest\\Release";
+std::string WEB_SERVICE_DIR = "Data\\SKSE\\Plugins";
 
 class MYLIBRARY_EXPORT PluginFunctions
 {

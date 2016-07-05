@@ -411,7 +411,7 @@ void PluginFunctions::startNormalFetch(std::string gameID, std::string username)
 		toDate = std::to_string((currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY);
 		config.setConfigProperty("startDate", currentDate());
 	}
-	//makeServiceCall("NORMAL", username, fromDate, toDate);
+	makeServiceCall("NORMAL", username, fromDate, toDate);
 	debug.exit();
 }
 

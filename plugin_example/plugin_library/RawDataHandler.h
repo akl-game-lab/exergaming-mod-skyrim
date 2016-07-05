@@ -16,6 +16,8 @@ public:
 
 	void refresh();
 
+	void getDefaultRawData();
+
 	void clear();
 
 	int getWorkoutCount();
@@ -23,5 +25,7 @@ public:
 	json getWorkout(int workoutNumber);
 
 	std::string getResponseCode();
+
+	void setData(json newData);
 };
 #endif

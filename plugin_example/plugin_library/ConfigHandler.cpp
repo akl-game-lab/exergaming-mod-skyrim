@@ -32,5 +32,5 @@ __int64 ConfigHandler::getConfigProperty(std::string propertyName)
 void ConfigHandler::setConfigProperty(std::string propertyName, int value)
 {
 	data[propertyName] = value;
-	saveJSON(filePath, data);
+	saveJSON(data, filePath);
 }
