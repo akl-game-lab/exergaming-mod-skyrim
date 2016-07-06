@@ -18,24 +18,16 @@ std::vector<std::string> PluginFunctions::split(const std::string &s, char delim
 //Converts a json representation of a workout to a formatted string
 std::string PluginFunctions::workoutToString(json workout)
 {
-	std::string weight = workout["weight"];
-	std::string health = workout["health"];
-	std::string stamina = workout["stamina"];
-	std::string magicka = workout["magicka"];
+	std::string weight = std::to_string((int)workout["weight"]);
+	std::string health = std::to_string((int)workout["health"]);
+	std::string stamina = std::to_string((int)workout["stamina"]);
+	std::string magicka = std::to_string((int)workout["magicka"]);
 	return weight + "," + health + "," + stamina + "," + magicka;
 }
 
 //Returns the week number that the workout date passed is in where week 1 is the week that the first workout was synced
-int PluginFunctions::getWeekForWorkout(long int firstTime, long int workoutTime) {
-	return (((workoutTime - firstTime) / 604800) + 1);
-}
-
-//Returns the current date
-__int64 PluginFunctions::currentDate()
-{
-	time_t t;
-	time(&t);
-	return t;
+int PluginFunctions::getWeekForWorkout(__int64 firstTime, __int64 workoutTime) {
+	return (((workoutTime - firstTime) / SECONDS_PER_WEEK) + 1);
 }
 
 //Returns a float representation of the number of levels gained from the workout passed to the method
@@ -48,9 +40,9 @@ float PluginFunctions::configure(json workout, int level)
 	int estimatedLevelsPerWeek = 3;
 	float levelsGained = 0;
 
-	time_t startDate = config.getConfigProperty("startDate");
-	time_t lastWorkoutDate = config.getConfigProperty("lastWorkoutDate");
-	time_t firstWorkoutDate = config.getConfigProperty("firstWorkoutDate");
+	__int64 startDate = config.getConfigProperty("startDate");
+	__int64 lastWorkoutDate = config.getConfigProperty("lastWorkoutDate");
+	__int64 firstWorkoutDate = config.getConfigProperty("firstWorkoutDate");
 
 	int workoutCount = config.getConfigProperty("workoutCount");
 	int weeksWorkedOut = config.getConfigProperty("weeksWorkedOut");
@@ -60,7 +52,7 @@ float PluginFunctions::configure(json workout, int level)
 
 	int workoutPoints = (int)workout["health"] + (int)workout["stamina"] + (int)workout["magicka"];
 
-	if (firstWorkoutDate == 0 && workoutCount == 0 && (int)workout["workoutDate"] > startDate)
+	if (firstWorkoutDate == 0 && workoutCount == 0 && (__int64)workout["workoutDate"] > startDate)
 	{
 		firstWorkoutDate = workout["workoutDate"];
 		config.setConfigProperty("firstWorkoutDate", firstWorkoutDate);
@@ -140,7 +132,6 @@ void PluginFunctions::makeServiceCall(std::string type, std::string username, st
 	std::string exePath = WEB_SERVICE_DIR + "\\webserviceTest.exe";
 	LPCSTR swExePath = exePath.c_str();
 
-
 	//Execute the code that fetches the xml and stores it in the skyrim folder.
 	SHELLEXECUTEINFO ShExecInfo = { 0 };
 	ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
@@ -173,7 +164,7 @@ std::string PluginFunctions::updateWeeks(int level)
 		workout["weight"] = configure(workout, level);
 		if ((float)workout["weight"] > 0)
 		{
-			weekHandler.addWorkout((time_t)config.getConfigProperty("startDate"), workout);
+			weekHandler.addWorkout(workout);
 
 			if (workoutNumber > 0)
 			{
@@ -183,12 +174,21 @@ std::string PluginFunctions::updateWeeks(int level)
 			workoutsAsString = workoutsAsString + workoutToString(workout);
 		}
 	}
+
 	return workoutsAsString;
 }
 	
 /**********************************************************************************************************
 *	Functions
 */
+
+//Returns the current date
+__int64 PluginFunctions::currentDate()
+{
+	time_t t;
+	time(&t);
+	return t;
+}
 
 //Checks if the current save is old
 bool PluginFunctions::isOldSave(int creationDate)
@@ -198,7 +198,7 @@ bool PluginFunctions::isOldSave(int creationDate)
 }
 
 //Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
-std::string PluginFunctions::getWorkoutsFromBestWeek(time_t creationDate)
+std::string PluginFunctions::getWorkoutsFromBestWeek(__int64 creationDate)
 {
 	int weekCount = weekHandler.getWeekCount();
 	float bestWeeksWeight = 0;
@@ -207,11 +207,11 @@ std::string PluginFunctions::getWorkoutsFromBestWeek(time_t creationDate)
 	if (weekCount != 0) {
 		for (int weekNumber = 0; weekNumber < weekCount; weekNumber++)
 		{
-			time_t weekStartDate = weekHandler.getWeekStart(weekNumber);
+			__int64 weekStartDate = weekHandler.getWeekStart(weekNumber);
 
 			//if the week in frame is after the creation date or is the week the save was made
-			if (weekHandler.getWeekStart(weekNumber) > creationDate ||
-				(weekHandler.getWeekStart(weekNumber) < creationDate && creationDate - weekHandler.getWeekStart(weekNumber) < SECONDS_PER_WEEK))
+			if (weekStartDate > creationDate ||
+				(weekStartDate < creationDate && creationDate - weekStartDate < SECONDS_PER_WEEK))
 			{
 				float thisWeeksWeight = 0;
 				std::string thisWeeksWorkouts = "";
@@ -221,8 +221,9 @@ std::string PluginFunctions::getWorkoutsFromBestWeek(time_t creationDate)
 				for (int workoutNumber = 0; workoutNumber < workouts.size(); workoutNumber++)
 				{
 					json workout(workouts[workoutNumber]);
+					__int64 workoutDate = (__int64)workout["workoutDate"];
 					//if it was done on a day of the week after that of the creation date add the weight to the total weight for this week
-					if ((time_t)workout["workoutDate"] >= creationDate) {
+					if (workoutDate >= creationDate && weekHandler.getDayOfWeek(workoutDate) >= weekHandler.getDayOfWeek(creationDate)) {
 						thisWeeksWeight += workout["weight"];
 						if (workoutNumber > 0)
 						{
@@ -400,7 +401,7 @@ std::string PluginFunctions::getOutstandingLevel(std::string levelUpsString)
 }
 
 //Makes a service call to fetch workouts
-void PluginFunctions::startNormalFetch(std::string gameID, std::string username)
+int PluginFunctions::startNormalFetch(std::string gameID, std::string username)
 {
 	debug.entry();
 	ConfigHandler config;
@@ -408,11 +409,12 @@ void PluginFunctions::startNormalFetch(std::string gameID, std::string username)
 	std::string toDate = std::to_string(currentDate());
 	if (config.getConfigProperty("startDate") == 0)
 	{
-		toDate = std::to_string((currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY);
-		config.setConfigProperty("startDate", currentDate());
+		toDate = std::to_string(currentDate());
+		config.setConfigProperty("startDate", weekHandler.getStartOfDay(currentDate()));
 	}
 	makeServiceCall("NORMAL", username, fromDate, toDate);
 	debug.exit();
+	return 345;
 }
 
 //Starts the poll for new workouts when the user requests a check
@@ -431,6 +433,7 @@ bool PluginFunctions::startForceFetch(std::string gameID, std::string username)
 //Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
 std::string PluginFunctions::getWorkoutsString(int level)
 {
+	debug.entry();
 	rawData.refresh();
 	std::string workouts;
 	if (config.getConfigProperty("startDate") == 0)
@@ -446,6 +449,7 @@ std::string PluginFunctions::getWorkoutsString(int level)
 	{
 		workouts = updateWeeks(level).c_str();
 	}
+	debug.exit();
 	return workouts;
 }
 

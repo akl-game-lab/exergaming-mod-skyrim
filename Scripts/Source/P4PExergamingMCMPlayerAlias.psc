@@ -27,7 +27,8 @@ event OnPlayerLoadGame()
 		if(oldSaveLoaded == true)
 			showDebugMessage("Old save detected.")
 		endIf
-		startNormalFetch("Skyrim",syncedUserName)
+		showDebugMessage(100);
+		showDebugMessage(startNormalFetch("Skyrim",syncedUserName));
 		normalFetchMade = true
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)

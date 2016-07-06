@@ -1,11 +1,5 @@
 #include "JSONHandler.h"
 
-#ifdef COMPILE_MYLIBRARY   
-#define MYLIBRARY_EXPORT __declspec(dllexport) 
-#else   
-#define MYLIBRARY_EXPORT __declspec(dllimport) 
-#endif
-
 #ifndef __WEEKHANDLER_H_INCLUDED__
 #define __WEEKHANDLER_H_INCLUDED__
 namespace
@@ -14,7 +8,7 @@ namespace
 	int SECONDS_PER_WEEK = 604800;
 }
 
-class MYLIBRARY_EXPORT WeekHandler : public JSONHandler
+class WeekHandler : public JSONHandler
 {
 public:
 	WeekHandler();

@@ -3,13 +3,7 @@
 #ifndef __CONFIGHANDLER_H_INCLUDED__
 #define __CONFIGHANDLER_H_INCLUDED__
 
-#ifdef COMPILE_MYLIBRARY   
-#define MYLIBRARY_EXPORT __declspec(dllexport) 
-#else   
-#define MYLIBRARY_EXPORT __declspec(dllimport) 
-#endif
-
-class MYLIBRARY_EXPORT ConfigHandler : public JSONHandler{
+class ConfigHandler : public JSONHandler{
 public:
 	ConfigHandler();
 

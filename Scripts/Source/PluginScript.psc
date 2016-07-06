@@ -22,7 +22,7 @@ int function getLevelComponent(string levelUpsString, int n, string type) global
 string function getOutstandingLevel(string levelUpsString) global native
 
 ;Makes a service call to fetch workouts
-function startNormalFetch(string gameID, string username) global native
+int function startNormalFetch(string gameID, string username) global native
 
 ;Starts the poll for new workouts when the user requests a check
 bool function startForceFetch(string gameID, string username) global native

@@ -9,31 +9,6 @@ RawDataHandler::RawDataHandler()
 void RawDataHandler::refresh()
 {
 	data = getJSON();
-	if (data.empty())
-	{
-		getDefaultRawData();
-	}
-}
-
-void RawDataHandler::getDefaultRawData()
-{
-	json workout = {
-		{"health",0},
-		{"magicka",0},
-		{"stamina",0},
-		{"syncDate",0},
-		{"workoutDate",0}
-	};
-
-	json workouts = {
-		{"workouts",json::array({workout})}
-	};
-
-	data = {
-		{"data",workouts}
-	};
-
-	saveJSON();
 }
 
 void RawDataHandler::clear()
