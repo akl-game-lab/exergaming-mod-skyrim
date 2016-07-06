@@ -6,7 +6,14 @@ using json = nlohmann::json;
 
 #ifndef __JSONHANDLER_H_INCLUDED__
 #define __JSONHANDLER_H_INCLUDED__
-class JSONHandler
+
+#ifdef COMPILE_MYLIBRARY   
+#define MYLIBRARY_EXPORT __declspec(dllexport) 
+#else   
+#define MYLIBRARY_EXPORT __declspec(dllimport) 
+#endif
+
+class MYLIBRARY_EXPORT JSONHandler
 {
 protected:
 	std::string filePath;

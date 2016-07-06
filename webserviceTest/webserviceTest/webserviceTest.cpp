@@ -98,11 +98,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	std::string username = toString(szArgList[2]);
 	std::string url = URL_BASE + username + "/forceUpdate";
 
-	if (type == "NORMAL"){
+	if (type.compare("NORMAL") == 0){
 		std::string fromDate = toString(szArgList[3]);
 		std::string toDate = toString(szArgList[4]);
 		url = URL_BASE + username + "/workouts/hsm/" + fromDate + "/" + toDate;
 	}
+
+	reportFile << type + "\n";
 
 	LocalFree(szArgList);
 

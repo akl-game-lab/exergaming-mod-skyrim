@@ -16,205 +16,103 @@ using json = nlohmann::json;
 *	Globals
 */
 
-int WEIGHT = 0;
-int HEALTH = 1;
-int STAMINA = 2;
-int MAGICKA = 3;
-char ITEM_SEPARATOR = ';';
-char FIELD_SEPARATOR = ',';
-std::string WEB_SERVICE_DIR = "Data\\webserviceTest\\Release";
+#ifdef COMPILE_MYLIBRARY   
+#define MYLIBRARY_EXPORT __declspec(dllexport) 
+#else   
+#define MYLIBRARY_EXPORT __declspec(dllimport) 
+#endif
 
-/**********************************************************************************************************
-*	Handlers
-*/
-
-DebugHandler debug;
-ConfigHandler config;
-RawDataHandler rawData;
-WeekHandler weekHandler;
-
-/**********************************************************************************************************
-*	Helpers
-*/
-
-//Returns the current date
-__int64 currentDate()
+class MYLIBRARY_EXPORT PluginFunctions
 {
-	time_t t;
-	time(&t);
-	return t;
-}
+public:
+	int WEIGHT = 0;
+	int HEALTH = 1;
+	int STAMINA = 2;
+	int MAGICKA = 3;
+	char ITEM_SEPARATOR = ';';
+	char FIELD_SEPARATOR = ',';
+	std::string WEB_SERVICE_DIR = "Data\\SKSE\\Plugins";
 
-//Splits a string by the given delimeter
-std::vector<std::string> split(const std::string &s, char delim) {
-	std::vector<std::string> elems;
-	std::stringstream ss(s);
-	std::string item;
-	while (std::getline(ss, item, delim)) {
-		elems.push_back(item);
-	}
-	return elems;
-}
+	/**********************************************************************************************************
+	*	Handlers
+	*/
 
-//Converts a json representation of a workout to a formatted string
-std::string workoutToString(json workout)
-{
-	std::string weight = std::to_string((int)workout["weight"]);
-	std::string health = std::to_string((int)workout["health"]);
-	std::string stamina = std::to_string((int)workout["stamina"]);
-	std::string magicka = std::to_string((int)workout["magicka"]);
-	return weight + "," + health + "," + stamina + "," + magicka;
-}
+	DebugHandler debug;
+	ConfigHandler config;
+	RawDataHandler rawData;
+	WeekHandler weekHandler;
 
-//Returns the week number that the workout date passed is in where week 1 is the week that the first workout was synced
-int getWeekForWorkout(__int64 firstTime, __int64 workoutTime) {
-	return (((workoutTime - firstTime) / SECONDS_PER_WEEK) + 1);
-}
+	/**********************************************************************************************************
+	*	Helpers
+	*/
 
-//Returns a float representation of the number of levels gained from the workout passed to the method
-float configure(json workout, int level)
-{
-	// the amount of extra experience (points) needed per specified number of levels needed 
-	float expIncreaseRate = 0.1;
-	// every x levels there should be improvement
-	int levelImprovement = 12;
-	int estimatedLevelsPerWeek = 3;
-	float levelsGained = 0;
+	//Splits a string by the given delimeter
+	std::vector<std::string> split(const std::string &s, char delim);
 
-	__int64 startDate = config.getConfigProperty("startDate");
-	__int64 lastWorkoutDate = config.getConfigProperty("lastWorkoutDate");
-	__int64 firstWorkoutDate = config.getConfigProperty("firstWorkoutDate");
+	//Converts a json representation of a workout to a formatted string
+	std::string workoutToString(json workout);
 
-	int workoutCount = config.getConfigProperty("workoutCount");
-	int weeksWorkedOut = config.getConfigProperty("weeksWorkedOut");
-	int avgPointsPerWorkout = config.getConfigProperty("avgPointsPerWorkout");
-	int totalPoints = config.getConfigProperty("totalPoints");
-	int workoutsThisWeek = config.getConfigProperty("workoutsThisWeek");
+	//Returns the week number that the workout date passed is in where week 1 is the week that the first workout was synced
+	int getWeekForWorkout(__int64 firstTime, __int64 workoutTime);
 
-	int workoutPoints = (int)workout["health"] + (int)workout["stamina"] + (int)workout["magicka"];
+	//Returns the day of the week that is the number of days from the start of the week, with the day of the configs startDate as the first day of the week.
+	int getDayOfConfigWeek(__int64 date);
 
-	if (firstWorkoutDate == 0 && workoutCount == 0 && (__int64)workout["workoutDate"] > startDate)
-	{
-		firstWorkoutDate = workout["workoutDate"];
-		config.setConfigProperty("firstWorkoutDate", firstWorkoutDate);
-	}
+	//Returns a float representation of the number of levels gained from the workout passed to the method
+	float configure(json workout, int level);
 
-	int workoutsWeek = getWeekForWorkout(firstWorkoutDate, workout["workoutDate"]);
-	int lastWorkoutsWeek = getWeekForWorkout(firstWorkoutDate, lastWorkoutDate);
+	//Makes the service call to get raw data from the server
+	void makeServiceCall(std::string type, std::string username, std::string fromDate, std::string toDate);
 
-	//if workout is for before the player synced their account
-	if ((int)workout["workoutDate"] < startDate || (int)workout["workoutDate"] < firstWorkoutDate)
-	{
-		config.setConfigProperty("lastSyncDate", currentDate());
-		return 0;
-	}
-	else
-	{
-		totalPoints = totalPoints + workoutPoints;
-		workoutCount = workoutCount + 1;
+	//Updates the Weeks.xml file to contain all workouts logged to date
+	std::string updateWeeks(int level);
 
-		if (workoutsWeek == 1)
-		{
-			if (weeksWorkedOut == 0)
-			{
-				weeksWorkedOut = 1;
-			}
-			/*When the workout is part of the first week*/
-			lastWorkoutDate = workout["workoutDate"];
-			workoutsThisWeek = workoutsThisWeek + 1;
-			levelsGained = 1.0;
-		}
-		else if (workoutsWeek == lastWorkoutsWeek)
-		{
-			/*When the workout is part of the current week*/
-			lastWorkoutDate = workout["workoutDate"];
-			workoutsThisWeek = workoutsThisWeek + 1;
-		}
-		else
-		{
-			avgPointsPerWorkout = (totalPoints / workoutCount);
+	/**********************************************************************************************************
+	*	Functions
+	*/
 
-			if (workoutsWeek > lastWorkoutsWeek)
-			{
-				/*When the workout is in a new week*/
-				lastWorkoutDate = workout["workoutDate"];
-				weeksWorkedOut = weeksWorkedOut + 1;
-				workoutsThisWeek = 1;
-			}
-		}
+	//Returns the current date
+	__int64 currentDate();
 
-		if (levelsGained == 0)
-		{
-			float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
-			levelsGained = ((estimatedLevelsPerWeek * workoutPoints) / (avgPointsPerWorkout * avgWorkoutsPerWeek));
-			levelsGained = levelsGained / (1 + ((level / levelImprovement) * expIncreaseRate));
-		}
-	}
+	//Checks if the current save is old
+	bool isOldSave(int creationDate);
 
-	config.setConfigProperty("lastSyncDate", currentDate());
-	config.setConfigProperty("workoutCount", workoutCount);
-	config.setConfigProperty("weeksWorkedOut", weeksWorkedOut);
-	config.setConfigProperty("avgPointsPerWorkout", avgPointsPerWorkout);
-	config.setConfigProperty("totalPoints", totalPoints);
-	config.setConfigProperty("workoutsThisWeek", workoutsThisWeek);
-	config.setConfigProperty("lastWorkoutDate", lastWorkoutDate);
-	return levelsGained;
-}
+	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
+	std::string getWorkoutsFromBestWeek(__int64 creationDate);
 
-//Makes the service call to get raw data from the server
-void makeServiceCall(std::string type, std::string username, std::string fromDate, std::string toDate)
-{
-	rawData.clear();
+	//Returns a string representation of the levels gained in the given week (format is "H,S,M;H,S,M...")
+	std::string getLevelUpsAsString(std::string outstandingLevel, std::string workoutsString);
 
-	std::string exeParams = type + " " + username + " " + fromDate + " " + toDate;
-	LPCSTR swExeParams = exeParams.c_str();
+	//Returns true if there is another level up and sets the health,stamina and magicka values
+	bool isNthLevelUp(std::string levelUpsString, int n);
 
-	//Set the executable path
-	std::string exePath = WEB_SERVICE_DIR + "\\webserviceTest.exe";
-	LPCSTR swExePath = exePath.c_str();
+	//Returns the health, stamina or magicka component of the given level up
+	int getLevelComponent(std::string levelUpsString, int n, std::string type);
 
-	//Execute the code that fetches the xml and stores it in the skyrim folder.
-	SHELLEXECUTEINFO ShExecInfo = { 0 };
-	ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-	ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-	ShExecInfo.hwnd = NULL;
-	ShExecInfo.lpVerb = NULL;
-	ShExecInfo.lpFile = (LPCTSTR)swExePath;
-	ShExecInfo.lpParameters = (LPCTSTR)swExeParams;
-	ShExecInfo.lpDirectory = NULL;
-	ShExecInfo.nShow = SW_SHOWMINNOACTIVE;
-	ShExecInfo.hInstApp = NULL;
-	ShellExecuteEx(&ShExecInfo);
-	WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
-	rawData.refresh();
-}
+	//Returns the outstanding level as a string
+	std::string getOutstandingLevel(std::string levelUpsString);
 
-//Updates the Weeks.xml file to contain all workouts logged to date
-std::string updateWeeks(int level)
-{
-	rawData.refresh();
-	std::string workoutsAsString = "";
-	int health = 0, stamina = 0, magicka = 0;
-	int workoutCount = rawData.getWorkoutCount();
+	//Makes a service call to fetch workouts
+	int startNormalFetch(std::string gameID, std::string username);
 
-	//for each workout
-	for (int workoutNumber = 0; workoutNumber < workoutCount; workoutNumber++)
-	{
-		json workout = rawData.getWorkout(workoutNumber);
-		//adjust the config to account for the new workout and gets the workouts weight
-		workout["weight"] = configure(workout, level);
-		if ((float)workout["weight"] > 0)
-		{
-			weekHandler.addWorkout(workout);
+	//Starts the poll for new workouts when the user requests a check
+	bool startForceFetch(std::string gameID, std::string username);
 
-			if (workoutNumber > 0)
-			{
-				workoutsAsString = workoutsAsString + ";";
-			}
+	//Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
+	std::string getWorkoutsString(int level);
 
-			workoutsAsString = workoutsAsString + workoutToString(workout);
-		}
-	}
+	//Returns the number of workouts in the raw data file
+	int getRawDataWorkoutCount();
 
-	return workoutsAsString;
-}
+	//Allows papyrus to clear the debug
+	void clearDebug();
+
+	//Checks if the given username is valid
+	bool validUsername(std::string gameID, std::string username);
+
+	//Returns a shortened username to fit in the menu screen
+	std::string getShortenedUsername(std::string username);
+
+	//Virtually presses the given key
+	void pressKey(std::string key);
+};

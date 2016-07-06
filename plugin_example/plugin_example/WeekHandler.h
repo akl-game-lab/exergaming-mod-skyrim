@@ -2,13 +2,20 @@
 
 #ifndef __WEEKHANDLER_H_INCLUDED__
 #define __WEEKHANDLER_H_INCLUDED__
+
+#ifdef COMPILE_MYLIBRARY   
+#define MYLIBRARY_EXPORT __declspec(dllexport) 
+#else   
+#define MYLIBRARY_EXPORT __declspec(dllimport) 
+#endif
+
 namespace
 {
 	int SECONDS_PER_DAY = 86400;
 	int SECONDS_PER_WEEK = 604800;
 }
 
-class WeekHandler : public JSONHandler
+class MYLIBRARY_EXPORT WeekHandler : public JSONHandler
 {
 public:
 	WeekHandler();
