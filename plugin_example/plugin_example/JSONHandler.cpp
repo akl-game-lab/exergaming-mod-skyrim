@@ -13,12 +13,12 @@ bool JSONHandler::fileExists(const std::string& name)
 }
 
 //Gets a json object from the given file
-json JSONHandler::getJSON(std::string fileName)
+json JSONHandler::getJSON()
 {
 	json JSONData = {};
-	if (fileExists(fileName))
+	if (fileExists(filePath))
 	{
-		std::ifstream inputFile(fileName);
+		std::ifstream inputFile(filePath);
 		inputFile >> JSONData;
 		inputFile.close();
 	}
@@ -26,9 +26,9 @@ json JSONHandler::getJSON(std::string fileName)
 }
 
 //Saves the given json object to the given file
-void JSONHandler::saveJSON(std::string fileName, json data)
+void JSONHandler::saveJSON()
 {
-	std::ofstream outputFile(fileName);
+	std::ofstream outputFile(filePath);
 	outputFile << data.dump(4).c_str();
 	outputFile.close();
 }

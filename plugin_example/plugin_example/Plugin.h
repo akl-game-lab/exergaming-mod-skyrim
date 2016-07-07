@@ -29,7 +29,7 @@ namespace plugin
 	BSFixedString getOutstandingLevel(StaticFunctionTag* base, BSFixedString levelUpsString);
 
 	//Makes a service call to fetch workouts
-	void startNormalFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName);
+	UInt32 startNormalFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName);
 
 	//Starts the poll for new workouts when the user requests a check
 	bool startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username);

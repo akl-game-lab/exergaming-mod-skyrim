@@ -1,13 +1,13 @@
 #include "Plugin.h"
-#include "plugin_library\PluginLibrary.h"
+#include "PluginLibrary.h"
 
 namespace plugin
 {
+	PluginFunctions pluginFunctions;
+
 	/**********************************************************************************************************
 	*	Functions
 	*/
-
-	PluginFunctions pluginFunctions;
 
 	//Returns the current date to the calling papyrus script
 	UInt32 currentDate(StaticFunctionTag* base)
@@ -36,7 +36,7 @@ namespace plugin
 	//Returns true if there is another level up and sets the health,stamina and magicka values
 	bool isNthLevelUp(StaticFunctionTag* base, BSFixedString levelUpsString, UInt32 n)
 	{
-		return pluginFunctions.isNthLevelUp(levelUpsString.data, n);
+		return pluginFunctions.isNthLevelUp(levelUpsString.data,n);
 	}
 
 	//Returns the health, stamina or magicka component of the given level up
@@ -52,9 +52,9 @@ namespace plugin
 	}
 
 	//Makes a service call to fetch workouts
-	void startNormalFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
+	UInt32 startNormalFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
 	{
-		pluginFunctions.startNormalFetch(gameID.data,username.data);
+		return pluginFunctions.startNormalFetch(gameID.data,username.data);
 	}
 
 	//Starts the poll for new workouts when the user requests a check
@@ -96,7 +96,7 @@ namespace plugin
 	//Virtually presses the given key
 	void pressKey(StaticFunctionTag* base, BSFixedString key)
 	{
-		pluginFunctions.pressKey(std::string(key.data));
+
 	}
 
 	/**********************************************************************************************************
@@ -128,7 +128,7 @@ namespace plugin
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, BSFixedString>("getOutstandingLevel", "PluginScript", plugin::getOutstandingLevel, registry));
 
 		registry->RegisterFunction(
-			new NativeFunction2 <StaticFunctionTag, void, BSFixedString, BSFixedString>("startNormalFetch", "PluginScript", plugin::startNormalFetch, registry));
+			new NativeFunction2 <StaticFunctionTag, UInt32, BSFixedString, BSFixedString>("startNormalFetch", "PluginScript", plugin::startNormalFetch, registry));
 
 		registry->RegisterFunction(
 			new NativeFunction2 <StaticFunctionTag, bool, BSFixedString, BSFixedString>("startForceFetch", "PluginScript", plugin::startForceFetch, registry));

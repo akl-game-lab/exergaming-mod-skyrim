@@ -16,11 +16,11 @@ ConfigHandler::ConfigHandler()
 			{ "totalPoints", 0 },
 			{ "workoutsThisWeek", 0 }
 		};
-		saveJSON(filePath, data);
+		saveJSON();
 	}
 	else
 	{
-		data = getJSON(filePath);
+		data = getJSON();
 	}
 }
 
@@ -29,8 +29,8 @@ __int64 ConfigHandler::getConfigProperty(std::string propertyName)
 	return (__int64)data[propertyName];
 }
 
-void ConfigHandler::setConfigProperty(std::string propertyName, int value)
+void ConfigHandler::setConfigProperty(std::string propertyName, __int64 value)
 {
 	data[propertyName] = value;
-	saveJSON(data, filePath);
+	saveJSON();
 }

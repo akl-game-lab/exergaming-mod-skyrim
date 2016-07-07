@@ -38,6 +38,49 @@ std::string toString(const std::wstring &wstr)
 	return strTo;
 }
 
+/*
+int main(int argc, char* argv[])
+{
+	std::string url = URL_BASE + "paul@paulralph.name" + "/workouts/hsm/" + "0" + "/" + "1467814567";
+	uri fullUri(conversions::to_string_t(url));
+	auto fileStream = std::make_shared<ostream>();
+	// Open stream to output file.
+	pplx::task<void> requestTask = fstream::open_ostream(U("Raw_Data.json")).then([=](ostream outFile)
+	{
+		*fileStream = outFile;
+
+		// Create http_client to send the request.
+		http_client client(fullUri);
+
+		// Start the request.
+		return client.request(methods::GET);
+	})
+
+		// Handle response headers arriving.
+		.then([=](http_response response)
+	{
+		// Write response body into the file.
+		return response.body().read_to_end(fileStream->streambuf());
+	})
+
+		// Close the file stream.
+		.then([=](size_t)
+	{
+		return fileStream->close();
+	});
+
+	// Wait for all the outstanding I/O to complete and handle any exceptions
+	try
+	{
+		requestTask.wait();
+	}
+	catch (const std::exception &e)
+	{
+	}
+	return 0;
+}
+*/
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	LPWSTR *szArgList;
@@ -55,11 +98,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	std::string username = toString(szArgList[2]);
 	std::string url = URL_BASE + username + "/forceUpdate";
 
-	if (type == "NORMAL"){
+	if (type.compare("NORMAL") == 0){
 		std::string fromDate = toString(szArgList[3]);
 		std::string toDate = toString(szArgList[4]);
 		url = URL_BASE + username + "/workouts/hsm/" + fromDate + "/" + toDate;
 	}
+
+	reportFile << type + "\n";
 
 	LocalFree(szArgList);
 
@@ -70,7 +115,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	auto fileStream = std::make_shared<ostream>();
 
 	// Open stream to output file.
-	pplx::task<void> requestTask = fstream::open_ostream(U("Raw_Data.xml")).then([=](ostream outFile)
+	pplx::task<void> requestTask = fstream::open_ostream(U("Raw_Data.json")).then([=](ostream outFile)
 	{
 		*fileStream = outFile;
 

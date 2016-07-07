@@ -10,28 +10,28 @@
 #include "RawDataHandler.h"
 #include "WeekHandler.h"
 
+using json = nlohmann::json;
+
+/**********************************************************************************************************
+*	Globals
+*/
+
 #ifdef COMPILE_MYLIBRARY   
 #define MYLIBRARY_EXPORT __declspec(dllexport) 
 #else   
 #define MYLIBRARY_EXPORT __declspec(dllimport) 
 #endif
 
-using json = nlohmann::json;
-
-/**********************************************************************************************************
-*	Globals
-*/
-int WEIGHT = 0;
-int HEALTH = 1;
-int STAMINA = 2;
-int MAGICKA = 3;
-char ITEM_SEPARATOR = ';';
-char FIELD_SEPARATOR = ',';
-std::string WEB_SERVICE_DIR = "Data\\SKSE\\Plugins";
-
 class MYLIBRARY_EXPORT PluginFunctions
 {
 public:
+	int WEIGHT = 0;
+	int HEALTH = 1;
+	int STAMINA = 2;
+	int MAGICKA = 3;
+	char ITEM_SEPARATOR = ';';
+	char FIELD_SEPARATOR = ',';
+	std::string WEB_SERVICE_DIR = "Data\\SKSE\\Plugins";
 
 	/**********************************************************************************************************
 	*	Handlers
@@ -53,10 +53,10 @@ public:
 	std::string workoutToString(json workout);
 
 	//Returns the week number that the workout date passed is in where week 1 is the week that the first workout was synced
-	int getWeekForWorkout(long int firstTime, long int workoutTime);
+	int getWeekForWorkout(__int64 firstTime, __int64 workoutTime);
 
-	//Returns the current date
-	__int64 currentDate();
+	//Returns the day of the week that is the number of days from the start of the week, with the day of the configs startDate as the first day of the week.
+	int getDayOfConfigWeek(__int64 date);
 
 	//Returns a float representation of the number of levels gained from the workout passed to the method
 	float configure(json workout, int level);
@@ -71,11 +71,14 @@ public:
 	*	Functions
 	*/
 
+	//Returns the current date
+	__int64 currentDate();
+
 	//Checks if the current save is old
 	bool isOldSave(int creationDate);
 
 	//Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")
-	std::string getWorkoutsFromBestWeek(time_t creationDate);
+	std::string getWorkoutsFromBestWeek(__int64 creationDate);
 
 	//Returns a string representation of the levels gained in the given week (format is "H,S,M;H,S,M...")
 	std::string getLevelUpsAsString(std::string outstandingLevel, std::string workoutsString);
@@ -90,7 +93,7 @@ public:
 	std::string getOutstandingLevel(std::string levelUpsString);
 
 	//Makes a service call to fetch workouts
-	void startNormalFetch(std::string gameID, std::string username);
+	int startNormalFetch(std::string gameID, std::string username);
 
 	//Starts the poll for new workouts when the user requests a check
 	bool startForceFetch(std::string gameID, std::string username);
