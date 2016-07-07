@@ -3,83 +3,58 @@
 
 #include "test_suite.h"
 
-
-
+int results[sizeof(tests) / 4] = {};
+int testNumber = 0;
 int main()
 {
-	//WEB_SERVICE_DIR = "C:\\Program\ Files\ (x86)\\Steam\\steamapps\\common\\Skyrim\\Data\\SKSE\\Plugins";
-	/*
-	std::cout << "Testing isOldSave()\n";
-	if (pluginFunctions.isOldSave(pluginFunctions.currentDate()))
+	for (TestCases t : tests) 
 	{
-		std::cout << "Failure\n";
-	}
-	else
-	{
-		std::cout << "Success\n";
+		(*t)();
+		testNumber++;
 	}
 	
-	std::cout << "Attempting to construct raw data.\n";
-
-	json newRawData = {
-		{ "startDate", 0 },
-		{ "lastWorkoutDate", 0 },
-		{ "lastSyncDate", 0 },
-		{ "firstWorkoutDate", 0 },
-		{ "workoutCount", 0 },
-		{ "weeksWorkedOut", 0 },
-		{ "avgPointsPerWorkout", 0 },
-		{ "totalPoints", 0 },
-		{ "workoutsThisWeek", 0 }
-	};
-
-	std::cout << "Attempting to set raw data.\n";
-
-	rawData.setData(newRawData);
-
-	std::cout << "Set raw data.\n";
-
-	/*
-	std::cout << rawData.getWorkoutCount();
-	std::cout << "\n";
-	std::cout << "Testing getWorkoutsString()\n|";
-	std::cout << pluginFunctions.getWorkoutsString(12);
-	std::cout << "|";*/
-	for (TestCases t : tests) {
-		(*t)();
+	std::cout << "\n|";
+	for (int r : results)
+	{
+		std::cout << (r == 0 ? "." : (r == 1 ? "+" : "-"));
 	}
+	std::cout << "|\n";
 	getchar();
 }
 
-//Tests for isOldSave()
-void Test_iSOldSave_ConfigDoesntExist_False() {
-	//check if it is the right case
-	//check how to delete config
-	std::cout << __func__ << ": ";
-	std::cout << "not performed\n";
+std::string assertToString(bool expression) {}
+
+std::string assertToStringWithName(bool expression, const char* funcName) {
+	if (!expression) {
+		results[testNumber] = -1;
+		return funcName + (std::string)": failed\n";
+	}
+	results[testNumber] = 1;
+	return "";
 }
-void Test_isOldSave_ConfigIsInDefaultState_True() {
+
+#define assertToString(bool) assertToStringWithName(bool,__FUNCTION__)
+
+//Tests for isOldSave()
+
+void Test_isOldSave_ConfigIsInDefaultState_False() {
 	initialiseConfig();
-	std::cout << __func__ << ": ";
-	std::cout << (pluginFunctions.isOldSave(1467690060) == true ? "passed" : "failed") << "\n";
+	std::cout << assertToString(pluginFunctions.isOldSave(1467690060) == false);
 }
 void Test_isOldSave_ConfigIsCurrent_False() {
 	initialiseConfig();
-	config.setConfigProperty("lastSyncDate", 1467690060);
-	std::cout << __func__ << ": ";
-	std::cout << (pluginFunctions.isOldSave(1467690060) == false ? "passed" : "failed") << "\n";
+	pluginFunctions.config.setConfigProperty("lastSyncDate", 1467690060);
+	std::cout << assertToString(pluginFunctions.isOldSave(1467690060) == false);
 }
 void Test_isOldSave_LastConfigFailsToUpdate_False() {
 	initialiseConfig();
-	config.setConfigProperty("lastSyncDate", 1467690000); //config last sync date is 1 minute before the creation date in the skyrim save file
-	std::cout << __func__ << ": ";
-	std::cout << (pluginFunctions.isOldSave(1467690060) == false ? "passed" : "failed") << "\n";
+	pluginFunctions.config.setConfigProperty("lastSyncDate", 1467690000); //config last sync date is 1 minute before the creation date in the skyrim save file
+	std::cout << assertToString(pluginFunctions.isOldSave(1467690060) == false);
 }
 void Test_isOldSave_ConfigIsOldSave_True() {
 	initialiseConfig();
-	config.setConfigProperty("lastSyncDate", 1467690120); //config is 1 minute after the creation date
-	std::cout << __func__ << ": ";
-	std::cout << (pluginFunctions.isOldSave(1467690060) == true ? "passed" : "failed") <<"\n";
+	pluginFunctions.config.setConfigProperty("lastSyncDate", 1467690120); //config is 1 minute after the creation date
+	std::cout << assertToString(pluginFunctions.isOldSave(1467690060) == true);
 }
 void Test_isOldSave_ConfigIsEmpty_Undefined() {
 	//check how to break the config file in tests
@@ -104,15 +79,13 @@ void Test_isOldSave_Config_Is_Empty() {
 }
 void Test_isOldSave_CheckIfIdempotentOnOldSave_UnchangedConfig() {
 	initialiseConfig();
-	config.setConfigProperty("lastSyncDate", 1467690120); //config is 1 minute after the creation date
-	std::cout << __func__ << ": ";
-	std::cout << (pluginFunctions.isOldSave(1467690060) == pluginFunctions.isOldSave(1467690060) ? "passed" : "failed") << "\n";
+	pluginFunctions.config.setConfigProperty("lastSyncDate", 1467690120); //config is 1 minute after the creation date
+	std::cout << assertToString(pluginFunctions.isOldSave(1467690060) == pluginFunctions.isOldSave(1467690060));
 }
 void Test_isOldSave_CheckIfIdempotentOnCurrentSave_UnchangedConfig() {
 	initialiseConfig();
-	config.setConfigProperty("lastSyncDate", 146769060); //config is 1 minute after the creation date
-	std::cout << __func__ << ": ";
-	std::cout << (pluginFunctions.isOldSave(1467690060) == pluginFunctions.isOldSave(1467690060) ? "passed" : "failed") << "\n";
+	pluginFunctions.config.setConfigProperty("lastSyncDate", 146769060); //config is 1 minute after the creation date
+	std::cout << assertToString(pluginFunctions.isOldSave(1467690060) == pluginFunctions.isOldSave(1467690060));
 }
 void Test_isOldSave_CheckIfCreateConfigOnDoesntExist_DefaultConfig() {
 	std::cout << __func__;
@@ -124,15 +97,13 @@ void Test_isOldSave_CheckIfRepairedConfigOnCorruptConfig_DefaultConfig() {
 }
 void Test_isOldSave_ConfigShouldNotUpdateOnOldSave_UnchangedConfig() {
 	initialiseConfig();
-	config.setConfigProperty("lastSyncDate", 1467690120); //config is 1 minute after the creation date
+	pluginFunctions.config.setConfigProperty("lastSyncDate", 1467690120); //config is 1 minute after the creation date
 	pluginFunctions.isOldSave(1467690060);
-	std::cout << __func__ << ": ";
-	std::cout << (config.getConfigProperty("lastSyncDate") == 1467690120 ? "passed" : "failed") << "\n";
+	std::cout << assertToString(pluginFunctions.config.getConfigProperty("lastSyncDate") == 1467690120);
 }
 void Test_isOldSave_ConfigShouldNotUpdateOnCurrentSave_UnchangedConfig() {
 	initialiseConfig();
-	config.setConfigProperty("lastSyncDate", 1467690060); //config is 1 minute after the creation date
+	pluginFunctions.config.setConfigProperty("lastSyncDate", 1467690060); //config is 1 minute after the creation date
 	pluginFunctions.isOldSave(1467690060);
-	std::cout << __func__ << ": ";
-	std::cout << (config.getConfigProperty("lastSyncDate") == 1467690060 ? "passed" : "failed") << "\n";
+	std::cout << assertToString(pluginFunctions.config.getConfigProperty("lastSyncDate") == 1467690060);
 }

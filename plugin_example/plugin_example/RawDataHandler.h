@@ -16,7 +16,7 @@ public:
 
 	void refresh();
 
-	void getDefaultRawData();
+	void getDefaultData();
 
 	void clear();
 

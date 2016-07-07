@@ -1,9 +1,9 @@
 #include "JSONHandler.h"
 
 //Checks if the given file exists
-bool JSONHandler::fileExists(const std::string& name)
+bool JSONHandler::fileExists()
 {
-	if (FILE *file = fopen(name.c_str(), "r")) {
+	if (FILE *file = fopen(filePath.c_str(), "r")) {
 		fclose(file);
 		return true;
 	}
@@ -16,7 +16,7 @@ bool JSONHandler::fileExists(const std::string& name)
 json JSONHandler::getJSON()
 {
 	json JSONData = {};
-	if (fileExists(filePath))
+	if (fileExists() && !fileEmpty())
 	{
 		std::ifstream inputFile(filePath);
 		inputFile >> JSONData;
@@ -25,10 +25,25 @@ json JSONHandler::getJSON()
 	return JSONData;
 }
 
+void JSONHandler::reset()
+{
+	getDefaultData();
+}
+
 //Saves the given json object to the given file
 void JSONHandler::saveJSON()
 {
 	std::ofstream outputFile(filePath);
 	outputFile << data.dump(4).c_str();
 	outputFile.close();
+}
+
+bool JSONHandler::fileEmpty()
+{
+	if (fileExists())
+	{
+		std::ifstream inputFile(filePath);
+		return inputFile.peek() == std::ifstream::traits_type::eof();
+	}
+	return true;
 }

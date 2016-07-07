@@ -16,5 +16,7 @@ public:
 	__int64 getConfigProperty(std::string propertyName);
 
 	void setConfigProperty(std::string propertyName, __int64 value);
+
+	void getDefaultData();
 };
 #endif

@@ -21,12 +21,18 @@ protected:
 	DebugHandler debug;
 
 	//Checks if the given file exists
-	bool fileExists(const std::string& name);
+	bool fileExists();
 	
 	//Gets a json object from the given file
 	json getJSON();
 
+	void reset();
+
+	virtual void getDefaultData();
+
 	//Saves the given json object to the given file
 	void saveJSON();
+
+	bool fileEmpty();
 };
 #endif

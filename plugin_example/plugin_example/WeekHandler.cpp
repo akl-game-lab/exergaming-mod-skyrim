@@ -5,7 +5,7 @@
 WeekHandler::WeekHandler()
 {
 	filePath = "Weeks.json";
-	if (!fileExists(filePath))
+	if (!fileExists())
 	{
 		data = {
 			{"weeks",json::array({})}

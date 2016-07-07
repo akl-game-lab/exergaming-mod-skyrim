@@ -11,6 +11,11 @@ void RawDataHandler::refresh()
 	data = getJSON();
 }
 
+void RawDataHandler::getDefaultData()
+{
+	data = { "data",{} };
+}
+
 void RawDataHandler::clear()
 {
 	data = {};
@@ -19,10 +24,7 @@ void RawDataHandler::clear()
 
 int RawDataHandler::getWorkoutCount()
 {
-	debug.entry();
 	int count = data["data"]["workouts"].size();
-	debug.write(std::to_string(count));
-	debug.exit();
 	return count;
 }
 
