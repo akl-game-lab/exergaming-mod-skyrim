@@ -44,12 +44,14 @@ int PluginFunctions::getDayOfConfigWeek(__int64 date)
 //Returns a float representation of the number of levels gained from the workout passed to the method
 float PluginFunctions::configure(json workout, int level)
 {
+	std::cout << workout;
+	
 	// the amount of extra experience (points) needed per specified number of levels needed 
 	float expIncreaseRate = 0.1;
 	// every x levels there should be improvement
 	int levelImprovement = 12;
 	int estimatedLevelsPerWeek = 3;
-	float levelsGained = 0;
+	float levelsGained = 0.0;
 
 	__int64 startDate = config.getConfigProperty("startDate");
 	__int64 lastWorkoutDate = config.getConfigProperty("lastWorkoutDate");
@@ -62,21 +64,24 @@ float PluginFunctions::configure(json workout, int level)
 	int workoutsThisWeek = config.getConfigProperty("workoutsThisWeek");
 
 	int workoutPoints = (int)workout["health"] + (int)workout["stamina"] + (int)workout["magicka"];
-
+	std::cout << "\nfirstWorkoutDate: " << firstWorkoutDate;
+	std::cout << "\nworkoutCount: " << workoutCount;
+	std::cout << "\nworkout[\"workoutDate\"]: " << workout["workoutDate"];
+	std::cout << "\nstartDate: " << startDate;
 	if (firstWorkoutDate == 0 && workoutCount == 0 && (__int64)workout["workoutDate"] > startDate)
 	{
-		firstWorkoutDate = workout["workoutDate"];
+		firstWorkoutDate = (__int64)workout["workoutDate"];
 		config.setConfigProperty("firstWorkoutDate", firstWorkoutDate);
 	}
 
-	int workoutsWeek = getWeekForWorkout(firstWorkoutDate, workout["workoutDate"]);
+	int workoutsWeek = getWeekForWorkout(firstWorkoutDate, (__int64)workout["workoutDate"]);
 	int lastWorkoutsWeek = getWeekForWorkout(firstWorkoutDate, lastWorkoutDate);
 
 	//if workout is for before the player synced their account
-	if ((int)workout["workoutDate"] < startDate || (int)workout["workoutDate"] < firstWorkoutDate)
+	if ((__int64)workout["workoutDate"] < startDate || (__int64)workout["workoutDate"] < firstWorkoutDate)
 	{
 		config.setConfigProperty("lastSyncDate", currentDate());
-		return 0;
+		return levelsGained;
 	}
 	else
 	{
@@ -115,9 +120,20 @@ float PluginFunctions::configure(json workout, int level)
 
 		if (levelsGained == 0)
 		{
-			float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
+			float avgWorkoutsPerWeek = 0.0;
+			if (weeksWorkedOut > 1) {
+				avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
+			} 
+			else 
+			{
+				
+			}
 			levelsGained = ((estimatedLevelsPerWeek * workoutPoints) / (avgPointsPerWorkout * avgWorkoutsPerWeek));
+			std::cout << "\npre-levelsGained: " << levelsGained;
 			levelsGained = levelsGained / (1 + ((level / levelImprovement) * expIncreaseRate));
+			std::cout << "\nlevel: " << level;
+			std::cout << "\nlevelImprovement: " << levelImprovement;
+			std::cout << "\nexpIncreaseRate: " << expIncreaseRate;
 		}
 	}
 
@@ -128,6 +144,7 @@ float PluginFunctions::configure(json workout, int level)
 	config.setConfigProperty("totalPoints", totalPoints);
 	config.setConfigProperty("workoutsThisWeek", workoutsThisWeek);
 	config.setConfigProperty("lastWorkoutDate", lastWorkoutDate);
+	std::cout << "\nlevelsGained: " << levelsGained;
 	return levelsGained;
 }
 
@@ -171,8 +188,18 @@ std::string PluginFunctions::updateWeeks(int level)
 	for (int workoutNumber = 0; workoutNumber < workoutCount; workoutNumber++)
 	{
 		json workout = rawData.getWorkout(workoutNumber);
+		std::cout << "\n\nworkout type = ";
+		std::cout << workout.type();
 		//adjust the config to account for the new workout and gets the workouts weight
-		workout["weight"] = configure(workout, level);
+		float weight = configure(workout, level);
+		std::cout << "\nGot weight.";
+		workout["weight"] = weight;
+		std::cout << "\nAdded to json.\n";
+		std::cout << workout["weight"].type();
+		float workoutWeight = (float)workout["weight"];
+		std::cout << "\nCast weight.\n";
+		std::cout << workoutWeight;
+		std::cout << "\nPrinted weight.";
 		if ((float)workout["weight"] > 0)
 		{
 			weekHandler.addWorkout(workout);
@@ -185,7 +212,7 @@ std::string PluginFunctions::updateWeeks(int level)
 			workoutsAsString = workoutsAsString + workoutToString(workout);
 		}
 	}
-
+	std::cout << "\nReturning.";
 	return workoutsAsString;
 }
 	
@@ -425,6 +452,7 @@ std::string PluginFunctions::getOutstandingLevel(std::string levelUpsString)
 int PluginFunctions::startNormalFetch(std::string gameID, std::string username)
 {
 	debug.entry();
+	rawData.clear();
 	ConfigHandler config;
 	std::string fromDate = std::to_string(config.getConfigProperty("lastSyncDate"));
 	std::string toDate = std::to_string(currentDate());

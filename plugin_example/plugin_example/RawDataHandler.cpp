@@ -14,6 +14,7 @@ void RawDataHandler::refresh()
 void RawDataHandler::clear()
 {
 	data = {};
+	saveJSON();
 }
 
 int RawDataHandler::getWorkoutCount()

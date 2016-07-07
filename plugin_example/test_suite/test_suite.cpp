@@ -10,7 +10,12 @@ RawDataHandler rawData;
 
 int main()
 {
-	std::cout << "Testing getWorkoutsFromBestWeek()\n";
-	std::cout << pluginFunctions.getWorkoutsFromBestWeek(1462211085) + "\n";
+	if (pluginFunctions.isOldSave(1466208462))
+	{
+		std::cout << "Old save detected.";
+	}
+	std::cout << pluginFunctions.startNormalFetch("Skyrim","paul@paulralph.name");
+	Sleep(5000);
+	std::cout << pluginFunctions.getWorkoutsString(12) + "\n";
 	getchar();
 }

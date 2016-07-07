@@ -29,7 +29,7 @@ __int64 ConfigHandler::getConfigProperty(std::string propertyName)
 	return (__int64)data[propertyName];
 }
 
-void ConfigHandler::setConfigProperty(std::string propertyName, int value)
+void ConfigHandler::setConfigProperty(std::string propertyName, __int64 value)
 {
 	data[propertyName] = value;
 	saveJSON();
