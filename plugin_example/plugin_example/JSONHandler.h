@@ -28,7 +28,7 @@ protected:
 
 	void reset();
 
-	virtual void getDefaultData();
+	virtual void getDefaultData() = 0;
 
 	//Saves the given json object to the given file
 	void saveJSON();
