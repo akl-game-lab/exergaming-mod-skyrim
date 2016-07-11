@@ -41,5 +41,7 @@ public:
 
 	//Returns the number of weeks currently stored
 	int getWeekCount();
+
+	void getDefaultData();
 };
 #endif

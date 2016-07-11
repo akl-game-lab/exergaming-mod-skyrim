@@ -125,3 +125,10 @@ int WeekHandler::getWeekCount()
 {
 	return (int)data["weeks"].size();
 }
+
+//a do nothing implementation to compile
+void WeekHandler::getDefaultData()
+{
+	data = {};
+	saveJSON();
+}
