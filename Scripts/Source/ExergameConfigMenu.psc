@@ -116,7 +116,7 @@ Event OnOptionInputAccept(int option, string userInput)
 			playerReference.normalFetchMade = true
 			playerReference.saveRequested = true
 		else
-			ShowMessage("Invalid username", false)
+			ShowMessage("Invalid username!", false)
 		endIf
 	endIf
 endEvent

@@ -20,13 +20,13 @@ event OnPlayerLoadGame()
 	forceFetchMade = false
 	oldSaveLoaded = false
 	if (syncedUserName != "")
-		showDebugMessage("Currently synced with " + syncedUserName)
+		;showDebugMessage("Currently synced with " + syncedUserName)
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
-		showDebugMessage(creationDate)
+		;showDebugMessage(creationDate)
 		oldSaveLoaded = isOldSave(creationDate as int)
-		if(oldSaveLoaded == true)
-			showDebugMessage("Old save detected.")
-		endIf
+		;if(oldSaveLoaded == true)
+			;showDebugMessage("Old save detected.")
+		;endIf
 		startNormalFetch("Skyrim",syncedUserName)
 		normalFetchMade = true
 	else
@@ -94,7 +94,6 @@ function doLevelUp(int health, int stamina, int magicka)
 	player.modActorValue("stamina", stamina)
 	player.modActorValue("magicka", magicka)
 	Game.setPlayerLevel(currentLevel + 1)
-	
 	currentLevel = player.getLevel()
 	Game.setPerkPoints(Game.getPerkPoints() + 1)
 	showDebugMessage("Congratulations.\nYou have reached level " + currentLevel + "!")
