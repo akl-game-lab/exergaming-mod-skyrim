@@ -74,7 +74,7 @@ event OnOptionSelect(int option)
 				;reset the exp variables
 				Game.SetPlayerExperience(0)
 				Game.SetGameSettingFloat("fXPPerSkillRank", 1)
-				ShowMessage("Unsync complete.", false, "$Ok")
+				ShowMessage("Unsync complete.", false, "Ok")
 				playerReference.saveRequested = true
 			endIf
 		elseIf (option == forceFetchButton)
@@ -111,7 +111,7 @@ Event OnOptionInputAccept(int option, string userInput)
 			exergameModOn = true
 			ForcePageReset()
 			string msg = "Sync with " + username + " complete."
-			ShowMessage(msg, false, "$Ok")
+			ShowMessage(msg, false, "Ok")
 			startNormalFetch("Skyrim",username)
 			playerReference.normalFetchMade = true
 			playerReference.saveRequested = true
