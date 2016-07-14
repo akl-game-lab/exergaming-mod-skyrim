@@ -3,7 +3,7 @@
 /**********************************************************************************************************
 *	Helpers
 */
-	
+
 //Splits a string by the given delimeter
 std::vector<std::string> PluginFunctions::split(const std::string &s, char delim) {
 	std::vector<std::string> elems;
@@ -470,7 +470,7 @@ int PluginFunctions::startNormalFetch(std::string gameID, std::string username)
 bool PluginFunctions::startForceFetch(std::string gameID, std::string username)
 {
 	//Start the headless browser by making the force fetch request
-	makeServiceCall("FORCE_FETCH", username, "0", "0");
+	makeServiceCall("FORCE_FETCH", username, "0", std::to_string(currentDate()));
 
 	if (rawData.getResponseCode() == "200")
 	{
@@ -518,8 +518,8 @@ void PluginFunctions::clearDebug()
 //Checks if the given username is valid
 bool PluginFunctions::validUsername(std::string gameID, std::string username)
 {
-	makeServiceCall("NORMAL", username, "0", "0");
-	if (rawData.getResponseCode() == "404")
+	makeServiceCall("NORMAL", username, "0", std::to_string(currentDate()));
+	if (rawData.getResponseCode().compare("404") == 0)
 	{
 		return false;
 	}

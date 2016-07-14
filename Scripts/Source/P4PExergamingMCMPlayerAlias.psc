@@ -11,22 +11,23 @@ bool property saveRequested auto
 int property pollStartTime auto
 bool property oldSaveLoaded auto
 
-int pollDuration = 120
+message property noWorkoutsFound auto
+message property searchComplete auto
+message property priorWorkouts auto
+message property levelUpMessage auto
+message property levelUpDetails auto
+
 float pollInterval = 0.5
 int pollCount = 1
 
 event OnPlayerLoadGame()
 	clearDebug()
+	pollStartTime = 0
 	forceFetchMade = false
 	oldSaveLoaded = false
 	if (syncedUserName != "")
-		;showDebugMessage("Currently synced with " + syncedUserName)
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
-		;showDebugMessage(creationDate)
 		oldSaveLoaded = isOldSave(creationDate as int)
-		;if(oldSaveLoaded == true)
-			;showDebugMessage("Old save detected.")
-		;endIf
 		startNormalFetch("Skyrim",syncedUserName)
 		normalFetchMade = true
 	else
@@ -36,6 +37,8 @@ event OnPlayerLoadGame()
 endEvent
 
 event onUpdate()
+	int pollDuration = 120
+	
 	if(saveRequested == true)
 		creationDate = currentDate()
 		saveRequested = false
@@ -50,22 +53,26 @@ event onUpdate()
 			getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
 			forceFetchMade = false
 		elseIf (forceFetchMade == false)
-			showDebugMessage("No workouts found.")
+			noWorkoutsFound.show()
 		endIf
 		normalFetchMade = false
 	endIf
-	if (forceFetchMade == true && currentDate() - pollStartTime == pollDuration)
-		showDebugMessage("Search for recent workouts complete.");
-		forceFetchMade = false
-		startNormalFetch("Skyrim",syncedUserName)
-		normalFetchMade = true
+	if (forceFetchMade == true)
+		debug.Notification("Checking for recent workouts.")
+		int elapsed = currentDate() - pollStartTime
+		if(elapsed >= pollDuration)
+			searchComplete.show()
+			forceFetchMade = false
+			startNormalFetch("Skyrim",syncedUserName)
+			normalFetchMade = true
+		endIf
 	endIf
 	pollCount = pollCount + 1
 endEvent
 
 function getLevelUps(string workouts)
 	if(workouts == "Prior Workout")
-		showDebugMessage("Prior workouts detected.")
+		priorWorkouts.show()
 		doLevelUp(4,3,3)
 	else
 		string levelUpsString = getLevelUpsAsString(outstandingLevel,workouts)
@@ -96,13 +103,8 @@ function doLevelUp(int health, int stamina, int magicka)
 	Game.setPlayerLevel(currentLevel + 1)
 	currentLevel = player.getLevel()
 	Game.setPerkPoints(Game.getPerkPoints() + 1)
-	showDebugMessage("Congratulations.\nYou have reached level " + currentLevel + "!")
-	showDebugMessage("Health (+" + health + ")\nStamina (+" + stamina + ")\nMagicka (+" + magicka + ")")
-endFunction
-
-function showDebugMessage(string msg)
-	Utility.WaitMenuMode(1)
-	debug.messageBox(msg)
+	levelUpMessage.show(currentLevel)
+	levelUpDetails.show(health,stamina,magicka)
 endFunction
 
 ;update the xp bar to show the progress gained

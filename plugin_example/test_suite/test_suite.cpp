@@ -7,6 +7,7 @@ int results[sizeof(tests) / 4] = {};
 int testNumber = 0;
 int main()
 {
+	/*
 	for (TestCases t : tests) 
 	{
 		(*t)();
@@ -19,6 +20,9 @@ int main()
 		std::cout << (r == 0 ? "." : (r == 1 ? "+" : "-"));
 	}
 	std::cout << "|\n";
+	*/
+	pluginFunctions.validUsername("Skyrim","paul");
+
 	getchar();
 }
 
