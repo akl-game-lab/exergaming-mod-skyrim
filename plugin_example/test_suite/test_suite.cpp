@@ -134,12 +134,46 @@ void Test_getLevelUpAsString_NoOutstandingExactlyFourLevelForMagicka_String() {
 	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "1,0,0,30;1,0,0,30;1,0,0,30;1,0,0,30").compare("0.000000,0.000000,0.000000;0,0,10;0,0,10;0,0,10;0,0,10") == 0);
 }
 void Test_getLevelUpAsString_NoOutstandingExactlyOneLevelForHealthOverTwoWorkouts_String() {
-	std::cout << pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.75,750,0,0;0.25,250,0,0"); //this output is wrong. I expect 1 level since the weights add up to 1
-	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.75,750,0,0;0.25,250,0,0").compare("0.000000,0.000000,0.000000;10,0,0") == 0);
+	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.75,750,0,0;0.25,250,0,0").compare("0.000000,0.000000,0.000000;10,0,0") == 0); //I think the code is not taking into account the decimal points
 }
 void Test_getLevelUpAsString_NoOutstandingExactlyOneLevelForStaminaOverFourWorkouts_String() {
 	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.5,0,300,0;0.25,0,150,0;0.2,0,120,0;0.05,0,30,0").compare("0.000000,0.000000,0.000000;0,10,0") == 0);
 }
 void Test_getLevelUpAsString_NoOutstandingExactlyOneLevelForMagickaOverFiveWorkouts_String() {
 	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.1,0,0,40;0.2,0,0,80;0.3,0,0,120;0.3,0,0,120;0.1,0,0,40").compare("0.000000,0.000000,0.000000;0,0,10") == 0);
+}
+void Test_getLevelUpAsString_NoOutstandingWithPartLevelForHealth_String() {
+	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.333333,50,0,0;0.333333,50,0,0").compare("0.666666,0.000000,0.000000") == 0, 1);
+	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.666666,500,0,0;0.333333,250,0,0").compare("0.999999,0.000000,0.000000") == 0, 2); //is it intentional?
+	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.666666,500,0,0;0.666666,500,0,0").compare("0.333332,0.000000,0.000000;10,0,0") == 0, 3);
+}
+void Test_getLevelUpAsString_NoOutstandingWithPartLevelForStamina_String() {
+	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.333333,0,200,0;0.333333,0,200,0").compare("0.000000,0.666666,0.000000") == 0);
+}
+void Test_getLevelUpAsString_NoOutstandingWithPartLevelForMagicka_String() {
+	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.666666,0,0,1000;0.666666,0,0,1000").compare("0.333332,0.000000,0.000000;10,0,0") == 0);
+}
+void Test_getLevelUpAsString_OutstandingLevelsExactlyOneLevelForHealthOverTwoWorkouts_String() {
+	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.500000,0.000000,0.000000", "0.25,750,0,0;0.25,750,0,0").compare("0.000000,0.000000,0.000000;10,0,0") == 0); //I think the code is not taking into account the decimal points
+}
+void Test_getLevelUpAsString_OutstandingLevelsExactlyOneLevelForStaminaOverTwoWorkouts_String() {
+	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.000000,0.750000,0.000000", "0.125,0,300,0;0.125,0,300,0").compare("0.000000,0.000000,0.000000;0,10,0") == 0);
+}
+void Test_getLevelUpAsString_OutstandingLevelsExactlyOneLevelForMagickaOverTwoWorkouts_String() {
+	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.250000", "0.25,0,0,40;0.5,0,0,80").compare("0.000000,0.000000,0.000000;0,0,10") == 0);
+}
+void Test_getLevelUpAsString_OutstandingLevelsInAllAttributesForHealthOverTwoWorkouts_String() {
+	std::cout << "these cases with points in all 3 attributes will fail - I didn't think it through when I write them. I will recalculate the expected output\n";
+	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.500000,0.233000,0.115000", "0.55,750,0,0;0.25,750,0,0").compare("0.300000,0.233000,0.115000;10,0,0") == 0);
+}
+void Test_getLevelUpAsString_OutstandingLevelsInAllAttributesForStaminaOverTwoWorkouts_String() {
+	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.100000,0.750000,0.200000", "0.25,0,300,0;0.125,0,300,0").compare("0.100000,0.125000,0.200000;0,10,0") == 0);
+}
+void Test_getLevelUpAsString_OutstandingLevelsInAllAttributesForMagickaOverTwoWorkouts_String() {
+	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.400000,0.000000,0.250000", "0.46,0,0,40;0.5,0,0,80").compare("0.400000,0.000000,0.210000;0,0,10") == 0);
+}
+void Test_getLevelUpAsString_CompositeCases_String() {
+	//std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.500000,0.333333,0.222222", "1,50,50,0;1,50,100,100").compare("0.666666,0.000000,0.000000") == 0, 1);
+	//std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.666666,500,0,0;0.333333,250,0,0").compare("0.999999,0.000000,0.000000") == 0, 2);
+	//std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.666666,500,0,0;0.666666,500,0,0").compare("0.333332,0.000000,0.000000;10,0,0") == 0, 3);
 }
