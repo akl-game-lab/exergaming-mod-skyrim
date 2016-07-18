@@ -45,10 +45,6 @@ int PluginFunctions::getDayOfConfigWeek(__int64 date)
 float PluginFunctions::configure(json workout, int level)
 {
 	// the amount of extra experience (points) needed per specified number of levels needed 
-	float expIncreaseRate = 0.1;
-	// every x levels there should be improvement
-	float levelImprovement = 12.0;
-	float estimatedLevelsPerWeek = 3.0;
 	float levelsGained = 0.0;
 
 	__int64 startDate = config.getConfigProperty("startDate");
@@ -114,16 +110,10 @@ float PluginFunctions::configure(json workout, int level)
 
 		if (levelsGained == 0)
 		{
-			float avgWorkoutsPerWeek = 0.0;
-			if (weeksWorkedOut > 1) {
-				avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
-			} 
-			else 
-			{
-				
-			}
-			levelsGained = ((estimatedLevelsPerWeek * workoutPoints) / ((float)avgPointsPerWorkout * avgWorkoutsPerWeek));
-			levelsGained = levelsGained / (1.0 + (((float)level / levelImprovement) * expIncreaseRate));
+			float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
+
+			levelsGained = ((ESTIMATED__LEVELS_PER_WEEK * workoutPoints) / ((float)avgPointsPerWorkout * avgWorkoutsPerWeek));
+			levelsGained = levelsGained / (1.0 + (((float)level / LEVEL_IMPROVEMENT) * EXP_INCREASE_RATE));
 		}
 	}
 
