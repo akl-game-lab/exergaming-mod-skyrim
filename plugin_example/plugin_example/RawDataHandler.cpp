@@ -35,15 +35,15 @@ json RawDataHandler::getWorkout(int workoutNumber)
 
 std::string RawDataHandler::getResponseCode()
 {
-	std::string started = data["data"]["started"];
-	if (!started.empty() && started == "true")
+	json started = data["data"]["started"];
+	if (!started.empty() && started.dump().compare("true") == 0)
 	{
 		return "200";
 	}
-	std::string errorCode = data["data"]["errorCode"];
+	json errorCode = data["data"]["errorCode"];
 	if (!errorCode.empty())
 	{
-		return errorCode;
+		return errorCode.dump();
 	}
 	return "200";
 }
