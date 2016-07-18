@@ -16,6 +16,7 @@ message property searchComplete auto
 message property priorWorkouts auto
 message property levelUpMessage auto
 message property levelUpDetails auto
+message property levelProgressMsg auto
 
 float pollInterval = 0.5
 int pollCount = 1
@@ -113,5 +114,8 @@ function updateXpBar(string levelUpsString)
 	float outstandingStamina = getLevelComponent(levelUpsString,0,"S")
 	float outstandingMagicka = getLevelComponent(levelUpsString,0,"M")
 	float outstandingWeight = outstandingHealth + outstandingStamina + outstandingMagicka
+	;display message for progress to next level
+	;first progress, second amount of workout
+	levelProgressMsg.show(outstandingWeight*100, 20)
 	Game.setPlayerExperience(outstandingWeight)
 endFunction

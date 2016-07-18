@@ -44,13 +44,11 @@ int PluginFunctions::getDayOfConfigWeek(__int64 date)
 //Returns a float representation of the number of levels gained from the workout passed to the method
 float PluginFunctions::configure(json workout, int level)
 {
-	std::cout << workout;
-	
 	// the amount of extra experience (points) needed per specified number of levels needed 
 	float expIncreaseRate = 0.1;
 	// every x levels there should be improvement
-	int levelImprovement = 12;
-	int estimatedLevelsPerWeek = 3;
+	float levelImprovement = 12.0;
+	float estimatedLevelsPerWeek = 3.0;
 	float levelsGained = 0.0;
 
 	__int64 startDate = config.getConfigProperty("startDate");
@@ -63,11 +61,7 @@ float PluginFunctions::configure(json workout, int level)
 	int totalPoints = config.getConfigProperty("totalPoints");
 	int workoutsThisWeek = config.getConfigProperty("workoutsThisWeek");
 
-	int workoutPoints = (int)workout["health"] + (int)workout["stamina"] + (int)workout["magicka"];
-	std::cout << "\nfirstWorkoutDate: " << firstWorkoutDate;
-	std::cout << "\nworkoutCount: " << workoutCount;
-	std::cout << "\nworkout[\"workoutDate\"]: " << workout["workoutDate"];
-	std::cout << "\nstartDate: " << startDate;
+	float workoutPoints = (int)workout["health"] + (int)workout["stamina"] + (int)workout["magicka"];
 	if (firstWorkoutDate == 0 && workoutCount == 0 && (__int64)workout["workoutDate"] > startDate)
 	{
 		firstWorkoutDate = (__int64)workout["workoutDate"];
@@ -128,12 +122,8 @@ float PluginFunctions::configure(json workout, int level)
 			{
 				
 			}
-			levelsGained = ((estimatedLevelsPerWeek * workoutPoints) / (avgPointsPerWorkout * avgWorkoutsPerWeek));
-			std::cout << "\npre-levelsGained: " << levelsGained;
-			levelsGained = levelsGained / (1 + ((level / levelImprovement) * expIncreaseRate));
-			std::cout << "\nlevel: " << level;
-			std::cout << "\nlevelImprovement: " << levelImprovement;
-			std::cout << "\nexpIncreaseRate: " << expIncreaseRate;
+			levelsGained = ((estimatedLevelsPerWeek * workoutPoints) / ((float)avgPointsPerWorkout * avgWorkoutsPerWeek));
+			levelsGained = levelsGained / (1.0 + (((float)level / levelImprovement) * expIncreaseRate));
 		}
 	}
 
@@ -144,7 +134,7 @@ float PluginFunctions::configure(json workout, int level)
 	config.setConfigProperty("totalPoints", totalPoints);
 	config.setConfigProperty("workoutsThisWeek", workoutsThisWeek);
 	config.setConfigProperty("lastWorkoutDate", lastWorkoutDate);
-	std::cout << "\nlevelsGained: " << levelsGained;
+
 	return levelsGained;
 }
 
@@ -188,19 +178,11 @@ std::string PluginFunctions::updateWeeks(int level)
 	for (int workoutNumber = 0; workoutNumber < workoutCount; workoutNumber++)
 	{
 		json workout = rawData.getWorkout(workoutNumber);
-		std::cout << "\n\nworkout type = ";
-		std::cout << workout.type();
 		//adjust the config to account for the new workout and gets the workouts weight
 		float weight = configure(workout, level);
-		std::cout << "\nGot weight.";
 		workout["weight"] = weight;
-		std::cout << "\nAdded to json.\n";
-		std::cout << workout["weight"].type();
 		float workoutWeight = (float)workout["weight"];
-		std::cout << "\nCast weight.\n";
-		std::cout << workoutWeight;
-		std::cout << "\nPrinted weight.";
-		if ((float)workout["weight"] > 0)
+		if (workoutWeight > 0)
 		{
 			weekHandler.addWorkout(workout);
 
@@ -212,7 +194,6 @@ std::string PluginFunctions::updateWeeks(int level)
 			workoutsAsString = workoutsAsString + workoutToString(workout);
 		}
 	}
-	std::cout << "\nReturning.";
 	return workoutsAsString;
 }
 	
@@ -316,9 +297,9 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 	{
 		try
 		{
-			totalHealth = std::stof(outstandingLevelFields.at(HEALTH).c_str());
-			totalStamina = std::stof(outstandingLevelFields.at(STAMINA).c_str());
-			totalMagicka = std::stof(outstandingLevelFields.at(MAGICKA).c_str());
+			totalHealth = std::stof(outstandingLevelFields.at(HEALTH - 1).c_str());
+			totalStamina = std::stof(outstandingLevelFields.at(STAMINA - 1).c_str());
+			totalMagicka = std::stof(outstandingLevelFields.at(MAGICKA - 1).c_str());
 			totalWeight = (totalHealth + totalStamina + totalMagicka) / 10;
 		}
 		catch (const std::out_of_range& oor)
@@ -331,16 +312,16 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 	for (int i = 0; i < workouts.size(); i++)
 	{
 		std::string workout = workouts.at(i);
-
+		
 		std::vector<std::string> workoutFields = split(workout, FIELD_SEPARATOR);
-
+		std::cout << "Workout string:" + workout + "\n";
 		try
 		{
-			int weight = std::stoi(workoutFields.at(WEIGHT));
-			int health = std::stoi(workoutFields.at(HEALTH));
-			int stamina = std::stoi(workoutFields.at(STAMINA));
-			int magicka = std::stoi(workoutFields.at(MAGICKA));
-			int total = health + stamina + magicka;
+			float weight = std::stof(workoutFields.at(WEIGHT));
+			float health = std::stof(workoutFields.at(HEALTH));
+			float stamina = std::stof(workoutFields.at(STAMINA));
+			float magicka = std::stof(workoutFields.at(MAGICKA));
+			float total = health + stamina + magicka;
 
 			if (total == 0)
 			{
@@ -348,22 +329,22 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 			}
 
 			//get how much weight is needed to level up
-			int weightNeeded = 1 - totalWeight;
+			float weightNeeded = 1 - totalWeight;
 
 			//use the minimum of the current workouts weight, and the weight needed to scale the current workouts points
-			int scalingWeight = min(weightNeeded, weight);
-
-			float healthUsed = ((health * 10) * scalingWeight) / total;
-			float staminaUsed = ((stamina * 10) * scalingWeight) / total;
-			float magickaUsed = (10 * scalingWeight) - (healthUsed + staminaUsed);
-
-			totalHealth += healthUsed;
-			totalStamina += staminaUsed;
-			totalMagicka += magickaUsed;
+			float scalingWeight = min(weightNeeded, weight);
 
 			//if the weight of the current workout is greter than the weight needed then the player has levelled up
-			if (weightNeeded <= weight)
+			while (weightNeeded <= weight)
 			{
+				float healthUsed = ((health * 10) * scalingWeight) / total;
+				float staminaUsed = ((stamina * 10) * scalingWeight) / total;
+				float magickaUsed = (10 * scalingWeight) - (healthUsed + staminaUsed);
+
+				totalHealth += healthUsed;
+				totalStamina += staminaUsed;
+				totalMagicka += magickaUsed;
+
 				//convert point distribution to ints
 				int healthInt = round(totalHealth);
 				int staminaInt = round(totalStamina);
@@ -383,13 +364,35 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 				}
 
 				//store the left over health, stamina and magicka
+				std::cout << "\n W:";
+				std::cout << weight;
+				std::cout << "\n WN:";
+				std::cout << weightNeeded;
 				scalingWeight = weight - weightNeeded;
-				totalHealth = ((health * 10) * scalingWeight) / total;
-				totalStamina = ((stamina * 10) * scalingWeight) / total;
-				totalMagicka = (10 * scalingWeight) - (totalHealth + totalStamina);
+				std::cout << "\n SW:";
+				std::cout << scalingWeight;
+				totalHealth = ((health * 10.0) * scalingWeight) / total;
+				totalStamina = ((stamina * 10.0) * scalingWeight) / total;
+				totalMagicka = (10.0 * scalingWeight) - (totalHealth + totalStamina);
+				std::cout << "\n H:";
+				std::cout << health;
+				std::cout << "\n S:";
+				std::cout << stamina;
+				std::cout << "\n M:";
+				std::cout << magicka;
+				std::cout << "\n TH:";
+				std::cout << totalHealth;
+				std::cout << "\n TS:";
+				std::cout << totalStamina;
+				std::cout << "\n TM:";
+				std::cout << totalMagicka;
+				std::cout << "\n";
+				weight = weight - weightNeeded;
+				weightNeeded = 1;
+				scalingWeight = min(weightNeeded, weight);
 			}
 
-			totalWeight = (totalHealth + totalStamina + totalMagicka) / 10;
+			totalWeight = (totalHealth + totalStamina + totalMagicka) / 10.0;
 		}
 		catch (const std::out_of_range& oor)
 		{

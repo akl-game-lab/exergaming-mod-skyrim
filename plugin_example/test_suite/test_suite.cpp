@@ -2,11 +2,17 @@
 //
 
 #include "test_suite.h"
-
+/*
 int results[sizeof(tests) / 4] = {};
 int testNumber = 0;
-int main()
+*/int main()
 {
+	pluginFunctions.startNormalFetch("Skyrim","paul@paulralph.name");
+	std::string workouts = pluginFunctions.getWorkoutsString(3);
+	std::string levels = pluginFunctions.getLevelUpsAsString("0,0,0,0",workouts);
+	std::cout << levels + "\n\n";
+	std::cout << pluginFunctions.getOutstandingLevel(levels);
+	//std::cout << pluginFunctions.getOutstandingLevel(pluginFunctions.getWorkoutsString(12));
 	/*
 	for (TestCases t : tests) 
 	{
@@ -20,12 +26,12 @@ int main()
 		std::cout << (r == 0 ? "." : (r == 1 ? "+" : "-"));
 	}
 	std::cout << "|\n";
-	*/
+	
 	pluginFunctions.validUsername("Skyrim","paul");
-
+	*/
 	getchar();
 }
-
+/*
 std::string assertToString(bool expression) {}
 
 std::string assertToStringWithName(bool expression, const char* funcName) {
@@ -111,3 +117,4 @@ void Test_isOldSave_ConfigShouldNotUpdateOnCurrentSave_UnchangedConfig() {
 	pluginFunctions.isOldSave(1467690060);
 	std::cout << assertToString(pluginFunctions.config.getConfigProperty("lastSyncDate") == 1467690060);
 }
+*/
