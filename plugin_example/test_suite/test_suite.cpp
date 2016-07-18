@@ -1,18 +1,20 @@
 // test_suite.cpp : Defines the entry point for the console application.
 //
 
-#include "test_suite.h"
+#include "plugin_example\PluginLibrary.h"
 /*
 int results[sizeof(tests) / 4] = {};
 int testNumber = 0;
 */int main()
 {
+	PluginFunctions pluginFunctions;
 	pluginFunctions.startNormalFetch("Skyrim","paul@paulralph.name");
+	Sleep(5000);
 	std::string workouts = pluginFunctions.getWorkoutsString(3);
+	std::cout << "\nWORKOUTS:" + workouts;
 	std::string levels = pluginFunctions.getLevelUpsAsString("0,0,0,0",workouts);
-	std::cout << levels + "\n\n";
+	std::cout << "\nLEVEL_UPS:" + levels + "\nOUTSTANDING_LEVELS:";
 	std::cout << pluginFunctions.getOutstandingLevel(levels);
-	//std::cout << pluginFunctions.getOutstandingLevel(pluginFunctions.getWorkoutsString(12));
 	/*
 	for (TestCases t : tests) 
 	{
