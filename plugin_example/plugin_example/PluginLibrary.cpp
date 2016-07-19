@@ -543,10 +543,11 @@ void PluginFunctions::pressKey(std::string key)
 //Gets the number of exercise.com points needed to level up
 int PluginFunctions::getPointsToNextLevel(float outstandingWeight)
 {
+	int avePointsPerWorkout = config.getConfigProperty("avgPointsPerWorkout");
 	int workoutCount = config.getConfigProperty("workoutCount");
 	int weeksWorkedOut = config.getConfigProperty("weeksWorkedOut");
 	int workoutsThisWeek = config.getConfigProperty("workoutsThisWeek");
 	float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
-	int pointsToNextLevel = round((1.0f - outstandingWeight)*(avgWorkoutsPerWeek / ESTIMATED_LEVELS_PER_WEEK));
+	int pointsToNextLevel = round((1.0f - outstandingWeight)*avePointsPerWorkout*(float(avgWorkoutsPerWeek)/ESTIMATED_LEVELS_PER_WEEK));
 	return pointsToNextLevel;
 }

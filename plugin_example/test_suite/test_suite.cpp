@@ -218,14 +218,50 @@ void Test_getLevelComponent_GetMagicka1_0() {
 void Test_getLevelComponent_GetMagicka2_3() {
 	std::cout << assertToString(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3);
 }
-/*
-void Test_getPointsToNextLevel_Composite_Results() {
-	//initialiseConfig();
-	//pluginFunctions.config.setConfigProperty("avgPointsPerWorkout", 1467690060);
-	//pluginFunctions.config.setConfigProperty("lastSyncDate", 1467690060);
-	//std::cout << assertToStringWithInt(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3, 1);
-	//std::cout << assertToStringWithInt(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3, 2);
-	//std::cout << assertToStringWithInt(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3, 3);
-	//std::cout << assertToStringWithInt(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3, 4);
-	//std::cout << assertToStringWithInt(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3, 5);
-}*/
+
+//How does it work if the user is on first week??
+void Test_getPointsToNextLevel_FreshConfig_Minus1() {
+	initialiseConfig();
+	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(0.0f) == -1);
+}
+void Test_getPointsToNextLevel_AfterOneWorkOut_Minus1() {
+	initialiseConfig();
+	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(0.3f) == -1);
+}
+void Test_getPointsToNextLevel_AfterExactlyOneWorkOut_Minus1() {
+	initialiseConfig();
+	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(0.3f) == -1);
+}
+void Test_getPointsToNextLevel_EarlyInSecondWeek_3500() {
+	initialiseConfig();
+	pluginFunctions.config.setConfigProperty("avgPointsPerWorkout", 3000);
+	pluginFunctions.config.setConfigProperty("weeksWorkedOut", 2);
+	pluginFunctions.config.setConfigProperty("workoutsThisWeek", 1); //should never be 0 since it is checked after the workouts processed
+	pluginFunctions.config.setConfigProperty("workoutCount", 6);
+	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(0.3f) == 3500);
+	std::cout << pluginFunctions.getPointsToNextLevel(0.3f) << "\n";
+}
+void Test_getPointsToNextLevel_LateInSecondWeek_1712() {
+	initialiseConfig();
+	pluginFunctions.config.setConfigProperty("avgPointsPerWorkout", 1467);
+	pluginFunctions.config.setConfigProperty("weeksWorkedOut", 2);
+	pluginFunctions.config.setConfigProperty("workoutsThisWeek", 4);
+	pluginFunctions.config.setConfigProperty("workoutCount", 9);
+	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(0.3f) == 1712);
+}
+void Test_getPointsToNextLevel_Week5NoOutstandingLevel_5174() {
+	initialiseConfig();
+	pluginFunctions.config.setConfigProperty("avgPointsPerWorkout", 2141);
+	pluginFunctions.config.setConfigProperty("weeksWorkedOut", 5);
+	pluginFunctions.config.setConfigProperty("workoutsThisWeek", 4);
+	pluginFunctions.config.setConfigProperty("workoutCount", 33);
+	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(0.0f) == 5174);
+}
+void Test_getPointsToNextLevel_Week5AlmostLevel_1() {
+	initialiseConfig();
+	pluginFunctions.config.setConfigProperty("avgPointsPerWorkout", 127662);
+	pluginFunctions.config.setConfigProperty("weeksWorkedOut", 5);
+	pluginFunctions.config.setConfigProperty("workoutsThisWeek", 4);
+	pluginFunctions.config.setConfigProperty("workoutCount", 51);
+	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(0.999999f) == 1);
+}
