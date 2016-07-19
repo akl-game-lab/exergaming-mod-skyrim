@@ -45,10 +45,6 @@ int PluginFunctions::getDayOfConfigWeek(__int64 date)
 float PluginFunctions::configure(json workout, int level)
 {
 	// the amount of extra experience (points) needed per specified number of levels needed 
-	float expIncreaseRate = 0.1;
-	// every x levels there should be improvement
-	float levelImprovement = 12.0;
-	float estimatedLevelsPerWeek = 3.0;
 	float levelsGained = 0.0;
 
 	__int64 startDate = config.getConfigProperty("startDate");
@@ -114,16 +110,10 @@ float PluginFunctions::configure(json workout, int level)
 
 		if (levelsGained == 0)
 		{
-			float avgWorkoutsPerWeek = 0.0;
-			if (weeksWorkedOut > 1) {
-				avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
-			} 
-			else 
-			{
-				
-			}
-			levelsGained = ((estimatedLevelsPerWeek * workoutPoints) / ((float)avgPointsPerWorkout * avgWorkoutsPerWeek));
-			levelsGained = levelsGained / (1.0 + (((float)level / levelImprovement) * expIncreaseRate));
+			float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
+
+			levelsGained = ((ESTIMATED__LEVELS_PER_WEEK * workoutPoints) / ((float)avgPointsPerWorkout * avgWorkoutsPerWeek));
+			levelsGained = levelsGained / (1.0 + (((float)level / LEVEL_IMPROVEMENT) * EXP_INCREASE_RATE));
 		}
 	}
 
@@ -173,7 +163,6 @@ std::string PluginFunctions::updateWeeks(int level)
 	std::string workoutsAsString = "";
 	int health = 0, stamina = 0, magicka = 0;
 	int workoutCount = rawData.getWorkoutCount();
-
 	//for each workout
 	for (int workoutNumber = 0; workoutNumber < workoutCount; workoutNumber++)
 	{
@@ -276,7 +265,7 @@ std::string PluginFunctions::getWorkoutsFromBestWeek(__int64 creationDate)
 	return bestWeeksWorkouts;
 }
 
-//Returns a string representation of the levels gained in the given week (format is "H,S,M;H,S,M...")
+//Returns a string representation of the levels gained(format is "H,S,M;H,S,M...")
 std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, std::string workoutsString)
 {
 	std::string levelUps = "";
@@ -284,23 +273,19 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 	//initialise the level ditribution with the outstanding points
 	std::vector<std::string> outstandingLevelFields = split(outstandingLevel, FIELD_SEPARATOR);
 
-	/*TO-DO
-	Improve health, stamina, magicka reptition with a loop from 0-2;
-	*/
-
-	float totalHealth = 0;
-	float totalStamina = 0;
-	float totalMagicka = 0;
-	float totalWeight = 0;
+	float outstandingHealth = 0;
+	float outstandingStamina = 0;
+	float outstandingMagicka = 0;
+	float outstandingWeight = 0;
 
 	if (outstandingLevelFields.size() == 3)
 	{
 		try
 		{
-			totalHealth = std::stof(outstandingLevelFields.at(HEALTH - 1).c_str());
-			totalStamina = std::stof(outstandingLevelFields.at(STAMINA - 1).c_str());
-			totalMagicka = std::stof(outstandingLevelFields.at(MAGICKA - 1).c_str());
-			totalWeight = (totalHealth + totalStamina + totalMagicka) / 10;
+			outstandingHealth = std::stof(outstandingLevelFields.at(HEALTH - 1).c_str());
+			outstandingStamina = std::stof(outstandingLevelFields.at(STAMINA - 1).c_str());
+			outstandingMagicka = std::stof(outstandingLevelFields.at(MAGICKA - 1).c_str());
+			outstandingWeight = (outstandingHealth + outstandingStamina + outstandingMagicka) / 10;
 		}
 		catch (const std::out_of_range& oor)
 		{
@@ -309,106 +294,79 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 
 	std::vector<std::string> workouts = split(workoutsString, ITEM_SEPARATOR);
 	//loop through the given weeks workouts to see if a level up can be awarded
+	std::cout << "\nWC:" + std::to_string(workouts.size());
 	for (int i = 0; i < workouts.size(); i++)
 	{
 		std::string workout = workouts.at(i);
-		
 		std::vector<std::string> workoutFields = split(workout, FIELD_SEPARATOR);
-		std::cout << "Workout string:" + workout + "\n";
 		try
 		{
-			float weight = std::stof(workoutFields.at(WEIGHT));
-			float health = std::stof(workoutFields.at(HEALTH));
-			float stamina = std::stof(workoutFields.at(STAMINA));
-			float magicka = std::stof(workoutFields.at(MAGICKA));
-			float total = health + stamina + magicka;
+			float workoutWeight = std::stof(workoutFields.at(WEIGHT));
+			float workoutHealth = std::stof(workoutFields.at(HEALTH));
+			float workoutStamina = std::stof(workoutFields.at(STAMINA));
+			float workoutMagicka = std::stof(workoutFields.at(MAGICKA));
+			float workoutTotal = workoutHealth + workoutStamina + workoutMagicka;
 
-			if (total == 0)
+			if (workoutTotal != 0)
 			{
-				break;
-			}
+				float totalWeight = outstandingWeight + workoutWeight;
 
-			//get how much weight is needed to level up
-			float weightNeeded = 1 - totalWeight;
+				std::cout << "\n\nNEW_WORKOUT";
 
-			//use the minimum of the current workouts weight, and the weight needed to scale the current workouts points
-			float scalingWeight = min(weightNeeded, weight);
+				std::cout << "\nWW:" + std::to_string(workoutWeight);
+				std::cout << "\nWH:" + std::to_string(workoutHealth);
+				std::cout << "\nWS:" + std::to_string(workoutStamina);
+				std::cout << "\nWM:" + std::to_string(workoutMagicka);
+				std::cout << "\nWT:" + std::to_string(workoutTotal);
 
-			//if the weight of the current workout is greter than the weight needed then the player has levelled up
-			while (weightNeeded <= weight)
-			{
-				float healthUsed = ((health * 10) * scalingWeight) / total;
-				float staminaUsed = ((stamina * 10) * scalingWeight) / total;
-				float magickaUsed = (10 * scalingWeight) - (healthUsed + staminaUsed);
+				//while there is another level up from this workout
 
-				totalHealth += healthUsed;
-				totalStamina += staminaUsed;
-				totalMagicka += magickaUsed;
-
-				//convert point distribution to ints
-				int healthInt = round(totalHealth);
-				int staminaInt = round(totalStamina);
-				int magikaInt = 10 - (healthInt + staminaInt);
-
-				//format the level up string
-				std::string newLevelUp = std::to_string(healthInt) + "," + std::to_string(staminaInt) + "," + std::to_string(magikaInt);
-
-				//add the new level up to the string of level ups
-				if (levelUps.compare("") == 0)
+				if (totalWeight >= 1)
 				{
-					levelUps = newLevelUp;
+					while (totalWeight >= 1)
+					{
+						std::cout << "\nOW:" + std::to_string(outstandingWeight);
+						std::cout << "\nOH:" + std::to_string(outstandingHealth);
+						std::cout << "\nOS:" + std::to_string(outstandingStamina);
+						std::cout << "\nOM:" + std::to_string(outstandingMagicka);
+						std::cout << "\nTW:" + std::to_string(totalWeight);
+						//Calculate each value using the weight needed (1 - outstandingWeight)
+						int levelHealth = round((outstandingHealth + ((workoutHealth / workoutTotal) * (1 - outstandingWeight))) * 10);
+						int levelStamina = round((outstandingStamina + ((workoutStamina / workoutTotal) * (1 - outstandingWeight))) * 10);
+						int levelMagicka = (10 - levelHealth) - levelStamina;
+						if (levelUps.compare("") != 0)
+						{
+							levelUps = levelUps + ITEM_SEPARATOR;
+						}
+						//Add new level to levelUps string
+						levelUps = levelUps + std::to_string(levelHealth) + FIELD_SEPARATOR + std::to_string(levelStamina) + FIELD_SEPARATOR + std::to_string(levelMagicka);
+						totalWeight = totalWeight - 1;
+						outstandingWeight = totalWeight;
+						outstandingHealth = (workoutHealth / workoutTotal) * outstandingWeight;
+						outstandingStamina = (workoutStamina / workoutTotal) * outstandingWeight;
+						outstandingMagicka = (outstandingWeight - outstandingHealth) - outstandingStamina;
+					}
 				}
 				else
 				{
-					levelUps = levelUps + ITEM_SEPARATOR + newLevelUp;
+					std::cout << "\nOW:" + std::to_string(outstandingWeight);
+					std::cout << "\nOH:" + std::to_string(outstandingHealth);
+					std::cout << "\nOS:" + std::to_string(outstandingStamina);
+					std::cout << "\nOM:" + std::to_string(outstandingMagicka);
+					std::cout << "\nTW:" + std::to_string(totalWeight);
+					outstandingWeight = totalWeight;
+					outstandingHealth = outstandingHealth + (workoutHealth / workoutTotal) * workoutWeight;
+					outstandingStamina = outstandingStamina + (workoutStamina / workoutTotal) * workoutWeight;
+					outstandingMagicka = (outstandingWeight - outstandingHealth) - outstandingStamina;
 				}
-
-				//store the left over health, stamina and magicka
-				std::cout << "\n W:";
-				std::cout << weight;
-				std::cout << "\n WN:";
-				std::cout << weightNeeded;
-				scalingWeight = weight - weightNeeded;
-				std::cout << "\n SW:";
-				std::cout << scalingWeight;
-				totalHealth = ((health * 10.0) * scalingWeight) / total;
-				totalStamina = ((stamina * 10.0) * scalingWeight) / total;
-				totalMagicka = (10.0 * scalingWeight) - (totalHealth + totalStamina);
-				std::cout << "\n H:";
-				std::cout << health;
-				std::cout << "\n S:";
-				std::cout << stamina;
-				std::cout << "\n M:";
-				std::cout << magicka;
-				std::cout << "\n TH:";
-				std::cout << totalHealth;
-				std::cout << "\n TS:";
-				std::cout << totalStamina;
-				std::cout << "\n TM:";
-				std::cout << totalMagicka;
-				std::cout << "\n";
-				weight = weight - weightNeeded;
-				weightNeeded = 1;
-				scalingWeight = min(weightNeeded, weight);
 			}
-
-			totalWeight = (totalHealth + totalStamina + totalMagicka) / 10.0;
 		}
 		catch (const std::out_of_range& oor)
 		{
 		}
 	}
-
-	//add the left over health, stamina and magicka to outstandingLevel
-	std::string totals = std::to_string(totalHealth) + FIELD_SEPARATOR + std::to_string(totalStamina) + FIELD_SEPARATOR + std::to_string(totalMagicka);
-
-	//add the outstanding level to the start of the return string
-	std::string levelUpsFinal = totals;
-	if (levelUps.compare("") != 0)
-	{
-		levelUpsFinal = levelUpsFinal + ITEM_SEPARATOR + levelUps;
-	}
-	return levelUpsFinal;
+	levelUps = std::to_string(outstandingHealth) + FIELD_SEPARATOR + std::to_string(outstandingStamina) + FIELD_SEPARATOR + std::to_string(outstandingMagicka) + ITEM_SEPARATOR + levelUps;
+	return levelUps;
 }
 
 //Returns true if there is another level up and sets the health,stamina and magicka values

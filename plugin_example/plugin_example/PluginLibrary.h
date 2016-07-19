@@ -31,6 +31,10 @@ public:
 	int MAGICKA = 3;
 	char ITEM_SEPARATOR = ';';
 	char FIELD_SEPARATOR = ',';
+	float EXP_INCREASE_RATE = 0.1;
+	// every x levels there should be improvement
+	float LEVEL_IMPROVEMENT = 12.0;
+	float ESTIMATED__LEVELS_PER_WEEK = 3.0;
 	std::string WEB_SERVICE_DIR = "Data\\SKSE\\Plugins";
 
 	/**********************************************************************************************************
