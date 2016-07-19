@@ -547,9 +547,6 @@ int PluginFunctions::getPointsToNextLevel(float outstandingWeight)
 	int weeksWorkedOut = config.getConfigProperty("weeksWorkedOut");
 	int workoutsThisWeek = config.getConfigProperty("workoutsThisWeek");
 	float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
-	float num = round(double((1.0 - outstandingWeight)*(avgWorkoutsPerWeek / ESTIMATED_LEVELS_PER_WEEK)));
-	//int pointsToNextLevel = round((1.0 - outstandingWeight)*(avgWorkoutsPerWeek/ESTIMATED_LEVELS_PER_WEEK));
-	/*return pointsToNextLevel;
-	*/
-	return 0;
+	int pointsToNextLevel = round((1.0f - outstandingWeight)*(avgWorkoutsPerWeek / ESTIMATED_LEVELS_PER_WEEK));
+	return pointsToNextLevel;
 }
