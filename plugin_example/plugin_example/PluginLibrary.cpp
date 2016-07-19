@@ -285,7 +285,7 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 			outstandingHealth = std::stof(outstandingLevelFields.at(HEALTH - 1).c_str());
 			outstandingStamina = std::stof(outstandingLevelFields.at(STAMINA - 1).c_str());
 			outstandingMagicka = std::stof(outstandingLevelFields.at(MAGICKA - 1).c_str());
-			outstandingWeight = (outstandingHealth + outstandingStamina + outstandingMagicka) / 10;
+			outstandingWeight = (outstandingHealth + outstandingStamina + outstandingMagicka);
 		}
 		catch (const std::out_of_range& oor)
 		{
@@ -344,7 +344,7 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 						outstandingWeight = totalWeight;
 						outstandingHealth = (workoutHealth / workoutTotal) * outstandingWeight;
 						outstandingStamina = (workoutStamina / workoutTotal) * outstandingWeight;
-						outstandingMagicka = (outstandingWeight - outstandingHealth) - outstandingStamina;
+						outstandingMagicka = abs((outstandingWeight - outstandingHealth) - outstandingStamina);
 					}
 				}
 				else
@@ -357,7 +357,7 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 					outstandingWeight = totalWeight;
 					outstandingHealth = outstandingHealth + (workoutHealth / workoutTotal) * workoutWeight;
 					outstandingStamina = outstandingStamina + (workoutStamina / workoutTotal) * workoutWeight;
-					outstandingMagicka = (outstandingWeight - outstandingHealth) - outstandingStamina;
+					outstandingMagicka = abs((outstandingWeight - outstandingHealth) - outstandingStamina);
 				}
 			}
 		}
@@ -365,7 +365,16 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 		{
 		}
 	}
-	levelUps = std::to_string(outstandingHealth) + FIELD_SEPARATOR + std::to_string(outstandingStamina) + FIELD_SEPARATOR + std::to_string(outstandingMagicka) + ITEM_SEPARATOR + levelUps;
+
+	if (levelUps.compare("") != 0)
+	{
+		levelUps = std::to_string(outstandingHealth) + FIELD_SEPARATOR + std::to_string(outstandingStamina) + FIELD_SEPARATOR + std::to_string(outstandingMagicka) + ITEM_SEPARATOR + levelUps;
+	}
+	else 
+	{
+		levelUps = std::to_string(outstandingHealth) + FIELD_SEPARATOR + std::to_string(outstandingStamina) + FIELD_SEPARATOR + std::to_string(outstandingMagicka);
+	}
+
 	return levelUps;
 }
 
