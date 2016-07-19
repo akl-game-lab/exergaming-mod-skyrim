@@ -112,7 +112,7 @@ float PluginFunctions::configure(json workout, int level)
 		{
 			float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
 
-			levelsGained = ((ESTIMATED__LEVELS_PER_WEEK * workoutPoints) / ((float)avgPointsPerWorkout * avgWorkoutsPerWeek));
+			levelsGained = ((ESTIMATED_LEVELS_PER_WEEK * workoutPoints) / ((float)avgPointsPerWorkout * avgWorkoutsPerWeek));
 			levelsGained = levelsGained / (1.0 + (((float)level / LEVEL_IMPROVEMENT) * EXP_INCREASE_RATE));
 		}
 	}
@@ -538,4 +538,18 @@ void PluginFunctions::pressKey(std::string key)
 	//Release Key
 	input.ki.dwFlags = KEYEVENTF_KEYUP;
 	SendInput(1, &input, sizeof(INPUT));
+}
+
+//Gets the number of exercise.com points needed to level up
+int PluginFunctions::getPointsToNextLevel(float outstandingWeight)
+{
+	int workoutCount = config.getConfigProperty("workoutCount");
+	int weeksWorkedOut = config.getConfigProperty("weeksWorkedOut");
+	int workoutsThisWeek = config.getConfigProperty("workoutsThisWeek");
+	float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
+	float num = round(double((1.0 - outstandingWeight)*(avgWorkoutsPerWeek / ESTIMATED_LEVELS_PER_WEEK)));
+	//int pointsToNextLevel = round((1.0 - outstandingWeight)*(avgWorkoutsPerWeek/ESTIMATED_LEVELS_PER_WEEK));
+	/*return pointsToNextLevel;
+	*/
+	return 0;
 }

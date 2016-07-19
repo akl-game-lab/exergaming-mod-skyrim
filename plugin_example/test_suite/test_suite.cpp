@@ -158,7 +158,7 @@ void Test_getLevelUpAsString_NoOutstandingWithPartLevelForMagicka_String() {
 	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.666666,0,0,1000;0.666666,0,0,1000").compare("0.000000,0.000000,0.333332;0,0,10") == 0);
 }
 void Test_getLevelUpAsString_OutstandingLevelsExactlyOneLevelForHealthOverTwoWorkouts_String() {
-	//std::cout << "\n" << pluginFunctions.getLevelUpsAsString("0.500000,0.000000,0.000000", "0.25,750,0,0;0.25,750,0,0") << "\n";
+	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.500000,0.000000,0.000000", "0.25,750,0,0;0.25,750,0,0").compare("0.000000,0.000000,0.000000;10,0,0") == 0);
 }
 void Test_getLevelUpAsString_OutstandingLevelsExactlyOneLevelForStaminaOverTwoWorkouts_String() {
 	std::cout << assertToString(pluginFunctions.getLevelUpsAsString("0.000000,0.750000,0.000000", "0.125,0,300,0;0.125,0,300,0").compare("0.000000,0.000000,0.000000;0,10,0") == 0);
@@ -171,7 +171,6 @@ void Test_getLevelUpAsString_OutstandingLevelsInAllAttributesOverTwoWorkouts_Str
 	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.200000,0.000000,0.000000", "0.25,750,0,0;0.35,250,100,0").compare("0.700000,0.100000,0.000000") == 0, 2);
 	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.300000,0.200000", "1,100,0,0;0.2,10,5,5").compare("0.600000,0.050000,0.050000;5,3,2") == 0, 3);
 	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.200000,0.500000,0.100000", "0.7,100,100,500;1,900,300,300").compare("0.300000,0.100000,0.100000;2,5,3;4,2,4") == 0, 4);
-	
 }
 void Test_getLevelUpAsString_CompositeCases_String() {
 	//std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.500000,0.333333,0.222222", "1,50,50,0;1,50,100,100").compare("0.666666,0.000000,0.000000") == 0, 1);
@@ -219,3 +218,14 @@ void Test_getLevelComponent_GetMagicka1_0() {
 void Test_getLevelComponent_GetMagicka2_3() {
 	std::cout << assertToString(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3);
 }
+/*
+void Test_getPointsToNextLevel_Composite_Results() {
+	//initialiseConfig();
+	//pluginFunctions.config.setConfigProperty("avgPointsPerWorkout", 1467690060);
+	//pluginFunctions.config.setConfigProperty("lastSyncDate", 1467690060);
+	//std::cout << assertToStringWithInt(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3, 1);
+	//std::cout << assertToStringWithInt(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3, 2);
+	//std::cout << assertToStringWithInt(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3, 3);
+	//std::cout << assertToStringWithInt(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3, 4);
+	//std::cout << assertToStringWithInt(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3, 5);
+}*/

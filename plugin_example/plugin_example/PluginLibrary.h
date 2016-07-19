@@ -34,7 +34,7 @@ public:
 	float EXP_INCREASE_RATE = 0.1;
 	// every x levels there should be improvement
 	float LEVEL_IMPROVEMENT = 12.0;
-	float ESTIMATED__LEVELS_PER_WEEK = 3.0;
+	float ESTIMATED_LEVELS_PER_WEEK = 3.0;
 	std::string WEB_SERVICE_DIR = "Data\\SKSE\\Plugins";
 
 	/**********************************************************************************************************
@@ -119,4 +119,7 @@ public:
 
 	//Virtually presses the given key
 	void pressKey(std::string key);
+
+	//Gets the number of exercise.com points needed to level up
+	int getPointsToNextLevel(float outstandingWeight);
 };
