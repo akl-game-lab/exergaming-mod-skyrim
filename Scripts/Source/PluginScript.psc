@@ -47,3 +47,6 @@ string function getShortenedUsername(string username) global native
 
 ;Opens the skills menu
 function openSkillsMenu() global native
+
+;Gets the number of exercise.com points needed to level up
+int function getPointsToNextLevel(float outstandingWeight) global native

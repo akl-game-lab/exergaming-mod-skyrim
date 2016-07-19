@@ -99,6 +99,12 @@ namespace plugin
 
 	}
 
+	//Gets the number of exercise.com points needed to level up
+	UInt32 getPointsToNextLevel(StaticFunctionTag* base, float outstandingWeight)
+	{
+		return pluginFunctions.getPointsToNextLevel(outstandingWeight);
+	}
+
 	/**********************************************************************************************************
 	*	Register
 	*/
@@ -150,6 +156,9 @@ namespace plugin
 
 		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, void, BSFixedString>("pressKey", "PluginScript", plugin::pressKey, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction1 <StaticFunctionTag, UInt32, float>("getPointsToNextLevel", "PluginScript", plugin::getPointsToNextLevel, registry));
 
 		return true;
 	}

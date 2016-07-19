@@ -1,13 +1,13 @@
 // test_suite.cpp : Defines the entry point for the console application.
 //
+#include "stdio.h"
+//#include "test_suite.h"
 
-#include "test_suite.h"
-
-int results[sizeof(tests) / 4] = {};
-int testNumber = 0;
+//int results[sizeof(tests) / 4] = {};
+//int testNumber = 0;
 int main()
 {
-	for (TestCases t : tests) 
+	/*for (TestCases t : tests) 
 	{
 		(*t)();
 		testNumber++;
@@ -22,17 +22,17 @@ int main()
 	{
 		std::cout << (r == 0 ? "." : (r == 1 ? "+" : "-"));
 	}
-	std::cout << "|\n";
+	std::cout << "|\n";*/
 	getchar();
 }
-
+/*
 std::string assertToString(bool expression) {}
 
 std::string assertToStringWithInt(bool expression, int subCase) {}
 
 /*
 if it is the first test, init results to 1, if any failed, set to -1
-*/
+*//*
 std::string assertToStringWithName(bool expression, const char* funcName) {
 	if (results[testNumber] == 0) {
 		results[testNumber] = 1;
@@ -264,4 +264,4 @@ void Test_getPointsToNextLevel_Week5AlmostLevel_1() {
 	pluginFunctions.config.setConfigProperty("workoutsThisWeek", 4);
 	pluginFunctions.config.setConfigProperty("workoutCount", 51);
 	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(0.999999f) == 1);
-}
+}*/

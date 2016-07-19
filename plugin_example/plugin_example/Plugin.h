@@ -50,7 +50,10 @@ namespace plugin
 	BSFixedString getShortenedUsername(StaticFunctionTag* base, BSFixedString username);
 
 	//Virtually presses the given key
-	void pressKey(BSFixedString key);
+	void pressKey(StaticFunctionTag* base, BSFixedString key);
+
+	//Gets the number of exercise.com points needed to level up
+	UInt32 getPointsToNextLevel(StaticFunctionTag* base, float outstandingWeight);
 
 	/**********************************************************************************************************
 	*	Register

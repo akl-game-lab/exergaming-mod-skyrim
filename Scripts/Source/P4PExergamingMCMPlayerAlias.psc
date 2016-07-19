@@ -74,7 +74,7 @@ endEvent
 function getLevelUps(string workouts)
 	if(workouts == "Prior Workout")
 		priorWorkouts.show()
-		doLevelUp(4,3,3)
+		doLevelUp(4,3,3,true)
 	else
 		string levelUpsString = getLevelUpsAsString(outstandingLevel,workouts)
 		;level ups start at index 1 as index 0 holds the outstanding level up
@@ -84,7 +84,7 @@ function getLevelUps(string workouts)
 			int health = getLevelComponent(levelUpsString,n,"H")
 			int stamina = getLevelComponent(levelUpsString,n,"S")
 			int magicka = getLevelComponent(levelUpsString,n,"M")
-			doLevelUp(health,stamina,magicka)
+			doLevelUp(health,stamina,magicka,false)
 			n = n + 1
 			shouldContinue = isNthLevelUp(levelUpsString,n)
 		endWhile
@@ -95,7 +95,7 @@ function getLevelUps(string workouts)
 endFunction
 
 ;Increment the player level and give the player a perk point
-function doLevelUp(int health, int stamina, int magicka)
+function doLevelUp(int health, int stamina, int magicka, bool isPrior)
 	Actor player = Game.getPlayer()
 	int currentLevel = player.getLevel()
 	player.modActorValue("health", health)
@@ -104,7 +104,9 @@ function doLevelUp(int health, int stamina, int magicka)
 	Game.setPlayerLevel(currentLevel + 1)
 	currentLevel = player.getLevel()
 	Game.setPerkPoints(Game.getPerkPoints() + 1)
-	levelUpMessage.show(currentLevel)
+	if(isPrior == false)
+		levelUpMessage.show(currentLevel)
+	endIf
 	levelUpDetails.show(health,stamina,magicka)
 endFunction
 
@@ -116,6 +118,8 @@ function updateXpBar(string levelUpsString)
 	float outstandingWeight = outstandingHealth + outstandingStamina + outstandingMagicka
 	;display message for progress to next level
 	;first progress, second amount of workout
-	levelProgressMsg.show(outstandingWeight*100, 20)
+	if(outstandingWeight > 0)
+		levelProgressMsg.show(outstandingWeight*100, getPointsToNextLevel(outstandingWeight))
+	endIf
 	Game.setPlayerExperience(outstandingWeight)
 endFunction

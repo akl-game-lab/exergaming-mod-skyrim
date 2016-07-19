@@ -332,7 +332,13 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 						std::cout << "\nTW:" + std::to_string(totalWeight);
 						//Calculate each value using the weight needed (1 - outstandingWeight)
 						int levelHealth = round((outstandingHealth + ((workoutHealth / workoutTotal) * (1 - outstandingWeight))) * 10);
-						int levelStamina = round((outstandingStamina + ((workoutStamina / workoutTotal) * (1 - outstandingWeight))) * 10);
+						float tempStamina = (outstandingStamina + ((workoutStamina / workoutTotal) * (1 - outstandingWeight))) * 10;
+						int levelStamina = round(tempStamina);
+						if (levelStamina + levelHealth > 10)
+						{
+							levelStamina = floor(tempStamina);
+						}
+
 						int levelMagicka = (10 - levelHealth) - levelStamina;
 						if (levelUps.compare("") != 0)
 						{
@@ -543,11 +549,11 @@ void PluginFunctions::pressKey(std::string key)
 //Gets the number of exercise.com points needed to level up
 int PluginFunctions::getPointsToNextLevel(float outstandingWeight)
 {
-	int avePointsPerWorkout = config.getConfigProperty("avgPointsPerWorkout");
+	int avgPointsPerWorkout = config.getConfigProperty("avgPointsPerWorkout");
 	int workoutCount = config.getConfigProperty("workoutCount");
 	int weeksWorkedOut = config.getConfigProperty("weeksWorkedOut");
 	int workoutsThisWeek = config.getConfigProperty("workoutsThisWeek");
 	float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
-	int pointsToNextLevel = round((1.0f - outstandingWeight)*avePointsPerWorkout*(float(avgWorkoutsPerWeek)/ESTIMATED_LEVELS_PER_WEEK));
+	int pointsToNextLevel = round((1.0f - outstandingWeight)*avgPointsPerWorkout*(float(avgWorkoutsPerWeek)/ESTIMATED_LEVELS_PER_WEEK));
 	return pointsToNextLevel;
 }
