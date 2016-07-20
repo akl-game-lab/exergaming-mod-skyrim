@@ -1,13 +1,13 @@
 // test_suite.cpp : Defines the entry point for the console application.
 //
 #include "stdio.h"
-//#include "test_suite.h"
+#include "test_suite.h"
 
-//int results[sizeof(tests) / 4] = {};
-//int testNumber = 0;
+int results[sizeof(tests) / 4] = {};
+int testNumber = 0;
 int main()
 {
-	/*for (TestCases t : tests) 
+	for (TestCases t : tests) 
 	{
 		(*t)();
 		testNumber++;
@@ -22,17 +22,17 @@ int main()
 	{
 		std::cout << (r == 0 ? "." : (r == 1 ? "+" : "-"));
 	}
-	std::cout << "|\n";*/
+	std::cout << "|\n";
 	getchar();
 }
-/*
+
 std::string assertToString(bool expression) {}
 
 std::string assertToStringWithInt(bool expression, int subCase) {}
 
 /*
 if it is the first test, init results to 1, if any failed, set to -1
-*//*
+*/
 std::string assertToStringWithName(bool expression, const char* funcName) {
 	if (results[testNumber] == 0) {
 		results[testNumber] = 1;
@@ -172,6 +172,12 @@ void Test_getLevelUpAsString_OutstandingLevelsInAllAttributesOverTwoWorkouts_Str
 	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.300000,0.200000", "1,100,0,0;0.2,10,5,5").compare("0.600000,0.050000,0.050000;5,3,2") == 0, 3);
 	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.200000,0.500000,0.100000", "0.7,100,100,500;1,900,300,300").compare("0.300000,0.100000,0.100000;2,5,3;4,2,4") == 0, 4);
 }
+void Test_getLevelUpAsString_AllAttributesTestRounding() {
+	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "1,550,450,0").compare("0.000000,0.000000,0.000000;6,4,0") == 0, 1);
+	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "2,108,88,4").compare("0.000000,0.000000,0.000000;5,4,1;5,4,1") == 0, 2); //that is a little too high, but the alternative may get -ve numbers
+	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.275000,0.225000,0.000000", "1,550,450,0").compare("0.275000,0.225000,0.000000;6,4,0") == 0, 3);
+	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "10.5,549,449,2").compare("0.274500,0.224500,0.001000;5,4,1;5,4,1;5,4,1;5,4,1;5,4,1;5,4,1;5,4,1;5,4,1;5,4,1;5,4,1") == 0, 4);
+}
 void Test_getLevelUpAsString_CompositeCases_String() {
 	//std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.500000,0.333333,0.222222", "1,50,50,0;1,50,100,100").compare("0.666666,0.000000,0.000000") == 0, 1);
 	//std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.666666,500,0,0;0.333333,250,0,0").compare("0.999999,0.000000,0.000000") == 0, 2);
@@ -264,4 +270,4 @@ void Test_getPointsToNextLevel_Week5AlmostLevel_1() {
 	pluginFunctions.config.setConfigProperty("workoutsThisWeek", 4);
 	pluginFunctions.config.setConfigProperty("workoutCount", 51);
 	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(0.999999f) == 1);
-}*/
+}
