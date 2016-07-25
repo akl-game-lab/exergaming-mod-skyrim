@@ -27,6 +27,10 @@ std::string PluginFunctions::workoutToString(json workout)
 
 //Returns the week number that the workout date passed is in where week 1 is the week that the first workout was synced
 int PluginFunctions::getWeekForWorkout(__int64 firstTime, __int64 workoutTime) {
+	if (workoutTime - firstTime == 0)
+	{
+		return 1;
+	}
 	return (((workoutTime - firstTime) / SECONDS_PER_WEEK) + 1);
 }
 
@@ -97,7 +101,6 @@ float PluginFunctions::configure(json workout, int level)
 		}
 		else
 		{
-			avgPointsPerWorkout = (totalPoints / workoutCount);
 
 			if (workoutsWeek > lastWorkoutsWeek)
 			{
@@ -110,6 +113,7 @@ float PluginFunctions::configure(json workout, int level)
 
 		if (levelsGained == 0)
 		{
+			avgPointsPerWorkout = (totalPoints / workoutCount);
 			float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
 
 			levelsGained = ((ESTIMATED_LEVELS_PER_WEEK * workoutPoints) / ((float)avgPointsPerWorkout * avgWorkoutsPerWeek));
