@@ -112,14 +112,14 @@ endFunction
 
 ;update the xp bar to show the progress gained
 function updateXpBar(string levelUpsString)
-	float outstandingHealth = getLevelComponent(levelUpsString,0,"H")
-	float outstandingStamina = getLevelComponent(levelUpsString,0,"S")
-	float outstandingMagicka = getLevelComponent(levelUpsString,0,"M")
+	int outstandingHealth = getLevelComponent(levelUpsString,0,"H")
+	int outstandingStamina = getLevelComponent(levelUpsString,0,"S")
+	int outstandingMagicka = getLevelComponent(levelUpsString,0,"M")
 	float outstandingWeight = outstandingHealth + outstandingStamina + outstandingMagicka
 	;display message for progress to next level
 	;first progress, second amount of workout
 	if(outstandingWeight > 0)
-		levelProgressMsg.show(outstandingWeight*100, getPointsToNextLevel(outstandingWeight))
+		levelProgressMsg.show(outstandingWeight, getPointsToNextLevel(outstandingWeight))
 	endIf
-	Game.setPlayerExperience(outstandingWeight)
+	Game.setPlayerExperience(Game.getExperienceForLevel(Game.getPlayer().getLevel())*(outstandingWeight/100))
 endFunction

@@ -225,6 +225,25 @@ void Test_getLevelComponent_GetMagicka2_3() {
 	std::cout << assertToString(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3);
 }
 
+void Test_getShortenedUsername_PaulRalph_unchanged() {
+	std::cout << assertToString(pluginFunctions.getShortenedUsername("PaulRalph").compare("PaulRalph") == 0);
+}
+void Test_getShortenedUsername_DrPaulRalph_unchanged() {
+	std::cout << assertToString(pluginFunctions.getShortenedUsername("DrPaulRalph").compare("DrPaulRalph") == 0);
+}
+void Test_getShortenedUsername_PaulRalph123_shortened() {
+	std::cout << assertToString(pluginFunctions.getShortenedUsername("PaulRalph123").compare("PaulRal...") == 0);
+}
+void Test_getShortenedUsername_ReallyReallyLongString_shortened() {
+	std::cout << assertToString(pluginFunctions.getShortenedUsername("ReallyReallyLongString").compare("ReallyR...") == 0);
+}
+void Test_getShortenedUsername_PaulRalph0_unchanged() {
+	std::cout << assertToString(pluginFunctions.getShortenedUsername("PaulRalph0").compare("PaulRalph0") == 0);
+}
+void Test_getShortenedUsername_P_unchanged() {
+	std::cout << assertToString(pluginFunctions.getShortenedUsername("P").compare("P") == 0);
+}
+
 //How does it work if the user is on first week??
 void Test_getPointsToNextLevel_FreshConfig_Minus1() {
 	initialiseConfig();
@@ -244,7 +263,7 @@ void Test_getPointsToNextLevel_EarlyInSecondWeek_3500() {
 	pluginFunctions.config.setConfigProperty("weeksWorkedOut", 2);
 	pluginFunctions.config.setConfigProperty("workoutsThisWeek", 1); //should never be 0 since it is checked after the workouts processed
 	pluginFunctions.config.setConfigProperty("workoutCount", 6);
-	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(0.3f) == 3500);
+	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(30) == 3500);
 	std::cout << pluginFunctions.getPointsToNextLevel(0.3f) << "\n";
 }
 void Test_getPointsToNextLevel_LateInSecondWeek_1712() {
@@ -253,7 +272,7 @@ void Test_getPointsToNextLevel_LateInSecondWeek_1712() {
 	pluginFunctions.config.setConfigProperty("weeksWorkedOut", 2);
 	pluginFunctions.config.setConfigProperty("workoutsThisWeek", 4);
 	pluginFunctions.config.setConfigProperty("workoutCount", 9);
-	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(0.3f) == 1712);
+	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(30) == 1711);
 }
 void Test_getPointsToNextLevel_Week5NoOutstandingLevel_5174() {
 	initialiseConfig();
@@ -269,5 +288,5 @@ void Test_getPointsToNextLevel_Week5AlmostLevel_1() {
 	pluginFunctions.config.setConfigProperty("weeksWorkedOut", 5);
 	pluginFunctions.config.setConfigProperty("workoutsThisWeek", 4);
 	pluginFunctions.config.setConfigProperty("workoutCount", 51);
-	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(0.999999f) == 1);
+	std::cout << assertToString(pluginFunctions.getPointsToNextLevel(99.999999) == 0);
 }

@@ -410,16 +410,20 @@ int PluginFunctions::getLevelComponent(std::string levelUpsString, int n, std::s
 {
 	std::vector<std::string> levelUps = split(levelUpsString, ITEM_SEPARATOR);
 	std::vector<std::string> levelUpComponents = split(levelUps.at(n), FIELD_SEPARATOR);
-	int levelComponent = std::stoi(levelUpComponents.at(2));
+	float levelComponent = std::stof(levelUpComponents.at(2));
 	if (type == "H")
 	{
-		levelComponent = std::stoi(levelUpComponents.at(0));
+		levelComponent = std::stof(levelUpComponents.at(0));
 	}
 	else if (type == "S")
 	{
-		levelComponent = std::stoi(levelUpComponents.at(1));
+		levelComponent = std::stof(levelUpComponents.at(1));
 	}
-	return levelComponent;
+	if (n == 0)
+	{
+		levelComponent = levelComponent * 100;
+	}
+	return (int)levelComponent;
 }
 
 //Returns the outstanding level as a string
@@ -558,6 +562,6 @@ int PluginFunctions::getPointsToNextLevel(float outstandingWeight)
 	int weeksWorkedOut = config.getConfigProperty("weeksWorkedOut");
 	int workoutsThisWeek = config.getConfigProperty("workoutsThisWeek");
 	float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
-	int pointsToNextLevel = round((1.0f - outstandingWeight)*avgPointsPerWorkout*(float(avgWorkoutsPerWeek)/ESTIMATED_LEVELS_PER_WEEK));
-	return pointsToNextLevel;
+	int pointsToNextLevel = round((100.0f - outstandingWeight)*avgPointsPerWorkout*(float(avgWorkoutsPerWeek)/ESTIMATED_LEVELS_PER_WEEK));
+	return (pointsToNextLevel / 100);
 }
