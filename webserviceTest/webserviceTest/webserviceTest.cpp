@@ -18,7 +18,7 @@ using namespace concurrency::streams;       // Asynchronous streams
 std::string NORMAL_FETCH = "0";
 std::string FORCE_FETCH = "1";
 
-std::string URL_BASE = "http://ec2-54-252-163-152.ap-southeast-2.compute.amazonaws.com:3001/users/";
+std::string URL_BASE = "http://ec2-54-252-163-152.ap-southeast-2.compute.amazonaws.com:3000/users/";
 
 /*
 std::string URL_BASE = "http://ec2-54-252-163-152.ap-southeast-2.compute.amazonaws.com:3000/users/";
