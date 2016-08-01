@@ -515,7 +515,7 @@ bool PluginFunctions::validUsername(std::string gameID, std::string username)
 std::string PluginFunctions::getShortenedUsername(std::string username)
 {
 	std::string shortenedUsername = username;
-	if (username.length() > 10)
+	if (username.length() > 11)
 	{
 		shortenedUsername = username.substr(0, 8) + "...";
 	}

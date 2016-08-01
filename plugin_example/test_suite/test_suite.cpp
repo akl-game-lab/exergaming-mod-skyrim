@@ -178,11 +178,6 @@ void Test_getLevelUpAsString_AllAttributesTestRounding() {
 	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.275000,0.225000,0.000000", "1,550,450,0").compare("0.275000,0.225000,0.000000;6,4,0") == 0, 3);
 	std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "10.5,549,449,2").compare("0.274500,0.224500,0.001000;5,4,1;5,4,1;5,4,1;5,4,1;5,4,1;5,4,1;5,4,1;5,4,1;5,4,1;5,4,1") == 0, 4);
 }
-void Test_getLevelUpAsString_CompositeCases_String() {
-	//std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.500000,0.333333,0.222222", "1,50,50,0;1,50,100,100").compare("0.666666,0.000000,0.000000") == 0, 1);
-	//std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.666666,500,0,0;0.333333,250,0,0").compare("0.999999,0.000000,0.000000") == 0, 2);
-	//std::cout << assertToStringWithInt(pluginFunctions.getLevelUpsAsString("0.000000,0.000000,0.000000", "0.666666,500,0,0;0.666666,500,0,0").compare("0.333332,0.000000,0.000000;10,0,0") == 0, 3);
-}
 
 void Test_isNthLevelUp_BlankString_False() { //levelup string should never be empty
 	std::cout << assertToString(pluginFunctions.isNthLevelUp("", 1) == false);
@@ -225,6 +220,32 @@ void Test_getLevelComponent_GetMagicka2_3() {
 	std::cout << assertToString(pluginFunctions.getLevelComponent("0.000000,0.100000,0.200000;10,0,0;5,2,3", 2, "M") == 3);
 }
 
+void Test_getOutstandingLevel_noLevelUp_String() {
+	std::cout << assertToString(pluginFunctions.getOutstandingLevel("0.000000,0.100000,0.200000").compare("0.000000,0.100000,0.200000") == 0);
+}
+void Test_getOutstandingLevel_oneLevelUp_String() {
+	std::cout << assertToString(pluginFunctions.getOutstandingLevel("0.000000,0.100000,0.200000;3,4,3").compare("0.000000,0.100000,0.200000") == 0);
+}
+void Test_getOutstandingLevel_multipleLevelUps_String() {
+	std::cout << assertToStringWithInt(pluginFunctions.getOutstandingLevel("0.333333,0.100000,0.200000;3,4,3;7,1,2;0,0,10").compare("0.333333,0.100000,0.200000") == 0, 1);
+	std::cout << assertToStringWithInt(pluginFunctions.getOutstandingLevel("0.500000,0.233333,0.200000;10,0,0;0,10,0;5,5,0;6,3,1").compare("0.500000,0.233333,0.200000") == 0, 2);
+}
+
+void Test_startNormalFetch_ValidRawData() {
+	initialiseConfig();
+	pluginFunctions.rawData.clear();
+	std::cout << assertToStringWithInt(pluginFunctions.getRawDataWorkoutCount() == 0, 1);
+	pluginFunctions.startNormalFetch("Skyrim", "paul@paulralph.name");
+	std::cout << assertToStringWithInt(pluginFunctions.getRawDataWorkoutCount() > 0, 2);
+}
+void Test_startForceFetch_ValidRawData() {
+	initialiseConfig();
+	pluginFunctions.rawData.clear();
+	std::cout << assertToStringWithInt(pluginFunctions.getRawDataWorkoutCount() == 0, 1);
+	pluginFunctions.startForceFetch("Skyrim", "paul@paulralph.name");
+	std::cout << assertToStringWithInt(pluginFunctions.getRawDataWorkoutCount() > 0, 2);
+}
+
 void Test_getShortenedUsername_PaulRalph_unchanged() {
 	std::cout << assertToString(pluginFunctions.getShortenedUsername("PaulRalph").compare("PaulRalph") == 0);
 }
@@ -232,10 +253,10 @@ void Test_getShortenedUsername_DrPaulRalph_unchanged() {
 	std::cout << assertToString(pluginFunctions.getShortenedUsername("DrPaulRalph").compare("DrPaulRalph") == 0);
 }
 void Test_getShortenedUsername_PaulRalph123_shortened() {
-	std::cout << assertToString(pluginFunctions.getShortenedUsername("PaulRalph123").compare("PaulRal...") == 0);
+	std::cout << assertToString(pluginFunctions.getShortenedUsername("PaulRalph123").compare("PaulRalp...") == 0);
 }
 void Test_getShortenedUsername_ReallyReallyLongString_shortened() {
-	std::cout << assertToString(pluginFunctions.getShortenedUsername("ReallyReallyLongString").compare("ReallyR...") == 0);
+	std::cout << assertToString(pluginFunctions.getShortenedUsername("ReallyReallyLongString").compare("ReallyRe...") == 0);
 }
 void Test_getShortenedUsername_PaulRalph0_unchanged() {
 	std::cout << assertToString(pluginFunctions.getShortenedUsername("PaulRalph0").compare("PaulRalph0") == 0);
