@@ -104,10 +104,10 @@ function doLevelUp(int health, int stamina, int magicka, bool isPrior)
 	Game.setPlayerLevel(currentLevel + 1)
 	currentLevel = player.getLevel()
 	Game.setPerkPoints(Game.getPerkPoints() + 1)
-	if(isPrior == false)
-		levelUpMessage.show(currentLevel)
+	if(isPrior == true)
+		levelUpDetails.show(health,stamina,magicka)
 	endIf
-	levelUpDetails.show(health,stamina,magicka)
+	levelUpMessage.show(currentLevel,health,stamina,magicka)
 endFunction
 
 ;update the xp bar to show the progress gained
