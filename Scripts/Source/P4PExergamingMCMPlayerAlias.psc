@@ -20,10 +20,18 @@ message property levelProgressMsg auto
 
 float pollInterval = 0.5
 int pollCount = 1
+int levelsUp
+int healthUp
+int staminaUp
+int magickaUp
 
 event OnPlayerLoadGame()
 	clearDebug()
 	pollStartTime = 0
+	levelsUp = 0
+	healthUp = 0
+	staminaUp = 0
+	magickaUp = 0
 	forceFetchMade = false
 	oldSaveLoaded = false
 	if (syncedUserName != "")
@@ -72,11 +80,13 @@ event onUpdate()
 endEvent
 
 function getLevelUps(string workouts)
+	string levelUpsString
 	if(workouts == "Prior Workout")
 		priorWorkouts.show()
 		doLevelUp(4,3,3,true)
+		levelUpsString = "0,0,0;4,3,3"
 	else
-		string levelUpsString = getLevelUpsAsString(outstandingLevel,workouts)
+		levelUpsString = getLevelUpsAsString(outstandingLevel,workouts)
 		;level ups start at index 1 as index 0 holds the outstanding level up
 		int n = 1
 		bool shouldContinue = isNthLevelUp(levelUpsString,n)
@@ -89,8 +99,8 @@ function getLevelUps(string workouts)
 			shouldContinue = isNthLevelUp(levelUpsString,n)
 		endWhile
 		outstandingLevel = getOutstandingLevel(levelUpsString)
-		updateXpBar(levelUpsString)
 	endIf
+	updateXpBar(levelUpsString)
 	saveRequested = true
 endFunction
 
@@ -104,10 +114,14 @@ function doLevelUp(int health, int stamina, int magicka, bool isPrior)
 	Game.setPlayerLevel(currentLevel + 1)
 	currentLevel = player.getLevel()
 	Game.setPerkPoints(Game.getPerkPoints() + 1)
-	if(isPrior == true)
-		levelUpDetails.show(health,stamina,magicka)
-	endIf
-	levelUpMessage.show(currentLevel,health,stamina,magicka)
+	;if(isPrior == true)
+	;	levelUpDetails.show(health,stamina,magicka)
+	;endIf
+	;levelUpMessage.show(currentLevel,health,stamina,magicka)
+	levelsUp = levelsUp + 1
+	healthUp = healthUp + health
+	staminaUp = staminaUp + stamina
+	magickaUp = magickaUp + magicka
 endFunction
 
 ;update the xp bar to show the progress gained
@@ -118,6 +132,9 @@ function updateXpBar(string levelUpsString)
 	float outstandingWeight = outstandingHealth + outstandingStamina + outstandingMagicka
 	;display message for progress to next level
 	;first progress, second amount of workout
+	if(levelsUp > 0)
+		levelUpMessage.show(levelsUp,Game.getPlayer().getLevel(),healthUp,staminaUp,magickaUp)
+	endIf
 	if(outstandingWeight > 0)
 		levelProgressMsg.show(outstandingWeight, getPointsToNextLevel(outstandingWeight))
 	endIf
