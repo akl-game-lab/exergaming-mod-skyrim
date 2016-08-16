@@ -445,6 +445,7 @@ int PluginFunctions::startNormalFetch(std::string gameID, std::string username)
 	{
 		toDate = std::to_string(currentDate());
 		config.setConfigProperty("startDate", weekHandler.getStartOfDay(currentDate()));
+		config.setConfigProperty("lastSyncDate", weekHandler.getStartOfDay(currentDate()));
 	}
 	makeServiceCall("NORMAL", username, fromDate, toDate);
 	debug.exit();
@@ -474,6 +475,7 @@ std::string PluginFunctions::getWorkoutsString(int level)
 	{
 		int startDate = (currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY;
 		config.setConfigProperty("startDate", startDate);
+		config.setConfigProperty("lastSyncDate", startDate);
 		if (rawData.getWorkoutCount() > 0)
 		{
 			workouts = "Prior Workout";

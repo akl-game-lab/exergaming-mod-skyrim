@@ -41,9 +41,10 @@ std::string RawDataHandler::getResponseCode()
 		return "200";
 	}
 	json errorCode = data["data"]["errorCode"];
+	std::string errorCodeString = data["data"]["errorCode"];
 	if (!errorCode.empty())
 	{
-		return errorCode.dump();
+		return errorCodeString;
 	}
 	return "200";
 }

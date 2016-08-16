@@ -96,7 +96,7 @@ Event OnOptionInputOpen(int option)
 	bool turnOnExergaming = ShowMessage("Are you sure?\nYou will not be able to gain levels in game while Exergame Mod is on.", true,  "$Yes", "$No")
 	if (turnOnExergaming == true)
 		;show user username entry dialog
-		SetInputDialogStartText("Please enter your username...")
+		SetInputDialogStartText("Please enter your exergaming email...")
 	endIf
 EndEvent
 
@@ -116,7 +116,7 @@ Event OnOptionInputAccept(int option, string userInput)
 			playerReference.normalFetchMade = true
 			playerReference.saveRequested = true
 		else
-			ShowMessage("Invalid username!", false)
+			ShowMessage("Invalid email!", false)
 		endIf
 	endIf
 endEvent
