@@ -93,11 +93,9 @@ endEvent
 
 ;Executes when the user tries to turn the mod on
 Event OnOptionInputOpen(int option)
-	bool turnOnExergaming = ShowMessage("Are you sure?\nYou will not be able to gain levels in game while Exergame Mod is on.", true,  "$Yes", "$No")
-	if (turnOnExergaming == true)
-		;show user username entry dialog
-		SetInputDialogStartText("Please enter your exergaming email...")
-	endIf
+	ShowMessage("You will not be able to gain levels in game while Exergame Mod is on.", false)
+	;show user username entry dialog
+	SetInputDialogStartText("Please enter your exergaming email...")
 EndEvent
 
 ;Executes once the user has entered a username

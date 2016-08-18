@@ -134,6 +134,8 @@ function updateXpBar(string levelUpsString)
 	;first progress, second amount of workout
 	if(levelsUp > 0)
 		levelUpMessage.show(levelsUp,Game.getPlayer().getLevel(),healthUp,staminaUp,magickaUp)
+	else
+		noWorkoutsFound.show()
 	endIf
 	if(outstandingWeight > 0)
 		levelProgressMsg.show(outstandingWeight, getPointsToNextLevel(outstandingWeight))
