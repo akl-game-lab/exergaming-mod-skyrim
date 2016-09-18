@@ -25,7 +25,9 @@ int healthUp
 int staminaUp
 int magickaUp
 
+;Executes when a save finishes loading up
 event OnPlayerLoadGame()
+	;reset variables used for leveling or polling
 	clearDebug()
 	pollStartTime = 0
 	levelsUp = 0
@@ -34,7 +36,7 @@ event OnPlayerLoadGame()
 	magickaUp = 0
 	forceFetchMade = false
 	oldSaveLoaded = false
-	if (syncedUserName != "")
+	if (syncedUserName != "");Check to see if user is synced with an account
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
 		oldSaveLoaded = isOldSave(creationDate as int)
 		startNormalFetch("Skyrim",syncedUserName)
@@ -45,6 +47,7 @@ event OnPlayerLoadGame()
 	RegisterForUpdate(pollInterval)
 endEvent
 
+;Executes automatically every second, called by the game
 event onUpdate()
 	int pollDuration = 120
 	
@@ -54,19 +57,21 @@ event onUpdate()
 		Utility.WaitMenuMode(1)
 		Game.requestSave()
 	endIf
+
 	if (normalFetchMade == true && pollCount % 6 == 0)
-		pollCount = 1;
+		pollCount = 1
 		if(oldSaveLoaded == true)
 			getLevelUps(getWorkoutsFromBestWeek(creationDate))
-		elseIf (0 < getRawDataWorkoutCount())
+		elseIf (0 < getRawDataWorkoutCount());force fetch returned data
 			getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
 			forceFetchMade = false
-		elseIf (forceFetchMade == false)
+		elseIf (forceFetchMade == false);force fetch returned no data
 			noWorkoutsFound.show()
 		endIf
 		normalFetchMade = false
 	endIf
-	if (forceFetchMade == true)
+
+	if (forceFetchMade == true);
 		debug.Notification("Checking for recent workouts.")
 		int elapsed = currentDate() - pollStartTime
 		if(elapsed >= pollDuration)
@@ -79,9 +84,13 @@ event onUpdate()
 	pollCount = pollCount + 1
 endEvent
 
+;Uses workout data in string format oH,oS,oM;H,S,M;...
+;oH, oS, and oM are the outstanding health, stamina, and magicka values from previous levels
+;H, S, and M are the health, stamina, and magicka values for a single workout.
+;all workout found in a single fetch should be in one string.
 function getLevelUps(string workouts)
 	string levelUpsString
-	if(workouts == "Prior Workout")
+	if(workouts == "Prior Workout");special case when workouts are returned on activation of the mod
 		priorWorkouts.show()
 		doLevelUp(4,3,3,true)
 		levelUpsString = "0,0,0;4,3,3"
@@ -114,10 +123,6 @@ function doLevelUp(int health, int stamina, int magicka, bool isPrior)
 	Game.setPlayerLevel(currentLevel + 1)
 	currentLevel = player.getLevel()
 	Game.setPerkPoints(Game.getPerkPoints() + 1)
-	;if(isPrior == true)
-	;	levelUpDetails.show(health,stamina,magicka)
-	;endIf
-	;levelUpMessage.show(currentLevel,health,stamina,magicka)
 	levelsUp = levelsUp + 1
 	healthUp = healthUp + health
 	staminaUp = staminaUp + stamina

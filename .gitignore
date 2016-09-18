@@ -182,3 +182,6 @@ plugin_example/plugin_library/targetver.h
 *.pdb
 *.txt
 plugin_example/plugin_library/Debug/
+HighResTexturePack01.esp
+HighResTexturePack02.esp
+HighResTexturePack03.esp

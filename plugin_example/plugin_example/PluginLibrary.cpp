@@ -324,7 +324,6 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 				std::cout << "\nWT:" + std::to_string(workoutTotal);
 
 				//while there is another level up from this workout
-
 				if (totalWeight >= 1)
 				{
 					while (totalWeight >= 1)
@@ -376,6 +375,7 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 		}
 	}
 
+	//if there is a level up, append it to after outstanding points, otherwise turn outstanding points to string
 	if (levelUps.compare("") != 0)
 	{
 		levelUps = std::to_string(outstandingHealth) + FIELD_SEPARATOR + std::to_string(outstandingStamina) + FIELD_SEPARATOR + std::to_string(outstandingMagicka) + ITEM_SEPARATOR + levelUps;

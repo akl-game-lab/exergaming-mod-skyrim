@@ -46,7 +46,7 @@ event OnPageReset(string page)
 		if (exergameModOn)
 			string shortenedUsername = getShortenedUsername(syncedUserName)
 			syncStatus = AddTextOption("Currently synced with ", shortenedUsername)
-			if (playerReference.forceFetchMade == true)
+			if (playerReference.forceFetchMade == true);Menu options shown when a force fetch is being made
 				AddTextOption("Close the menu while checking for workouts.","");
 				forceFetchCancelButton = AddToggleOption("Cancel",forceFetchCancel)
 			else
@@ -56,16 +56,16 @@ event OnPageReset(string page)
 				exergameModOffSwitch = AddToggleOption("Turn Exergame Mode off", exergameModOn)
 			endIf
 		else
-			exergameModOnSwitch = AddInputOption("Turn Exergame Mod on", "");runs code in OnOptionInputOpen();
+			exergameModOnSwitch = AddInputOption("Turn Exergame Mod on", "");runs code in OnOptionInputOpen()
 		endIf
 	endIf
 endEvent
 
-;Executes when the user tries to turn the mod off
+;Executes when the user selects an option in the menu
 event OnOptionSelect(int option)
 	if (playerReference.forceFetchMade == false)
 		if (option == exergameModOffSwitch)
-			;Show the confirmation to turn off Exergaming mode (need to change this message prompt to use the implementation for a yes no message from the mcm github)
+			;Show the confirmation to turn off Exergaming mode
 			bool turnOffExergaming = ShowMessage("Are you sure?\nThis will turn off Exergame Mod in the current save.", true, "$Yes", "$No")
 			if (turnOffExergaming)
 				exergameModOn = false
@@ -77,7 +77,7 @@ event OnOptionSelect(int option)
 				ShowMessage("Unsync complete.", false, "Ok")
 				playerReference.saveRequested = true
 			endIf
-		elseIf (option == forceFetchButton)
+		elseIf (option == forceFetchButton);Start force fetch
 			if( startForceFetch("Skyrim",playerReference.syncedUserName) == true )
 				playerReference.forceFetchMade = true
 				playerReference.pollStartTime = currentDate()
@@ -104,6 +104,7 @@ Event OnOptionInputAccept(int option, string userInput)
 		string username = userInput
 		if(validUsername("Skyrim",username))	
 			playerReference.syncedUserName = username
+			;Set exp variables to 0, to turn off in-game experience
 			Game.SetPlayerExperience(0)
 			Game.SetGameSettingFloat("fXPPerSkillRank", 0)
 			exergameModOn = true
