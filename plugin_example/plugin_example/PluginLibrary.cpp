@@ -449,7 +449,7 @@ int PluginFunctions::startNormalFetch(std::string gameID, std::string username)
 		config.setConfigProperty("lastSyncDate", weekHandler.getStartOfDay(currentDate()));
 	}
 	makeServiceCall("NORMAL", username, fromDate, toDate);
-	return 0;
+	return rawData.getResponseCode();
 }
 
 //Starts the poll for new workouts when the user requests a check
@@ -457,7 +457,7 @@ int PluginFunctions::startForceFetch(std::string gameID, std::string username)
 {
 	//Start the headless browser by making the force fetch request
 	makeServiceCall("FORCE_FETCH", username, "0", std::to_string(currentDate()));
-	return rawData.getResponseCode("FORCE_FETCH");
+	return rawData.getResponseCode();
 }
 
 //Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
@@ -499,7 +499,7 @@ void PluginFunctions::clearDebug()
 bool PluginFunctions::validUsername(std::string gameID, std::string username)
 {
 	makeServiceCall("NORMAL", username, "0", std::to_string(currentDate()));
-	if (rawData.getResponseCode("NORMAL") == 404)
+	if (rawData.getResponseCode() == 404)
 	{
 		return false;
 	}

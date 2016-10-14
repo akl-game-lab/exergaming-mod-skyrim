@@ -24,11 +24,6 @@ void RawDataHandler::clear()
 
 int RawDataHandler::getWorkoutCount()
 {
-	std::string response = data;
-	if (response.compare("null") == 0) 
-	{
-		return -1;
-	}
 	int count = data["data"]["workouts"].size();
 	return count;
 }
@@ -38,27 +33,19 @@ json RawDataHandler::getWorkout(int workoutNumber)
 	return data["data"]["workouts"][workoutNumber];
 }
 
-int RawDataHandler::getResponseCode(std::string type)
+int RawDataHandler::getResponseCode()
 {	
+	//Handle and return the server response
 	try {
-		json errorCode = data["data"]["errorCode"];
-		if (!errorCode.empty())
+		json responseCode = data["responseCode"];
+		if (!responseCode.empty())
 		{
-			std::string errorCodeString = data["data"]["errorCode"];
-			return 404;
+			return std::stoi(std::string(responseCode));
 		}
 	}
 	catch (...) {}
 
-	try {
-		std::string started = data["data"]["started"];
-
-		if (started.compare("true") == 0)
-		{
-			return 200;
-		}
-	}
-	catch(...){}
+	//Default Server error
 	return 500;
 }
 
