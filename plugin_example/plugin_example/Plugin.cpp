@@ -58,7 +58,7 @@ namespace plugin
 	}
 
 	//Starts the poll for new workouts when the user requests a check
-	bool startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
+	UInt32 startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
 	{
 		return pluginFunctions.startForceFetch(gameID.data,username.data);
 	}
@@ -105,6 +105,18 @@ namespace plugin
 		return pluginFunctions.getPointsToNextLevel(outstandingWeight);
 	}
 
+	//Updates the config file to match the config object
+	void updateConfig(StaticFunctionTag* base)
+	{
+		pluginFunctions.updateConfig();
+	}
+
+	//Returns a%b
+	UInt32 mod(StaticFunctionTag* base, UInt32 a, UInt32 b)
+	{
+		return pluginFunctions.mod(a, b);
+	}
+
 	/**********************************************************************************************************
 	*	Register
 	*/
@@ -137,7 +149,7 @@ namespace plugin
 			new NativeFunction2 <StaticFunctionTag, UInt32, BSFixedString, BSFixedString>("startNormalFetch", "PluginScript", plugin::startNormalFetch, registry));
 
 		registry->RegisterFunction(
-			new NativeFunction2 <StaticFunctionTag, bool, BSFixedString, BSFixedString>("startForceFetch", "PluginScript", plugin::startForceFetch, registry));
+			new NativeFunction2 <StaticFunctionTag, UInt32, BSFixedString, BSFixedString>("startForceFetch", "PluginScript", plugin::startForceFetch, registry));
 
 		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, BSFixedString, UInt32>("getWorkoutsString", "PluginScript", plugin::getWorkoutsString, registry));
@@ -159,6 +171,12 @@ namespace plugin
 
 		registry->RegisterFunction(
 			new NativeFunction1 <StaticFunctionTag, UInt32, float>("getPointsToNextLevel", "PluginScript", plugin::getPointsToNextLevel, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction0 <StaticFunctionTag, void>("updateConfig", "PluginScript", plugin::updateConfig, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction2 <StaticFunctionTag, UInt32, UInt32, UInt32>("mod", "PluginScript", plugin::mod, registry));
 
 		return true;
 	}

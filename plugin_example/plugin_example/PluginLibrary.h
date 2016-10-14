@@ -100,7 +100,7 @@ public:
 	int startNormalFetch(std::string gameID, std::string username);
 
 	//Starts the poll for new workouts when the user requests a check
-	bool startForceFetch(std::string gameID, std::string username);
+	int startForceFetch(std::string gameID, std::string username);
 
 	//Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
 	std::string getWorkoutsString(int level);
@@ -122,4 +122,10 @@ public:
 
 	//Gets the number of exercise.com points needed to level up
 	int getPointsToNextLevel(float outstandingWeight);
+
+	//Updates the config file to match the config object
+	void updateConfig();
+
+	//Returns a%b
+	int mod(int a, int b);
 };

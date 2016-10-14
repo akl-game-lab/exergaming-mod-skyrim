@@ -18,5 +18,7 @@ public:
 	void setConfigProperty(std::string propertyName, __int64 value);
 
 	void getDefaultData();
+
+	void save();
 };
 #endif

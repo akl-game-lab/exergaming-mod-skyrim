@@ -78,11 +78,14 @@ event OnOptionSelect(int option)
 				playerReference.saveRequested = true
 			endIf
 		elseIf (option == forceFetchButton);Start force fetch
-			if( startForceFetch("Skyrim",playerReference.syncedUserName) == true )
+			int forceFetchResponse = startForceFetch("Skyrim",playerReference.syncedUserName)
+			if( forceFetchResponse == 200 )
 				playerReference.forceFetchMade = true
 				playerReference.pollStartTime = currentDate()
-			else
-				ShowMessage("Something went wrong.\nPlease try again later.", false)
+			elseIf( forceFetchResponse == 404 )
+				ShowMessage("UNKNOWN ERROR\n\nPlease contact exergaming customer support.", false)
+			elseIf( forceFetchResponse == 500 )
+				ShowMessage("SERVER ERROR\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.", false)
 			endIf
 		endIf
 	elseIf (option == forceFetchCancelButton)
@@ -110,6 +113,7 @@ Event OnOptionInputAccept(int option, string userInput)
 			exergameModOn = true
 			ForcePageReset()
 			string msg = "Sync with " + username + " complete."
+			playerReference.initialise()
 			ShowMessage(msg, false, "Ok")
 			startNormalFetch("Skyrim",username)
 			playerReference.normalFetchMade = true

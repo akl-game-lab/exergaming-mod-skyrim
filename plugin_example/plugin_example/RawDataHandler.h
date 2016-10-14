@@ -24,7 +24,7 @@ public:
 
 	json getWorkout(int workoutNumber);
 
-	std::string getResponseCode();
+	int getResponseCode(std::string type);
 
 	void setData(json newData);
 };

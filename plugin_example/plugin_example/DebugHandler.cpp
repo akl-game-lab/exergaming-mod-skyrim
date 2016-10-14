@@ -8,12 +8,6 @@ std::fstream debugFile;
 void DebugHandler::write(std::string line)
 {
 	debugFile.open("Debug.txt", std::fstream::in | std::fstream::out | std::fstream::app);
-
-	for (int i = 0; i < treeDepth - 1; i++)
-	{
-		debugFile << "\t";
-	}
-
 	debugFile << lineStart << "[ " << line << " ]\n";
 	debugFile.close();
 }

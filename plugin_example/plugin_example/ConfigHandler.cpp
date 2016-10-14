@@ -21,7 +21,6 @@ __int64 ConfigHandler::getConfigProperty(std::string propertyName)
 void ConfigHandler::setConfigProperty(std::string propertyName, __int64 value)
 {
 	data[propertyName] = value;
-	saveJSON();
 }
 
 void ConfigHandler::getDefaultData()
@@ -37,5 +36,10 @@ void ConfigHandler::getDefaultData()
 		{ "totalPoints", 0 },
 		{ "workoutsThisWeek", 0 }
 	};
+	saveJSON();
+}
+
+void ConfigHandler::save()
+{
 	saveJSON();
 }

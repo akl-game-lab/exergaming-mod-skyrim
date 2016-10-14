@@ -384,7 +384,10 @@ std::string PluginFunctions::getLevelUpsAsString(std::string outstandingLevel, s
 	{
 		levelUps = std::to_string(outstandingHealth) + FIELD_SEPARATOR + std::to_string(outstandingStamina) + FIELD_SEPARATOR + std::to_string(outstandingMagicka);
 	}
-
+	DebugHandler debug;
+	debug.write(levelUps);
+	int levelCount = split(levelUps, ';').size();
+	debug.write(std::to_string(levelCount));
 	return levelUps;
 }
 
@@ -436,39 +439,30 @@ std::string PluginFunctions::getOutstandingLevel(std::string levelUpsString)
 //Makes a service call to fetch workouts
 int PluginFunctions::startNormalFetch(std::string gameID, std::string username)
 {
-	debug.entry();
 	rawData.clear();
 	ConfigHandler config;
 	std::string fromDate = std::to_string(config.getConfigProperty("lastSyncDate"));
 	std::string toDate = std::to_string(currentDate());
 	if (config.getConfigProperty("startDate") == 0)
 	{
-		toDate = std::to_string(currentDate());
 		config.setConfigProperty("startDate", weekHandler.getStartOfDay(currentDate()));
 		config.setConfigProperty("lastSyncDate", weekHandler.getStartOfDay(currentDate()));
 	}
 	makeServiceCall("NORMAL", username, fromDate, toDate);
-	debug.exit();
-	return 345;
+	return 0;
 }
 
 //Starts the poll for new workouts when the user requests a check
-bool PluginFunctions::startForceFetch(std::string gameID, std::string username)
+int PluginFunctions::startForceFetch(std::string gameID, std::string username)
 {
 	//Start the headless browser by making the force fetch request
 	makeServiceCall("FORCE_FETCH", username, "0", std::to_string(currentDate()));
-
-	if (rawData.getResponseCode() == "200")
-	{
-		return true;
-	}
-	return false;
+	return rawData.getResponseCode("FORCE_FETCH");
 }
 
 //Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
 std::string PluginFunctions::getWorkoutsString(int level)
 {
-	debug.entry();
 	rawData.refresh();
 	std::string workouts;
 	if (config.getConfigProperty("startDate") == 0)
@@ -485,7 +479,6 @@ std::string PluginFunctions::getWorkoutsString(int level)
 	{
 		workouts = updateWeeks(level).c_str();
 	}
-	debug.exit();
 	return workouts;
 }
 
@@ -506,7 +499,7 @@ void PluginFunctions::clearDebug()
 bool PluginFunctions::validUsername(std::string gameID, std::string username)
 {
 	makeServiceCall("NORMAL", username, "0", std::to_string(currentDate()));
-	if (rawData.getResponseCode().compare("404") == 0)
+	if (rawData.getResponseCode("NORMAL") == 404)
 	{
 		return false;
 	}
@@ -566,4 +559,16 @@ int PluginFunctions::getPointsToNextLevel(float outstandingWeight)
 	float avgWorkoutsPerWeek = ((float)(workoutCount - workoutsThisWeek) / (weeksWorkedOut - 1));
 	int pointsToNextLevel = round((100.0f - outstandingWeight)*avgPointsPerWorkout*(float(avgWorkoutsPerWeek)/ESTIMATED_LEVELS_PER_WEEK));
 	return (pointsToNextLevel / 100);
+}
+
+//Updates the config file to match the config object
+void PluginFunctions::updateConfig()
+{
+	config.save();
+}
+
+//Returns a%b
+int PluginFunctions::mod(int a, int b)
+{
+	return a%b;
 }

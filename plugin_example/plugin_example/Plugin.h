@@ -32,7 +32,7 @@ namespace plugin
 	UInt32 startNormalFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString userName);
 
 	//Starts the poll for new workouts when the user requests a check
-	bool startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username);
+	UInt32 startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username);
 	
 	//Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
 	BSFixedString getWorkoutsString(StaticFunctionTag* base, UInt32 level);
@@ -54,6 +54,12 @@ namespace plugin
 
 	//Gets the number of exercise.com points needed to level up
 	UInt32 getPointsToNextLevel(StaticFunctionTag* base, float outstandingWeight);
+
+	//Updates the config file to match the config object
+	void updateConfig(StaticFunctionTag* base);
+
+	//Returns a%b
+	UInt32 mod(StaticFunctionTag* base, UInt32 a, UInt32 b);
 
 	/**********************************************************************************************************
 	*	Register

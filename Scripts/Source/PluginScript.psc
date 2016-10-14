@@ -25,7 +25,7 @@ string function getOutstandingLevel(string levelUpsString) global native
 int function startNormalFetch(string gameID, string username) global native
 
 ;Starts the poll for new workouts when the user requests a check
-bool function startForceFetch(string gameID, string username) global native
+int function startForceFetch(string gameID, string username) global native
 
 ;Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
 string function getWorkoutsString(int level) global native
@@ -50,3 +50,9 @@ function openSkillsMenu() global native
 
 ;Gets the number of exercise.com points needed to level up
 int function getPointsToNextLevel(float outstandingWeight) global native
+
+;Updates the config file to match the config object
+function updateConfig() global native
+
+;Returns a%b
+int function mod(int a, int b) global native

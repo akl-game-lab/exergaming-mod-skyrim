@@ -25,10 +25,10 @@ int healthUp
 int staminaUp
 int magickaUp
 
-;Executes when a save finishes loading up
-event OnPlayerLoadGame()
-	;reset variables used for leveling or polling
+;resets variables used for leveling or polling
+function initialise()
 	clearDebug()
+	pollCount = 1
 	pollStartTime = 0
 	levelsUp = 0
 	healthUp = 0
@@ -36,6 +36,12 @@ event OnPlayerLoadGame()
 	magickaUp = 0
 	forceFetchMade = false
 	oldSaveLoaded = false
+	RegisterForUpdate(pollInterval)
+endFunction
+
+;Executes when a save finishes loading up
+event OnPlayerLoadGame()
+	initialise()
 	if (syncedUserName != "");Check to see if user is synced with an account
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
 		oldSaveLoaded = isOldSave(creationDate as int)
@@ -44,7 +50,6 @@ event OnPlayerLoadGame()
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 	endif
-	RegisterForUpdate(pollInterval)
 endEvent
 
 ;Executes automatically every second, called by the game
@@ -56,19 +61,25 @@ event onUpdate()
 		saveRequested = false
 		Utility.WaitMenuMode(1)
 		Game.requestSave()
+		updateConfig()
 	endIf
 
-	if (normalFetchMade == true && pollCount % 6 == 0)
+	if (normalFetchMade == true && mod(pollCount,6) == 0)
 		pollCount = 1
+		normalFetchMade = false
 		if(oldSaveLoaded == true)
 			getLevelUps(getWorkoutsFromBestWeek(creationDate))
 		elseIf (0 < getRawDataWorkoutCount());force fetch returned data
 			getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
+			Utility.wait(2.0)
 			forceFetchMade = false
 		elseIf (forceFetchMade == false);force fetch returned no data
-			noWorkoutsFound.show()
+			if(getRawDataWorkoutCount() == 0)
+				noWorkoutsFound.show()
+			else
+				debug.messageBox("SERVER ERROR\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.")
+			endIf
 		endIf
-		normalFetchMade = false
 	endIf
 
 	if (forceFetchMade == true);
@@ -139,8 +150,6 @@ function updateXpBar(string levelUpsString)
 	;first progress, second amount of workout
 	if(levelsUp > 0)
 		levelUpMessage.show(levelsUp,Game.getPlayer().getLevel(),healthUp,staminaUp,magickaUp)
-	else
-		noWorkoutsFound.show()
 	endIf
 	if(outstandingWeight > 0)
 		levelProgressMsg.show(outstandingWeight, getPointsToNextLevel(outstandingWeight))
