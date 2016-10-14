@@ -9,23 +9,23 @@ ConfigHandler::ConfigHandler()
 	}
 	else
 	{
-		data = getJSON();
+		content = getJSON();
 	}
 }
 
 __int64 ConfigHandler::getConfigProperty(std::string propertyName)
 {
-	return (__int64)data[propertyName];
+	return (__int64)content[propertyName];
 }
 
 void ConfigHandler::setConfigProperty(std::string propertyName, __int64 value)
 {
-	data[propertyName] = value;
+	content[propertyName] = value;
 }
 
 void ConfigHandler::getDefaultData()
 {
-	data = {
+	content = {
 		{ "startDate", 0 },
 		{ "lastWorkoutDate", 0 },
 		{ "lastSyncDate", 0 },

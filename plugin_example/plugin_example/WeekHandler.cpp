@@ -7,14 +7,14 @@ WeekHandler::WeekHandler()
 	filePath = "Weeks.json";
 	if (!fileExists())
 	{
-		data = {
+		content = {
 			{"weeks",json::array({})}
 		};
 		saveJSON();
 	}
 	else
 	{
-		data = getJSON();
+		content = getJSON();
 	}
 }
 
@@ -56,12 +56,12 @@ void WeekHandler::addWeek(__int64 workoutDate)
 	__int64 weekStart = getStartOfDay(workoutDate) - (daysBetween*SECONDS_PER_DAY);
 	int weekCount = 0;
 	
-	if (!data["weeks"].empty())
+	if (!content["weeks"].empty())
 	{
-		weekCount = data["weeks"].size();
+		weekCount = content["weeks"].size();
 	}
 	
-	data["weeks"][weekCount]["startDate"] = weekStart;
+	content["weeks"][weekCount]["startDate"] = weekStart;
 	saveJSON();
 }
 
@@ -70,12 +70,12 @@ void WeekHandler::addWorkoutToWeek(int weekNumber, json workout)
 	json workouts = getWorkoutsFromWeek(weekNumber);
 	for (int workoutNumber = 0; workoutNumber < workouts.size(); workoutNumber++)
 	{
-		if (getWorkoutHash(workout) == getWorkoutHash(data["weeks"][weekNumber]["workouts"][workoutNumber]))
+		if (getWorkoutHash(workout) == getWorkoutHash(content["weeks"][weekNumber]["workouts"][workoutNumber]))
 		{
 			return;
 		}
 	}
-	data["weeks"][weekNumber]["workouts"][data["weeks"][weekNumber]["workouts"].size()] = workout;
+	content["weeks"][weekNumber]["workouts"][content["weeks"][weekNumber]["workouts"].size()] = workout;
 	saveJSON();
 }
 
@@ -84,9 +84,9 @@ void WeekHandler::addWorkout(json workout)
 {
 	int weekCount = 0;
 
-	if (!data["weeks"].empty())
+	if (!content["weeks"].empty())
 	{
-		weekCount = data["weeks"].size();
+		weekCount = content["weeks"].size();
 	}
 
 	__int64 workoutDate = workout["workoutDate"];
@@ -94,7 +94,7 @@ void WeekHandler::addWorkout(json workout)
 	if (weekCount != 0) {
 		for (int weekNumber = 0; weekNumber < weekCount; weekNumber++)
 		{
-			__int64 weekStart = data["weeks"][weekNumber]["startDate"];
+			__int64 weekStart = content["weeks"][weekNumber]["startDate"];
 			__int64 workoutDate = workout["workoutDate"];
 			if (weekStart <= workoutDate && workoutDate - weekStart < SECONDS_PER_WEEK)
 			{
@@ -111,24 +111,24 @@ void WeekHandler::addWorkout(json workout)
 //Returns the workouts for the given week number
 json WeekHandler::getWorkoutsFromWeek(int weekNumber)
 {
-	return data["weeks"][weekNumber]["workouts"];
+	return content["weeks"][weekNumber]["workouts"];
 }
 
 //Returns the startDate for the given week number
 __int64 WeekHandler::getWeekStart(int weekNumber)
 {
-	return data["weeks"][weekNumber]["startDate"];
+	return content["weeks"][weekNumber]["startDate"];
 }
 
 //Returns the number of weeks currently stored
 int WeekHandler::getWeekCount()
 {
-	return (int)data["weeks"].size();
+	return (int)content["weeks"].size();
 }
 
 //a do nothing implementation to compile
 void WeekHandler::getDefaultData()
 {
-	data = {};
+	content = {};
 	saveJSON();
 }

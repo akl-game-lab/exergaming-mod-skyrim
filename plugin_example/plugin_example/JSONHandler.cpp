@@ -34,7 +34,7 @@ void JSONHandler::reset()
 void JSONHandler::saveJSON()
 {
 	std::ofstream outputFile(filePath);
-	outputFile << data.dump(4).c_str();
+	outputFile << content.dump(4).c_str();
 	outputFile.close();
 }
 

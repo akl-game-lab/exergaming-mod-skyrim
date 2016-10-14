@@ -30,37 +30,37 @@ namespace plugin
 	//Returns a string representation of the levels gained in the given week (format is "H,S,M;H,S,M...")
 	BSFixedString getLevelUpsAsString(StaticFunctionTag* base, BSFixedString outstandingLevel, BSFixedString workoutsString)
 	{
-		return pluginFunctions.getLevelUpsAsString(outstandingLevel.data, workoutsString.data).c_str();
+		return pluginFunctions.getLevelUpsAsString(outstandingLevel.content, workoutsString.content).c_str();
 	}
 
 	//Returns true if there is another level up and sets the health,stamina and magicka values
 	bool isNthLevelUp(StaticFunctionTag* base, BSFixedString levelUpsString, UInt32 n)
 	{
-		return pluginFunctions.isNthLevelUp(levelUpsString.data,n);
+		return pluginFunctions.isNthLevelUp(levelUpsString.content,n);
 	}
 
 	//Returns the health, stamina or magicka component of the given level up
 	UInt32 getLevelComponent(StaticFunctionTag* base, BSFixedString levelUpsString, UInt32 n, BSFixedString type)
 	{
-		return pluginFunctions.getLevelComponent(levelUpsString.data,n,type.data);
+		return pluginFunctions.getLevelComponent(levelUpsString.content,n,type.content);
 	}
 
 	//Returns the outstanding level as a string
 	BSFixedString getOutstandingLevel(StaticFunctionTag* base, BSFixedString levelUpsString)
 	{
-		return pluginFunctions.getOutstandingLevel(levelUpsString.data).c_str();
+		return pluginFunctions.getOutstandingLevel(levelUpsString.content).c_str();
 	}
 
 	//Makes a service call to fetch workouts
 	UInt32 startNormalFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
 	{
-		return pluginFunctions.startNormalFetch(gameID.data,username.data);
+		return pluginFunctions.startNormalFetch(gameID.content,username.content);
 	}
 
 	//Starts the poll for new workouts when the user requests a check
 	UInt32 startForceFetch(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
 	{
-		return pluginFunctions.startForceFetch(gameID.data,username.data);
+		return pluginFunctions.startForceFetch(gameID.content,username.content);
 	}
 
 	//Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
@@ -84,13 +84,13 @@ namespace plugin
 	//Checks if the given username is valid
 	bool validUsername(StaticFunctionTag* base, BSFixedString gameID, BSFixedString username)
 	{
-		return pluginFunctions.validUsername(gameID.data,username.data);
+		return pluginFunctions.validUsername(gameID.content,username.content);
 	}
 
 	//Returns a shortened username to fit in the menu screen
 	BSFixedString getShortenedUsername(StaticFunctionTag* base, BSFixedString username)
 	{
-		return pluginFunctions.getShortenedUsername(username.data).c_str();
+		return pluginFunctions.getShortenedUsername(username.content).c_str();
 	}
 
 	//Virtually presses the given key

@@ -8,50 +8,51 @@ RawDataHandler::RawDataHandler()
 
 void RawDataHandler::refresh()
 {
-	data = getJSON();
+	content = getJSON();
 }
 
 void RawDataHandler::getDefaultData()
 {
-	data = { "data",{} };
+	content = { "data",{} };
 }
 
 void RawDataHandler::clear()
 {
-	data = {};
+	content = {};
 	saveJSON();
 }
 
 int RawDataHandler::getWorkoutCount()
 {
-	int count = data["data"]["workouts"].size();
+	int count = content["data"]["workouts"].size();
 	return count;
 }
 
 json RawDataHandler::getWorkout(int workoutNumber)
 {
-	return data["data"]["workouts"][workoutNumber];
+	return content["data"]["workouts"][workoutNumber];
 }
 
 int RawDataHandler::getResponseCode()
 {	
 	//Handle and return the server response
 	try {
-		json responseCode = data["responseCode"];
-		if (!responseCode.empty())
+		json responseCodeJson = content["responseCode"];
+		if (!responseCodeJson.empty())
 		{
-			return std::stoi(std::string(responseCode));
+			std::string responseCodeString = responseCodeJson;
+			return std::stoi(responseCodeString);
 		}
 	}
 	catch (...) {}
 
 	//Default Server error
-	return 500;
+	return 503;
 }
 
 void RawDataHandler::setData(json newData)
 {
 	clear();
-	data = newData;
+	content = newData;
 	saveJSON();
 }

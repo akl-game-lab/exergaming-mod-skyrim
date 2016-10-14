@@ -78,13 +78,13 @@ event OnOptionSelect(int option)
 				playerReference.saveRequested = true
 			endIf
 		elseIf (option == forceFetchButton);Start force fetch
-			int forceFetchResponse = startForceFetch("Skyrim",playerReference.syncedUserName)
-			if( forceFetchResponse == 200 )
+			int serverResponse = startForceFetch("Skyrim",playerReference.syncedUserName)
+			if( serverResponse == 200 )
 				playerReference.forceFetchMade = true
 				playerReference.pollStartTime = currentDate()
-			elseIf( forceFetchResponse == 404 )
-				ShowMessage("UNKNOWN ERROR\n\nPlease contact exergaming customer support.", false)
-			elseIf( forceFetchResponse == 500 )
+			elseIf( serverResponse == 404 )
+				ShowMessage("INVALID STATE ERROR\n\nPlease contact exergaming customer support.", false)
+			else
 				ShowMessage("SERVER ERROR\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.", false)
 			endIf
 		endIf

@@ -17,7 +17,7 @@ class MYLIBRARY_EXPORT JSONHandler
 {
 protected:
 	std::string filePath;
-	json data;
+	json content;
 	DebugHandler debug;
 
 	//Checks if the given file exists

@@ -73,12 +73,8 @@ event onUpdate()
 			getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
 			Utility.wait(2.0)
 			forceFetchMade = false
-		elseIf (forceFetchMade == false);force fetch returned no data
-			if(getRawDataWorkoutCount() == 0)
-				noWorkoutsFound.show()
-			else
-				debug.messageBox("SERVER ERROR\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.")
-			endIf
+		elseIf (forceFetchMade == false)
+			noWorkoutsFound.show()
 		endIf
 	endIf
 
@@ -88,8 +84,16 @@ event onUpdate()
 		if(elapsed >= pollDuration)
 			searchComplete.show()
 			forceFetchMade = false
-			startNormalFetch("Skyrim",syncedUserName)
-			normalFetchMade = true
+			int serverResponse = startNormalFetch("Skyrim",syncedUserName)
+			if( serverResponse == 404)
+				debug.messageBox("INVALID STATE ERROR\n\nPlease contact exergaming customer support.")
+			elseIf( serverResponse == 400 )
+				debug.messageBox("CONFIGURATION ERROR\n\nPlease contact exergaming customer support.")
+			elseIf( serverResponse == 200)
+				normalFetchMade = true
+			else
+				debug.messageBox("SERVER ERROR\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.")
+			endIf
 		endIf
 	endIf
 	pollCount = pollCount + 1
