@@ -110,7 +110,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 
 	uri fullUri(conversions::to_string_t(url));
 
-	reportFile << "url:" + url + "\n";
+	reportFile << "url:\n" + url + "\n";
 
 	auto fileStream = std::make_shared<ostream>();
 

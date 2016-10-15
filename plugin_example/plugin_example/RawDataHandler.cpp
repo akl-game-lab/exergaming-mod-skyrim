@@ -25,6 +25,7 @@ void RawDataHandler::clear()
 int RawDataHandler::getWorkoutCount()
 {
 	int count = content["data"]["workouts"].size();
+	debug.write("getting workout count\n\nReturning:" + std::to_string(count));
 	return count;
 }
 

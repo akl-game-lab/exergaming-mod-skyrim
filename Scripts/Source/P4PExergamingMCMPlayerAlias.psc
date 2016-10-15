@@ -39,14 +39,29 @@ function initialise()
 	RegisterForUpdate(pollInterval)
 endFunction
 
+function uninitialise()
+	syncedUserName = ""
+	;reset the exp variables
+	Game.SetPlayerExperience(0)
+	Game.SetGameSettingFloat("fXPPerSkillRank", 1)
+	clearDebug()
+	pollCount = 1
+	pollStartTime = 0
+	levelsUp = 0
+	healthUp = 0
+	staminaUp = 0
+	magickaUp = 0
+	forceFetchMade = false
+	oldSaveLoaded = false
+endFunction
+
 ;Executes when a save finishes loading up
 event OnPlayerLoadGame()
 	initialise()
 	if (syncedUserName != "");Check to see if user is synced with an account
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
 		oldSaveLoaded = isOldSave(creationDate as int)
-		startNormalFetch("Skyrim",syncedUserName)
-		normalFetchMade = true
+		startNormalFetchWithErrorHandling()
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 	endif
@@ -84,28 +99,34 @@ event onUpdate()
 		if(elapsed >= pollDuration)
 			searchComplete.show()
 			forceFetchMade = false
-			int serverResponse = startNormalFetch("Skyrim",syncedUserName)
-			if( serverResponse == 404)
-				debug.messageBox("INVALID STATE ERROR\n\nPlease contact exergaming customer support.")
-			elseIf( serverResponse == 400 )
-				debug.messageBox("CONFIGURATION ERROR\n\nPlease contact exergaming customer support.")
-			elseIf( serverResponse == 200)
-				normalFetchMade = true
-			else
-				debug.messageBox("SERVER ERROR\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.")
-			endIf
+			startNormalFetchWithErrorHandling()
 		endIf
 	endIf
 	pollCount = pollCount + 1
 endEvent
+
+function startNormalFetchWithErrorHandling()
+	int serverResponse = startNormalFetch("Skyrim",syncedUserName)
+	if( serverResponse == 404)
+		debug.messageBox("INVALID STATE ERROR\n\nPlease contact exergaming customer support with the current date and time.")
+	elseIf( serverResponse == 400 )
+		debug.messageBox("CONFIGURATION ERROR\n\nPlease contact exergaming customer support with the current date and time.")
+	elseIf( serverResponse == 200)
+		normalFetchMade = true
+	else
+		debug.messageBox("SERVER ERROR\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.")
+	endIf
+endFunction
 
 ;Uses workout data in string format oH,oS,oM;H,S,M;...
 ;oH, oS, and oM are the outstanding health, stamina, and magicka values from previous levels
 ;H, S, and M are the health, stamina, and magicka values for a single workout.
 ;all workout found in a single fetch should be in one string.
 function getLevelUps(string workouts)
-	string levelUpsString
-	if(workouts == "Prior Workout");special case when workouts are returned on activation of the mod
+	string levelUpsString = "0,0,0"
+	if(workouts == "Workout Logged Prior")
+		debug.messageBox("REST DAY?\n\nThe only new workouts we could find were from before the date you started using our mod.\n\nYou'll only get level ups for workouts done after the mod was turned on.\n\n")
+	elseIf(workouts == "Prior Workout");special case when workouts are returned on activation of the mod
 		priorWorkouts.show()
 		doLevelUp(4,3,3,true)
 		levelUpsString = "0,0,0;4,3,3"

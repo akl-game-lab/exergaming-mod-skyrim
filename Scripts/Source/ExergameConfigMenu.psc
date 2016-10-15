@@ -69,11 +69,7 @@ event OnOptionSelect(int option)
 			bool turnOffExergaming = ShowMessage("Are you sure?\nThis will turn off Exergame Mod in the current save.", true, "$Yes", "$No")
 			if (turnOffExergaming)
 				exergameModOn = false
-				playerReference.syncedUserName = ""
-
-				;reset the exp variables
-				Game.SetPlayerExperience(0)
-				Game.SetGameSettingFloat("fXPPerSkillRank", 1)
+				playerReference.uninitialise()
 				ShowMessage("Unsync complete.", false, "Ok")
 				playerReference.saveRequested = true
 			endIf
@@ -83,7 +79,7 @@ event OnOptionSelect(int option)
 				playerReference.forceFetchMade = true
 				playerReference.pollStartTime = currentDate()
 			elseIf( serverResponse == 404 )
-				ShowMessage("INVALID STATE ERROR\n\nPlease contact exergaming customer support.", false)
+				ShowMessage("INVALID STATE ERROR\n\nPlease contact exergaming customer support with the current date and time.", false)
 			else
 				ShowMessage("SERVER ERROR\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.", false)
 			endIf
@@ -115,9 +111,7 @@ Event OnOptionInputAccept(int option, string userInput)
 			string msg = "Sync with " + username + " complete."
 			playerReference.initialise()
 			ShowMessage(msg, false, "Ok")
-			startNormalFetch("Skyrim",username)
-			playerReference.normalFetchMade = true
-			playerReference.saveRequested = true
+			playerReference.startNormalFetchWithErrorHandling()
 		else
 			ShowMessage("Invalid email!", false)
 		endIf

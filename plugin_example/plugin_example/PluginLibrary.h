@@ -63,7 +63,7 @@ public:
 	int getDayOfConfigWeek(__int64 date);
 
 	//Returns a float representation of the number of levels gained from the workout passed to the method
-	float configure(json workout, int level);
+	float getWeightForWorkout(json workout, int level);
 
 	//Makes the service call to get raw data from the server
 	void makeServiceCall(std::string type, std::string username, std::string fromDate, std::string toDate);

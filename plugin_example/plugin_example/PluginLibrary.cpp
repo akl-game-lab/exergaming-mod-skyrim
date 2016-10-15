@@ -46,7 +46,7 @@ int PluginFunctions::getDayOfConfigWeek(__int64 date)
 }
 
 //Returns a float representation of the number of levels gained from the workout passed to the method
-float PluginFunctions::configure(json workout, int level)
+float PluginFunctions::getWeightForWorkout(json workout, int level)
 {
 	// the amount of extra experience (points) needed per specified number of levels needed 
 	float levelsGained = 0.0;
@@ -65,6 +65,7 @@ float PluginFunctions::configure(json workout, int level)
 	if (firstWorkoutDate == 0 && workoutCount == 0 && (__int64)workout["workoutDate"] > startDate)
 	{
 		firstWorkoutDate = (__int64)workout["workoutDate"];
+		debug.write("setting first workout date");
 		config.setConfigProperty("firstWorkoutDate", firstWorkoutDate);
 	}
 
@@ -72,7 +73,7 @@ float PluginFunctions::configure(json workout, int level)
 	int lastWorkoutsWeek = getWeekForWorkout(firstWorkoutDate, lastWorkoutDate);
 
 	//if workout is for before the player synced their account
-	if ((__int64)workout["workoutDate"] < startDate || (__int64)workout["workoutDate"] < firstWorkoutDate)
+	if ((__int64)workout["workoutDate"] <= startDate || (__int64)workout["workoutDate"] < firstWorkoutDate)
 	{
 		config.setConfigProperty("lastSyncDate", currentDate());
 		return levelsGained;
@@ -164,30 +165,39 @@ void PluginFunctions::makeServiceCall(std::string type, std::string username, st
 std::string PluginFunctions::updateWeeks(int level)
 {
 	rawData.refresh();
-	std::string workoutsAsString = "";
+	std::string workoutsString = "";
 	int health = 0, stamina = 0, magicka = 0;
 	int workoutCount = rawData.getWorkoutCount();
+	bool workoutLoggedPrior = true;
 	//for each workout
 	for (int workoutNumber = 0; workoutNumber < workoutCount; workoutNumber++)
 	{
 		json workout = rawData.getWorkout(workoutNumber);
 		//adjust the config to account for the new workout and gets the workouts weight
-		float weight = configure(workout, level);
+		debug.write("getting workout weight");
+		float weight = getWeightForWorkout(workout, level);
+		debug.write("weight = " + std::to_string(weight));
 		workout["weight"] = weight;
-		float workoutWeight = (float)workout["weight"];
-		if (workoutWeight > 0)
+		debug.write("checking workout weight");
+		if (weight > 0)
 		{
+			debug.write("adding workout to weeks");
+			workoutLoggedPrior = false;
 			weekHandler.addWorkout(workout);
-
+			debug.write("workout added to weeks");
 			if (workoutNumber > 0)
 			{
-				workoutsAsString = workoutsAsString + ";";
+				workoutsString = workoutsString + ";";
 			}
 
-			workoutsAsString = workoutsAsString + workoutToString(workout);
+			workoutsString = workoutsString + workoutToString(workout);
 		}
 	}
-	return workoutsAsString;
+	if (workoutLoggedPrior)
+	{
+		workoutsString = "Workout Logged Prior";
+	}
+	return workoutsString;
 }
 	
 /**********************************************************************************************************
@@ -449,6 +459,7 @@ int PluginFunctions::startNormalFetch(std::string gameID, std::string username)
 		config.setConfigProperty("lastSyncDate", weekHandler.getStartOfDay(currentDate()));
 	}
 	makeServiceCall("NORMAL", username, fromDate, toDate);
+	debug.write("Exiting normal fetch\n\nReturning response code:" + std::to_string(rawData.getResponseCode()));
 	return rawData.getResponseCode();
 }
 
@@ -463,22 +474,37 @@ int PluginFunctions::startForceFetch(std::string gameID, std::string username)
 //Returns workouts from Raw_Data.xml as a string (format is "W,H,S,M;W,H,S,M...")
 std::string PluginFunctions::getWorkoutsString(int level)
 {
+	debug.write("getting workouts string");
 	rawData.refresh();
 	std::string workouts;
-	if (config.getConfigProperty("startDate") == 0)
-	{
-		int startDate = (currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY;
-		config.setConfigProperty("startDate", startDate);
-		config.setConfigProperty("lastSyncDate", startDate);
-		if (rawData.getWorkoutCount() > 0)
+	try {
+		debug.write("Getting start date from config");
+		if (config.getConfigProperty("startDate") == 0)
 		{
-			workouts = "Prior Workout";
+			debug.write("Getting start of current day");
+			int startDate = (currentDate() / SECONDS_PER_DAY)*SECONDS_PER_DAY;
+			debug.write("setting start date");
+			config.setConfigProperty("startDate", startDate);
+			debug.write("setting last sync date");
+			config.setConfigProperty("lastSyncDate", startDate);
+			if (rawData.getWorkoutCount() > 0)
+			{
+				debug.write("setting workouts");
+				workouts = "Prior Workout";
+			}
+		}
+		else
+		{
+			debug.write("updating weeks");
+			workouts = updateWeeks(level).c_str();
 		}
 	}
-	else
+	catch (...) 
 	{
-		workouts = updateWeeks(level).c_str();
+		debug.write("error in getting workouts string");
 	}
+
+	debug.write("returning workouts string(" + workouts + ")");
 	return workouts;
 }
 
