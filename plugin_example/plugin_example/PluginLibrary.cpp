@@ -73,15 +73,21 @@ float PluginFunctions::getWeightForWorkout(json workout, int level)
 	int lastWorkoutsWeek = getWeekForWorkout(firstWorkoutDate, lastWorkoutDate);
 
 	//if workout is for before the player synced their account
-	if ((__int64)workout["workoutDate"] <= startDate || (__int64)workout["workoutDate"] < firstWorkoutDate)
+	/*
+	if ((__int64)workout["workoutDate"] < startDate || (__int64)workout["workoutDate"] < firstWorkoutDate)
 	{
 		config.setConfigProperty("lastSyncDate", currentDate());
-		return levelsGained;
+		return 0.0;
 	}
-	else
+	else*/
 	{
 		totalPoints = totalPoints + workoutPoints;
 		workoutCount = workoutCount + 1;
+		
+		if ((__int64)workout["workoutDate"] == startDate)
+		{
+			workoutsWeek = 1;
+		}
 
 		if (workoutsWeek == 1)
 		{
@@ -486,7 +492,7 @@ std::string PluginFunctions::getWorkoutsString(int level)
 			debug.write("setting start date");
 			config.setConfigProperty("startDate", startDate);
 			debug.write("setting last sync date");
-			config.setConfigProperty("lastSyncDate", startDate);
+			config.setConfigProperty("lastSyncDate", currentDate());
 			if (rawData.getWorkoutCount() > 0)
 			{
 				debug.write("setting workouts");
