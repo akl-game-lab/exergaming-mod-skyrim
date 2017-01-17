@@ -21,6 +21,8 @@ message property levelProgressMsg auto
 float pollInterval = 0.5
 int pollCount = 1
 
+;Cannot do if(bool) need to do if(bool == true)
+
 ;Resets variables used for leveling or polling
 function initialise()
 	clearDebug()
@@ -45,7 +47,7 @@ function uninitialise()
 endFunction
 
 ;Executes when a save finishes loading up
-event OnPlayerLoadGame()
+event onPlayerLoadGame()
 	initialise()
 	if (syncedUserName != "");Check to see if user is synced with an account
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
@@ -75,6 +77,7 @@ event onUpdate()
 			getLevelUps(getWorkoutsFromBestWeek(creationDate))
 		elseIf (0 < getRawDataWorkoutCount());force fetch returned data
 			getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
+			;Important wait as papyrus can't read fast enough for long strings
 			Utility.wait(2.0)
 			forceFetchMade = false
 		elseIf (forceFetchMade == false)
@@ -144,6 +147,7 @@ function getLevelUps(string workouts)
 			int stamina = getLevelComponent(levelUpsString,n,"S")
 			int magicka = getLevelComponent(levelUpsString,n,"M")
 			doLevelUp(health,stamina,magicka)
+			;The hack to make all the leves show in one message
 			;--------------------------------------------------
 			levelsUp = levelsUp + 1
 			healthUp = healthUp + health
@@ -169,11 +173,10 @@ function doLevelUp(int health, int stamina, int magicka)
 	player.modActorValue("stamina", stamina)
 	player.modActorValue("magicka", magicka)
 	Game.setPlayerLevel(currentLevel + 1)
-	currentLevel = player.getLevel()
 	Game.setPerkPoints(Game.getPerkPoints() + 1)
 endFunction
 
-;update the xp bar to show the progress gained
+;update the xp bar to show the progress gained and shows the user the level up message
 function updateXpBar(string levelUpsString, int levelsUp, int healthUp, int staminaUp, int magickaUp)
 	int outstandingHealth = getLevelComponent(levelUpsString,0,"H")
 	int outstandingStamina = getLevelComponent(levelUpsString,0,"S")
@@ -187,5 +190,6 @@ function updateXpBar(string levelUpsString, int levelsUp, int healthUp, int stam
 	if(outstandingWeight > 0)
 		levelProgressMsg.show(outstandingWeight, getPointsToNextLevel(outstandingWeight))
 	endIf
+	;Division in papyrus is a bad idea, fix this
 	Game.setPlayerExperience(Game.getExperienceForLevel(Game.getPlayer().getLevel())*(outstandingWeight/100))
 endFunction

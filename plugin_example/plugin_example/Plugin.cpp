@@ -124,6 +124,8 @@ namespace plugin
 	//Registers functions for use in a papyrus script
 	bool RegisterFuncs(VMClassRegistry* registry) {
 
+		//NativeFuntion[NumberOfInput] <StaticFunctionTag, [OutputType], [Inputs]>([PapyrusName], [PluginScript], [C++ MethodName], registry);
+
 		registry->RegisterFunction(
 			new NativeFunction0 <StaticFunctionTag, UInt32>("currentDate", "PluginScript", plugin::currentDate, registry));
 

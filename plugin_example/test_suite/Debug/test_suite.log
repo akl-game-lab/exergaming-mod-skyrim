@@ -1,0 +1,11 @@
+﻿  stdafx.cpp
+  test_suite.cpp
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(16): warning C4251: 'DebugHandler::lineStart': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(17): warning C4251: 'DebugHandler::debugFile': class 'std::basic_fstream<char,std::char_traits<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(19): warning C4251: 'JSONHandler::filePath': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(20): warning C4251: 'JSONHandler::content': class 'nlohmann::basic_json<std::map,std::vector,std::string,bool,int64_t,uint64_t,double,std::allocator>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\pluginlibrary.h(34): warning C4251: 'PluginFunctions::WEB_SERVICE_DIR': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'PluginFunctions'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\pluginlibrary.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\test_suite\test_suite.cpp(312): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\test_suite\test_suite.cpp(29): error C4716: 'assertToString': must return a value
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\test_suite\test_suite.cpp(31): error C4716: 'assertToStringWithInt': must return a value
