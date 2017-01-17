@@ -1,0 +1,45 @@
+﻿  WeekHandler.cpp
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(16): warning C4251: 'DebugHandler::lineStart': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(17): warning C4251: 'DebugHandler::debugFile': class 'std::basic_fstream<char,std::char_traits<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(19): warning C4251: 'JSONHandler::filePath': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(20): warning C4251: 'JSONHandler::content': class 'nlohmann::basic_json<std::map,std::vector,std::string,bool,int64_t,uint64_t,double,std::allocator>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+  RawDataHandler.cpp
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(16): warning C4251: 'DebugHandler::lineStart': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(17): warning C4251: 'DebugHandler::debugFile': class 'std::basic_fstream<char,std::char_traits<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(19): warning C4251: 'JSONHandler::filePath': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(20): warning C4251: 'JSONHandler::content': class 'nlohmann::basic_json<std::map,std::vector,std::string,bool,int64_t,uint64_t,double,std::allocator>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+  hgj.cpp
+  PluginLibrary.cpp
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(16): warning C4251: 'DebugHandler::lineStart': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(17): warning C4251: 'DebugHandler::debugFile': class 'std::basic_fstream<char,std::char_traits<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(19): warning C4251: 'JSONHandler::filePath': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(20): warning C4251: 'JSONHandler::content': class 'nlohmann::basic_json<std::map,std::vector,std::string,bool,int64_t,uint64_t,double,std::allocator>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\pluginlibrary.h(34): warning C4251: 'PluginFunctions::WEB_SERVICE_DIR': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'PluginFunctions'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\pluginlibrary.cpp(311): warning C4101: 'oor': unreferenced local variable
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\pluginlibrary.cpp(372): warning C4101: 'oor': unreferenced local variable
+  Plugin.cpp
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(16): warning C4251: 'DebugHandler::lineStart': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(17): warning C4251: 'DebugHandler::debugFile': class 'std::basic_fstream<char,std::char_traits<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(19): warning C4251: 'JSONHandler::filePath': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(20): warning C4251: 'JSONHandler::content': class 'nlohmann::basic_json<std::map,std::vector,std::string,bool,int64_t,uint64_t,double,std::allocator>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\pluginlibrary.h(34): warning C4251: 'PluginFunctions::WEB_SERVICE_DIR': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'PluginFunctions'
+  main.cpp
+  JSONHandler.cpp
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(16): warning C4251: 'DebugHandler::lineStart': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(17): warning C4251: 'DebugHandler::debugFile': class 'std::basic_fstream<char,std::char_traits<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(19): warning C4251: 'JSONHandler::filePath': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(20): warning C4251: 'JSONHandler::content': class 'nlohmann::basic_json<std::map,std::vector,std::string,bool,int64_t,uint64_t,double,std::allocator>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+  DebugHandler.cpp
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(16): warning C4251: 'DebugHandler::lineStart': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(17): warning C4251: 'DebugHandler::debugFile': class 'std::basic_fstream<char,std::char_traits<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+  ConfigHandler.cpp
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(16): warning C4251: 'DebugHandler::lineStart': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\debughandler.h(17): warning C4251: 'DebugHandler::debugFile': class 'std::basic_fstream<char,std::char_traits<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(19): warning C4251: 'JSONHandler::filePath': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\jsonhandler.h(20): warning C4251: 'JSONHandler::content': class 'nlohmann::basic_json<std::map,std::vector,std::string,bool,int64_t,uint64_t,double,std::allocator>' needs to have dll-interface to be used by clients of class 'JSONHandler'
+  Generating Code...
+ConfigHandler.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
+     Creating library D:\SteamLibrary\steamapps\common\Skyrim\Data\plugin_example\Debug\plugin_example.lib and object D:\SteamLibrary\steamapps\common\Skyrim\Data\plugin_example\Debug\plugin_example.exp
+  plugin_example.vcxproj -> D:\SteamLibrary\steamapps\common\Skyrim\Data\plugin_example\Debug\plugin_example.dll
+  D:\SteamLibrary\steamapps\common\Skyrim\Data\plugin_example\Debug\plugin_example.dll
+  1 File(s) copied

@@ -1,0 +1,16 @@
+c:\users\mitchell\downloads\plugin_example3\plugin_example\plugin_example\debug\vc120.pdb
+c:\users\mitchell\downloads\plugin_example3\plugin_example\plugin_example\debug\vc120.idb
+c:\users\mitchell\downloads\plugin_example3\plugin_example\plugin_example\debug\main.obj
+c:\users\mitchell\downloads\plugin_example3\plugin_example\plugin_example\debug\myplugin.obj
+c:\users\mitchell\downloads\plugin_example3\plugin_example\debug\plugin_example.ilk
+c:\users\mitchell\downloads\plugin_example3\plugin_example\debug\plugin_example.dll
+c:\users\mitchell\downloads\plugin_example3\plugin_example\debug\plugin_example.pdb
+c:\users\mitchell\downloads\plugin_example3\plugin_example\debug\plugin_example.lib
+c:\users\mitchell\downloads\plugin_example3\plugin_example\debug\plugin_example.exp
+c:\users\mitchell\downloads\plugin_example3\plugin_example\plugin_example\debug\plugin_example.tlog\cl.command.1.tlog
+c:\users\mitchell\downloads\plugin_example3\plugin_example\plugin_example\debug\plugin_example.tlog\cl.read.1.tlog
+c:\users\mitchell\downloads\plugin_example3\plugin_example\plugin_example\debug\plugin_example.tlog\cl.write.1.tlog
+c:\users\mitchell\downloads\plugin_example3\plugin_example\plugin_example\debug\plugin_example.tlog\link.command.1.tlog
+c:\users\mitchell\downloads\plugin_example3\plugin_example\plugin_example\debug\plugin_example.tlog\link.read.1.tlog
+c:\users\mitchell\downloads\plugin_example3\plugin_example\plugin_example\debug\plugin_example.tlog\link.write.1.tlog
+c:\users\mitchell\downloads\plugin_example3\plugin_example\plugin_example\debug\plugin_example.tlog\plugin_example.write.1u.tlog
