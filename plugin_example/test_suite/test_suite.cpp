@@ -7,7 +7,7 @@ int results[sizeof(tests) / 4] = {};
 int testNumber = 0;
 int main()
 {
-	for (TestCases t : tests) 
+	for (TestCases t : tests)
 	{
 		(*t)();
 		testNumber++;
@@ -26,9 +26,25 @@ int main()
 	getchar();
 }
 
-std::string assertToString(bool expression) {}
+//#define assertToString(bool) assertToStringWithName(bool,__FUNCTION__)
+//#define assertToStringWithInt(bool, int) assertToStringWithNameAndInt(bool,__FUNCTION__,int)
 
-std::string assertToStringWithInt(bool expression, int subCase) {}
+//Content of this function written blindly by Henry
+std::string assertToString(bool expression) {
+	if (!expression) {
+		results[testNumber] = -1;
+		return (std::string)": failed\n";
+	}
+	else {
+		return (std::string)" ";
+	}
+}
+/*Also guessed by Henry*/
+std::string assertToStringWithInt(bool expression, int subCase) {
+	std::string string = std::to_string(subCase);
+	return (std::string)" ";
+}
+
 
 /*
 if it is the first test, init results to 1, if any failed, set to -1
@@ -183,7 +199,7 @@ void Test_isNthLevelUp_BlankString_False() { //levelup string should never be em
 	std::cout << assertToString(pluginFunctions.isNthLevelUp("", 1) == false);
 }
 void Test_isNthLevelUp_NoLevelsNEqualOne_False() {
-	std::cout << assertToString(pluginFunctions.isNthLevelUp("0.200000,0.200000,0.200000",1) == false);
+	std::cout << assertToString(pluginFunctions.isNthLevelUp("0.200000,0.200000,0.200000", 1) == false);
 }
 void Test_isNthLevelUp_OneLevelNEqualOne_True() {
 	std::cout << assertToString(pluginFunctions.isNthLevelUp("0.000000,0.000000,0.000000;5,3,2", 1) == true);
