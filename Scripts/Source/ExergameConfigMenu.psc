@@ -35,7 +35,7 @@ event OnPageReset(string page)
 		;initial options setup
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)
-		AddHeaderOption("Exergame Mod")
+		AddHeaderOption("Exergame Mod_HENRYWASHERE")
 		
 		string syncedUserName = playerReference.syncedUserName
 		
