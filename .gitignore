@@ -185,3 +185,5 @@ plugin_example/plugin_library/Debug/
 HighResTexturePack01.esp
 HighResTexturePack02.esp
 HighResTexturePack03.esp
+*.opendb
+webserviceTest/.vs/config/applicationhost.config
