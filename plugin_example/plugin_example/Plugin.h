@@ -61,6 +61,9 @@ namespace plugin
 	//Returns a%b
 	UInt32 mod(StaticFunctionTag* base, UInt32 a, UInt32 b);
 
+	//Returns a/b
+	UInt32 divide(StaticFunctionTag* base, UInt32 a, UInt32 b);
+
 	/**********************************************************************************************************
 	*	Register
 	*/

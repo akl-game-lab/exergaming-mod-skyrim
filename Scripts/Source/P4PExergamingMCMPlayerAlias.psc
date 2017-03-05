@@ -165,9 +165,11 @@ endFunction
 function doLevelUp(int health, int stamina, int magicka)
 	Actor player = Game.getPlayer()
 	int currentLevel = player.getLevel()
+	int carryCapacityUp = divide(stamina, 2)
 	player.modActorValue("health", health)
 	player.modActorValue("stamina", stamina)
 	player.modActorValue("magicka", magicka)
+	player.ModActorValue("CarryWeight", stamina/2) ;Added to increase carry weight proportionally with stamina as in the vanilla version
 	Game.setPlayerLevel(currentLevel + 1)
 	currentLevel = player.getLevel()
 	Game.setPerkPoints(Game.getPerkPoints() + 1)
