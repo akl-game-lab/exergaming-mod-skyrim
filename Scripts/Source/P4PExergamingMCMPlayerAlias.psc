@@ -45,7 +45,7 @@ function uninitialise()
 endFunction
 
 ;Executes when a save finishes loading up
-event onPlayerLoadGame()
+event OnPlayerLoadGame()
 	initialise()
 	if (syncedUserName != "");Check to see if user is synced with an account
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
