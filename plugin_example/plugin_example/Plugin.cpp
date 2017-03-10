@@ -120,7 +120,7 @@ namespace plugin
 	//Returns a/b
 	UInt32 divide(StaticFunctionTag* base, UInt32 a, UInt32 b)
 	{
-		return pluginFunctions.divide(a, b);
+		return 4;//pluginFunctions.divide(a, b);
 	}
 
 	/**********************************************************************************************************

@@ -608,5 +608,5 @@ int PluginFunctions::mod(int a, int b)
 //Returns a/b
 int PluginFunctions::divide(int a, int b)
 {
-	return (a/b);
+	return (5);
 }

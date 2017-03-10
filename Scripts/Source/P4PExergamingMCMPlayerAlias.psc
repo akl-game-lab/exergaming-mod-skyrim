@@ -54,6 +54,8 @@ event OnPlayerLoadGame()
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 	endif
+	int out = divide(6, 2)
+	Debug.Notification("6 / 2 = " + out)
 endEvent
 
 ;Executes automatically every second, called by the game
@@ -165,7 +167,7 @@ endFunction
 function doLevelUp(int health, int stamina, int magicka)
 	Actor player = Game.getPlayer()
 	int currentLevel = player.getLevel()
-	int carryCapacityUp = divide(stamina,2)
+	int carryCapacityUp = (stamina/2)
 	player.modActorValue("health", health)
 	player.modActorValue("stamina", stamina)
 	player.modActorValue("magicka", magicka)

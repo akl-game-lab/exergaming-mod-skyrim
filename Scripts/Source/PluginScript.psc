@@ -58,4 +58,4 @@ function updateConfig() global native
 int function mod(int a, int b) global native
 
 ;Returns a/b
-int function divide(int a, int b) global native
+int function divide(int a, int b) global native ;Currently not working

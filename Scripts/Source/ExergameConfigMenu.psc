@@ -24,6 +24,7 @@ event OnConfigInit()
 	Pages[0] = "Settings"
 endEvent
 
+
 ;Shows either the exergaming splash screen or the settings page
 event OnPageReset(string page)
 	;Splash screen
