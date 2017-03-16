@@ -88,4 +88,8 @@ HighResTexturePack02.esp
 HighResTexturePack03.esp
 *.opendb
 *.txt
+*.log
+*.cache
+*.exe
+
 
