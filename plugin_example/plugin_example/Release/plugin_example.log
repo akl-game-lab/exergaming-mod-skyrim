@@ -1,15 +1,6 @@
-﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(368,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
-  Plugin.cpp
-d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\DebugHandler.h(16): warning C4251: 'DebugHandler::lineStart': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
-d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\DebugHandler.h(17): warning C4251: 'DebugHandler::debugFile': class 'std::basic_fstream<char,std::char_traits<char>>' needs to have dll-interface to be used by clients of class 'DebugHandler'
-d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\JSONHandler.h(19): warning C4251: 'JSONHandler::filePath': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'JSONHandler'
-d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\JSONHandler.h(20): warning C4251: 'JSONHandler::content': class 'nlohmann::basic_json<std::map,std::vector,std::string,bool,int64_t,uint64_t,double,std::allocator>' needs to have dll-interface to be used by clients of class 'JSONHandler'
-d:\steamlibrary\steamapps\common\skyrim\data\plugin_example\plugin_example\PluginLibrary.h(38): warning C4251: 'PluginFunctions::WEB_SERVICE_DIR': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'PluginFunctions'
-     Creating library ..\..\SKSE\Plugins\plugin_example.lib and object ..\..\SKSE\Plugins\plugin_example.exp
+﻿     Creating library ..\..\SKSE\Plugins\plugin_example.lib and object ..\..\SKSE\Plugins\plugin_example.exp
   Generating code
-  2 of 1481 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+  All 1481 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   plugin_example.vcxproj -> D:\SteamLibrary\steamapps\common\Skyrim\Data\plugin_example\plugin_example\..\..\SKSE\Plugins\plugin_example.dll
   D:\SteamLibrary\steamapps\common\Skyrim\Data\plugin_example\Release\plugin_example.dll
