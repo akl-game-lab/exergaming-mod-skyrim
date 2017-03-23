@@ -54,8 +54,8 @@ event OnPlayerLoadGame()
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 	endif
-	int out = divide(6, 2)
-	Debug.Notification("6 / 2 = " + out)
+	;int out = divide(3,10) ;The divide function does not work
+	;Debug.Notification("10 / 3 = (should be 3)" + out)
 endEvent
 
 ;Executes automatically every second, called by the game
@@ -167,7 +167,7 @@ endFunction
 function doLevelUp(int health, int stamina, int magicka)
 	Actor player = Game.getPlayer()
 	int currentLevel = player.getLevel()
-	int carryCapacityUp = (stamina/2)
+	int carryCapacityUp = (stamina/2)  	;The division function is not working. this seems to work okay as the numbers are whole and simple.
 	player.modActorValue("health", health)
 	player.modActorValue("stamina", stamina)
 	player.modActorValue("magicka", magicka)
