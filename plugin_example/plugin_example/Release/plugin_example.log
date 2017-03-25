@@ -1,7 +1,0 @@
-﻿     Creating library ..\..\SKSE\Plugins\plugin_example.lib and object ..\..\SKSE\Plugins\plugin_example.exp
-  Generating code
-  All 1481 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  Finished generating code
-  plugin_example.vcxproj -> D:\SteamLibrary\steamapps\common\Skyrim\Data\plugin_example\plugin_example\..\..\SKSE\Plugins\plugin_example.dll
-  D:\SteamLibrary\steamapps\common\Skyrim\Data\plugin_example\Release\plugin_example.dll
-  1 File(s) copied
