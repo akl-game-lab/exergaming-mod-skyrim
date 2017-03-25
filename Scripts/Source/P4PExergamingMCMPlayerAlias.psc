@@ -18,6 +18,9 @@ message property levelUpMessage auto
 message property levelUpDetails auto
 message property levelProgressMsg auto
 
+;Event log file
+String eventLog = "SkyrimExergameMod_EventLog"
+
 float pollInterval = 0.5
 int pollCount = 1
 
@@ -29,6 +32,9 @@ function initialise()
 	forceFetchMade = false
 	oldSaveLoaded = false
 	RegisterForUpdate(pollInterval)
+	Debug.OpenUserLog(eventLog)
+	Debug.TraceUser(eventLog, "Mod Turned On", 0)
+	Debug.CloseUserLog(eventLog)
 endFunction
 
 ;Resets variables used by the mod when it is turned off
@@ -42,6 +48,9 @@ function uninitialise()
 	pollStartTime = 0
 	forceFetchMade = false
 	oldSaveLoaded = false
+	Debug.OpenUserLog(eventLog)
+	Debug.TraceUser(eventLog, "Mod Turned Off", 0)
+	Debug.CloseUserLog(eventLog)
 endFunction
 
 ;Executes when a save finishes loading up
@@ -50,17 +59,16 @@ event OnPlayerLoadGame()
 	if (syncedUserName != "");Check to see if user is synced with an account
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
 		oldSaveLoaded = isOldSave(creationDate as int)
+		Debug.OpenUserLog(eventLog)
+		Debug.TraceUser(eventLog, "Save Game loaded. File is an old save: " +oldSaveLoaded, 0)
+		Debug.CloseUserLog(eventLog)
 		startNormalFetchWithErrorHandling()
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
+		Debug.OpenUserLog(eventLog)
+		Debug.TraceUser(eventLog, "Save Game loaded. File is an old save: " +oldSaveLoaded, 0)
+		Debug.CloseUserLog(eventLog)
 	endif
-	Debug.OpenUserLog("MyCoolLog")
-	Debug.TraceUser("MyCoolLog", "wassup G", 0)
-	Debug.TraceUser("MyCoolLog", "I'm warning you!", 1)
-	Debug.TraceUser("MyCoolLog", "ERROR g", 2)
-	Debug.CloseUserLog("MyCoolLog")
-	;int out = divide(3,10) ;The divide function does not work
-	;Debug.Notification("10 / 3 = (should be 3)" + out)
 endEvent
 
 ;Executes automatically every second, called by the game
@@ -73,6 +81,9 @@ event onUpdate()
 		Utility.WaitMenuMode(1)
 		Game.requestSave()
 		updateConfig()
+		Debug.OpenUserLog(eventLog)
+		Debug.TraceUser(eventLog, "Game Saved", 0)
+		Debug.CloseUserLog(eventLog)
 	endIf
 
 	if (normalFetchMade == true && mod(pollCount,6) == 0)
@@ -80,6 +91,9 @@ event onUpdate()
 		normalFetchMade = false
 		if(oldSaveLoaded == true)
 			getLevelUps(getWorkoutsFromBestWeek(creationDate))
+			Debug.OpenUserLog(eventLog)
+			Debug.TraceUser(eventLog, "Retreiving work outs from best week as this is an old save", 0)
+			Debug.CloseUserLog(eventLog)
 		elseIf (0 < getRawDataWorkoutCount());force fetch returned data
 			getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
 			Utility.wait(2.0)
