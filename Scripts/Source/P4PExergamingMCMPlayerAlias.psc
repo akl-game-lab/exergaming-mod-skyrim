@@ -54,6 +54,11 @@ event OnPlayerLoadGame()
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 	endif
+	Debug.OpenUserLog("MyCoolLog")
+	Debug.TraceUser("MyCoolLog", "wassup G", 0)
+	Debug.TraceUser("MyCoolLog", "I'm warning you!", 1)
+	Debug.TraceUser("MyCoolLog", "ERROR g", 2)
+	Debug.CloseUserLog("MyCoolLog")
 	;int out = divide(3,10) ;The divide function does not work
 	;Debug.Notification("10 / 3 = (should be 3)" + out)
 endEvent
