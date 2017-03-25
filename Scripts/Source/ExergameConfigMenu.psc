@@ -18,6 +18,9 @@ bool exergameModOn = false
 bool forceFetch = false
 bool forceFetchCancel = false
 
+;Event log file
+String eventLog = "SkyrimExergameMod_EventLog"
+
 ;Defines the number of pages in the MCM
 event OnConfigInit()
 	Pages = new string[1]
@@ -36,7 +39,7 @@ event OnPageReset(string page)
 		;initial options setup
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		SetCursorPosition(0)
-		AddHeaderOption("Exergame Mod_HENRYWASHERE")
+		AddHeaderOption("Exergame Mod")
 		
 		string syncedUserName = playerReference.syncedUserName
 		
@@ -76,6 +79,9 @@ event OnOptionSelect(int option)
 			endIf
 		elseIf (option == forceFetchButton);Start force fetch
 			int serverResponse = startForceFetch("Skyrim",playerReference.syncedUserName)
+			Debug.OpenUserLog(eventLog)
+			Debug.TraceUser(eventLog, "Server Returned: " +serverResponse, 0)
+			Debug.CloseUserLog(eventLog)
 			if( serverResponse == 200 )
 				playerReference.forceFetchMade = true
 				playerReference.pollStartTime = currentDate()
@@ -87,6 +93,9 @@ event OnOptionSelect(int option)
 		endIf
 	elseIf (option == forceFetchCancelButton)
 		playerReference.forceFetchMade = false
+		Debug.OpenUserLog(eventLog)
+		Debug.TraceUser(eventLog, "Force Fetch Cancelled", 0)
+		Debug.CloseUserLog(eventLog)
 	endIf
 	ForcePageReset()
 endEvent
@@ -113,8 +122,15 @@ Event OnOptionInputAccept(int option, string userInput)
 			playerReference.initialise()
 			ShowMessage(msg, false, "Ok")
 			playerReference.startNormalFetchWithErrorHandling()
+			Debug.OpenUserLog(eventLog)
+			Debug.TraceUser(eventLog, "User synced with: " +username, 0)
+			Debug.CloseUserLog(eventLog)
 		else
 			ShowMessage("Invalid email!", false)
+			Debug.OpenUserLog(eventLog)
+			Debug.TraceUser(eventLog, "User attempted to sync with: " +username, 0)
+			Debug.TraceUser(eventLog, "Sync failed, invalid email", 1)
+			Debug.CloseUserLog(eventLog)
 		endIf
 	endIf
 endEvent
