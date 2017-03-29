@@ -130,5 +130,5 @@ public:
 	int mod(int a, int b);
 
 	//Returns a/b
-	UINT32 divide(UINT32 c, UINT32 d);
+	int division(int c, int d);
 };
