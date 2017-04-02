@@ -34,7 +34,7 @@ function initialise()
 	oldSaveLoaded = false
 	RegisterForUpdate(pollInterval)
 	
-	Debug.TraceUser(eventLog, "Mod Turned On", 0)
+	Debug.TraceUser(eventLog, "120 Mod Turned On", 0)
 	
 endFunction
 
@@ -50,7 +50,7 @@ function uninitialise()
 	forceFetchMade = false
 	oldSaveLoaded = false
 	
-	Debug.TraceUser(eventLog, "Mod Turned Off", 0)
+	Debug.TraceUser(eventLog, "121 Mod Turned Off", 0)
 	
 endFunction
 
@@ -61,13 +61,13 @@ event OnPlayerLoadGame()
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
 		oldSaveLoaded = isOldSave(creationDate as int)
 		
-		Debug.TraceUser(eventLog, "Save Game loaded. File is an old save: " +oldSaveLoaded, 0)
+		Debug.TraceUser(eventLog, "122 Save Game loaded. File is an old save: " +oldSaveLoaded, 0)
 		
 		startNormalFetchWithErrorHandling()
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 		
-		Debug.TraceUser(eventLog, "Save Game loaded. File is an old save: " +oldSaveLoaded, 0)
+		Debug.TraceUser(eventLog, "123 Save Game loaded. File is an old save: " +oldSaveLoaded, 0)
 		
 	endif
 	int result = 0
