@@ -93,7 +93,6 @@ HighResTexturePack03.esp
 *.exe
 Quick Start - Skip the Opening Sequence.esp
 
-
 #Files below here were unignored to move project to other gaming PC
 plugin_example/common/
 plugin_example/skse/
@@ -198,3 +197,5 @@ plugin_example/Release/
 plugin_example/plugin_library/Debug/
 webserviceTest/.vs/config/applicationhost.config
 
+TESV_Papyrus_Flags.flg
+.gitattributes
