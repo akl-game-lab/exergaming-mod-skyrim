@@ -114,7 +114,7 @@ event onUpdate()
 	endIf
 
 	if (forceFetchMade == true);
-		debug.Notification("105 Checking for recent workouts.")
+		debug.Notification("Checking for recent workouts.")
 		
 		int elapsed = currentDate() - pollStartTime
 		if(elapsed >= pollDuration)
@@ -132,26 +132,32 @@ endEvent
 ;Starts a normal fetch and handles the response to provide the user with error feedback
 function startNormalFetchWithErrorHandling()
 	int serverResponse = startNormalFetch("Skyrim",syncedUserName)
+	Debug.TraceUser(eventLog, "124 Normal Fetch Started", 0)
 	if( serverResponse == 404)
 		debug.messageBox("INVALID STATE ERROR\n\nPlease contact exergaming customer support with the current date and time.")
 		
-		Debug.TraceUser(eventLog, "107 Server Returned" +serverResponse, 1)
+		Debug.TraceUser(eventLog, "107 Server Returned: " +serverResponse, 1)
 		
 	elseIf( serverResponse == 400 )
 		debug.messageBox("CONFIGURATION ERROR\n\nPlease contact exergaming customer support with the current date and time.")
 		
-		Debug.TraceUser(eventLog, "108 Server Returned" +serverResponse, 1)
+		Debug.TraceUser(eventLog, "108 Server Returned: " +serverResponse, 1)
 		
 	elseIf( serverResponse == 200)
 		normalFetchMade = true
 		
-		Debug.TraceUser(eventLog, "109 Server Returned" +serverResponse, 0)
+		Debug.TraceUser(eventLog, "109 Server Returned: " +serverResponse, 0)
 		Debug.TraceUser(eventLog, "110 Success", 0)
 		
+	elseIf( serverResponse == 503)
+		debug.messageBox("Server Unreachable\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.")
+		
+		Debug.TraceUser(eventLog, "107 Server Unreachable, Returned: " +serverResponse, 1)
+
 	else
 		debug.messageBox("SERVER ERROR\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.")
 		
-		Debug.TraceUser(eventLog, "111 Unforseen error, Server Returned" +serverResponse, 2)
+		Debug.TraceUser(eventLog, "111 Unforseen error, Server Returned: " +serverResponse, 2)
 		
 	endIf
 endFunction
@@ -245,12 +251,12 @@ function doLevelUp(int health, int stamina, int magicka)
 	currentLevel = player.getLevel()
 	Game.setPerkPoints(Game.getPerkPoints() + 1)
 
-	Debug.TraceUser(eventLog, "119.0 LevelUp Done: New Current Level" +currentLevel, 0)
-	Debug.TraceUser(eventLog, "119.1 LevelUp Done: Health Increase" +health, 0)
-	Debug.TraceUser(eventLog, "119.2 LevelUp Done: Magicka Increase" +magicka, 0)
-	Debug.TraceUser(eventLog, "119.3 LevelUp Done: Stamina Increase" +stamina, 0)
-	Debug.TraceUser(eventLog, "119.4 LevelUp Done: Carry Capacity increase" +carryCapacityUp, 0)
-	Debug.TraceUser(eventLog, "119.5 LevelUp Done: Perkpoints incresed by One, New value:" +Game.GetPerkPoints(), 0)
+	Debug.TraceUser(eventLog, "119.0 LevelUp Done: New Current Level: " +currentLevel, 0)
+	Debug.TraceUser(eventLog, "119.1 LevelUp Done: Health Increase: " +health, 0)
+	Debug.TraceUser(eventLog, "119.2 LevelUp Done: Magicka Increase: " +magicka, 0)
+	Debug.TraceUser(eventLog, "119.3 LevelUp Done: Stamina Increase: " +stamina, 0)
+	Debug.TraceUser(eventLog, "119.4 LevelUp Done: Carry Capacity increase: " +carryCapacityUp, 0)
+	Debug.TraceUser(eventLog, "119.5 LevelUp Done: Perkpoints incresed by One, New value: " +Game.GetPerkPoints(), 0)
 	
 endFunction
 
