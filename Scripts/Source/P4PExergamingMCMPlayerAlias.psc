@@ -70,9 +70,6 @@ event OnPlayerLoadGame()
 		Debug.TraceUser(eventLog, "123 Save Game loaded. File is an old save: " +oldSaveLoaded, 0)
 		
 	endif
-	int result = 0
-	result = division(6, 2)
-	Debug.MessageBox("six divided by two = "+result)
 endEvent
 
 ;Executes automatically every second, called by the game
