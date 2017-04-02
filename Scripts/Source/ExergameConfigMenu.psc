@@ -78,10 +78,13 @@ event OnOptionSelect(int option)
 				playerReference.saveRequested = true
 			endIf
 		elseIf (option == forceFetchButton);Start force fetch
+			
+			Debug.TraceUser(eventLog, "001 Force Fetch Started", 0)
+
 			int serverResponse = startForceFetch("Skyrim",playerReference.syncedUserName)
-			Debug.OpenUserLog(eventLog)
-			Debug.TraceUser(eventLog, "Server Returned: " +serverResponse, 0)
-			Debug.CloseUserLog(eventLog)
+			
+			Debug.TraceUser(eventLog, "002 Server Returned: " +serverResponse, 0)
+			
 			if( serverResponse == 200 )
 				playerReference.forceFetchMade = true
 				playerReference.pollStartTime = currentDate()
@@ -93,9 +96,9 @@ event OnOptionSelect(int option)
 		endIf
 	elseIf (option == forceFetchCancelButton)
 		playerReference.forceFetchMade = false
-		Debug.OpenUserLog(eventLog)
-		Debug.TraceUser(eventLog, "Force Fetch Cancelled", 0)
-		Debug.CloseUserLog(eventLog)
+		
+		Debug.TraceUser(eventLog, "003 Force Fetch Cancelled", 0)
+		
 	endIf
 	ForcePageReset()
 endEvent
@@ -122,15 +125,15 @@ Event OnOptionInputAccept(int option, string userInput)
 			playerReference.initialise()
 			ShowMessage(msg, false, "Ok")
 			playerReference.startNormalFetchWithErrorHandling()
-			Debug.OpenUserLog(eventLog)
-			Debug.TraceUser(eventLog, "User synced with: " +username, 0)
-			Debug.CloseUserLog(eventLog)
+			
+			Debug.TraceUser(eventLog, "004User synced with: " +username, 0)
+			
 		else
 			ShowMessage("Invalid email!", false)
-			Debug.OpenUserLog(eventLog)
-			Debug.TraceUser(eventLog, "User attempted to sync with: " +username, 0)
-			Debug.TraceUser(eventLog, "Sync failed, invalid email", 1)
-			Debug.CloseUserLog(eventLog)
+			
+			Debug.TraceUser(eventLog, "005 User attempted to sync with: " +username, 0)
+			Debug.TraceUser(eventLog, "006 Sync failed, invalid email", 1)
+			
 		endIf
 	endIf
 endEvent
