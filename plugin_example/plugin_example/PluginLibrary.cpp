@@ -606,7 +606,7 @@ int PluginFunctions::mod(int a, int b)
 }
 
 //Returns a/b
-UINT32 PluginFunctions::divide(UINT32 c, UINT32 d)
+int PluginFunctions::division(int c, int d)
 {
 	return c/d;
 }

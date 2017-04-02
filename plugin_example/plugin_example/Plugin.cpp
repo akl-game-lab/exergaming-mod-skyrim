@@ -118,9 +118,9 @@ namespace plugin
 	}
 
 	//Returns a/b
-	UInt32 divide(StaticFunctionTag* base, UInt32 c, UInt32 d)
+	UInt32 division(StaticFunctionTag* base, UInt32 c, UInt32 d)
 	{
-		return pluginFunctions.divide(c, d);
+		return pluginFunctions.division(c, d);
 	}
 
 	/**********************************************************************************************************
@@ -185,7 +185,7 @@ namespace plugin
 			new NativeFunction2 <StaticFunctionTag, UInt32, UInt32, UInt32>("mod", "PluginScript", plugin::mod, registry));
 
 		registry->RegisterFunction(
-			new NativeFunction2 <StaticFunctionTag, UInt32, UInt32, UInt32>("divide", "PluginScript", plugin::divide, registry));
+			new NativeFunction2 <StaticFunctionTag, UInt32, UInt32, UInt32>("division", "PluginScript", plugin::division, registry));
 
 		return true;
 	}
