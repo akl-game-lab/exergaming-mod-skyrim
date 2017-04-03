@@ -117,6 +117,12 @@ namespace plugin
 		return pluginFunctions.mod(a, b);
 	}
 
+	//Returns a/b
+	UInt32 division(StaticFunctionTag* base, UInt32 c, UInt32 d)
+	{
+		return pluginFunctions.division(c, d);
+	}
+
 	/**********************************************************************************************************
 	*	Register
 	*/
@@ -177,6 +183,9 @@ namespace plugin
 
 		registry->RegisterFunction(
 			new NativeFunction2 <StaticFunctionTag, UInt32, UInt32, UInt32>("mod", "PluginScript", plugin::mod, registry));
+
+		registry->RegisterFunction(
+			new NativeFunction2 <StaticFunctionTag, UInt32, UInt32, UInt32>("division", "PluginScript", plugin::division, registry));
 
 		return true;
 	}

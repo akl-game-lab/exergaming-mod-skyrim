@@ -604,3 +604,9 @@ int PluginFunctions::mod(int a, int b)
 {
 	return a%b;
 }
+
+//Returns a/b
+int PluginFunctions::division(int c, int d)
+{
+	return c/d;
+}

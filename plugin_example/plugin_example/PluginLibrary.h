@@ -128,4 +128,7 @@ public:
 
 	//Returns a%b
 	int mod(int a, int b);
+
+	//Returns a/b
+	int division(int c, int d);
 };

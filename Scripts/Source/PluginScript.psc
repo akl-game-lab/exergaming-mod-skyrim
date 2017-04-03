@@ -1,5 +1,7 @@
 scriptName PluginScript Hidden
 
+String eventLog = "skyrimExergameMod_eventLog"
+
 ;Returns the current date to the calling papyrus script
 int function currentDate() global native
 
@@ -56,3 +58,6 @@ function updateConfig() global native
 
 ;Returns a%b
 int function mod(int a, int b) global native
+
+;Returns a/b
+int function division(int c, int d) global native ;Currently not working 
