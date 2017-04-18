@@ -92,6 +92,7 @@ HighResTexturePack03.esp
 *.cache
 *.exe
 Quick Start - Skip the Opening Sequence.esp
+Scripts/Source_bk.rar
 
 #Files below here were unignored to move project to other gaming PC
 plugin_example/common/
