@@ -103,9 +103,7 @@ event onUpdate()
 			Debug.TraceUser(eventLog, "103 Force fetch returned data", 0)
 			
 		elseIf (forceFetchMade == false)
-			Debug.Notification("No new workouts found")
-			Debug.Notification("If this is wrong, try running a force fetch")
-			;noWorkoutsFound.show()
+			noWorkoutsFound.show()
 			
 			Debug.TraceUser(eventLog, "104 No workouts found", 0)
 			
