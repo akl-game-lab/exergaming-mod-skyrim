@@ -23,6 +23,8 @@ String eventLog = "SkyrimExergameMod_EventLog"
 
 float pollInterval = 0.5
 int pollCount = 1
+int searchCount = 1
+int delayCount = 0
 
 ;Resets variables used for leveling or polling
 function initialise()
@@ -32,6 +34,7 @@ function initialise()
 	pollStartTime = 0
 	forceFetchMade = false
 	oldSaveLoaded = false
+	searchCount = 1
 	RegisterForUpdate(pollInterval)
 	
 	Debug.TraceUser(eventLog, "120 Mod Turned On", 0)
@@ -74,7 +77,8 @@ endEvent
 
 ;Executes automatically every second, called by the game
 event onUpdate()
-	int pollDuration = 120
+	int pollDuration = 30
+
 	
 	if(saveRequested == true)
 		creationDate = currentDate()
@@ -111,8 +115,117 @@ event onUpdate()
 	endIf
 
 	if (forceFetchMade == true);
-		debug.Notification("Checking for recent workouts.")
-		
+
+		if (delaycount ==  8) 
+
+			searchCount = Utility.RandomInt(0,22)
+
+			if (searchCount == 0)
+
+				debug.Notification("Talking to your personal trainer")
+
+			ElseIf (searchCount == 1)
+				
+				debug.Notification("Smelling your gym socks")
+
+			ElseIf (searchCount == 2)
+				
+				debug.Notification("Looking at your gym's CCTV footage")
+
+			ElseIf (searchCount == 3)
+
+				debug.Notification("Comparing alibis")
+
+			ElseIf (searchCount == 4)
+
+				debug.Notification("Checking popular bodybuilding forums")
+
+			ElseIf (searchCount == 5)
+
+				debug.Notification("Hiring forensic investigators")
+
+			ElseIf (searchCount == 6)
+
+				debug.Notification("Looking for workouts")
+
+			ElseIf (searchCount == 7)
+
+				debug.Notification("Probing the host")
+
+			ElseIf (searchCount == 8)
+
+				debug.Notification("...")
+
+			ElseIf (searchCount == 9)
+
+				debug.Notification("Hitting a new deadlift PB")
+
+			ElseIf (searchCount == 10)
+
+				debug.Notification("Hitting a new squat PB")
+
+			ElseIf (searchCount == 11)
+
+				debug.Notification("Hitting a new bench press PB")
+
+			ElseIf (searchCount == 12)
+
+				debug.Notification("Tying shoelaces")
+
+			ElseIf (searchCount == 13)
+
+				debug.Notification("Defrosting chicken breast")
+
+			ElseIf (searchCount == 14)
+
+				debug.Notification("Waiting patiently")
+
+			ElseIf (searchCount == 15)
+
+				debug.Notification("Smiling at the gym receptionist")
+
+			ElseIf (searchCount == 16)
+
+				debug.Notification("Querying server")
+
+			ElseIf (searchCount == 17)
+
+				debug.Notification("Decoding transmission")
+
+			ElseIf (searchCount == 18)
+
+				debug.Notification("Unracking weights")
+
+			ElseIf (searchCount == 19)
+
+				debug.Notification("Completing set")
+
+			ElseIf (searchCount == 20)
+
+				debug.Notification("Stretching")
+
+			ElseIf (searchCount == 21)
+
+				debug.Notification("Flexing")
+
+			ElseIf (searchCount == 22)
+
+				debug.Notification("Scanning our server")
+			
+			Else
+				
+				debug.Notification("Scanning our server")
+
+			endif;
+
+			delayCount = 0
+
+		else 
+
+			delayCount = delayCount + 1
+
+		endif
+
 		int elapsed = currentDate() - pollStartTime
 		if(elapsed >= pollDuration)
 			searchComplete.show()
@@ -174,7 +287,7 @@ function getLevelUps(string workouts)
 	if(workouts == "Workout Logged Prior")
 		debug.messageBox("REST DAY?\n\nThe only new workouts we could find were from before the date you started using our mod.\n\nYou'll only get level ups for workouts done after the mod was turned on.\n\nIf you've only just logged one, you can check using the \"Check for recent workouts\" button in the Exergaming Menu.")
 		
-		Debug.TraceUser(eventLog, "112 The only work outs found were logged after the mod was turned on for a date prior to the mod being turned on, No level up applied", 0)
+		Debug.TraceUser(eventLog, "112 The only work outs found were logged before the mod was turned on for a date prior to the mod being turned on, No level up applied", 0)
 		
 	;Special case when workouts are found when the mod is turned on
 	elseIf(workouts == "Prior Workout")
@@ -267,6 +380,7 @@ function updateXpBar(string levelUpsString, int levelsUp, int healthUp, int stam
 	;first progress, second amount of workout
 	if(levelsUp > 0)
 		levelUpMessage.show(levelsUp,Game.getPlayer().getLevel(),healthUp,staminaUp,magickaUp)
+		debug.Notification("Remember to allocate points in the skill tree")
 	endIf
 	if(outstandingWeight > 0)
 		levelProgressMsg.show(outstandingWeight, getPointsToNextLevel(outstandingWeight))
