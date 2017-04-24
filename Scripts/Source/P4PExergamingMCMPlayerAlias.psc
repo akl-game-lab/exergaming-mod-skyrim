@@ -244,12 +244,12 @@ function startNormalFetchWithErrorHandling()
 	int serverResponse = startNormalFetch("Skyrim",syncedUserName)
 	Debug.TraceUser(eventLog, "124 Normal Fetch Started", 0)
 	if( serverResponse == 404)
-		debug.messageBox("INVALID STATE ERROR\n\nPlease contact exergaming customer support with the current date and time.")
+		debug.messageBox("Server Invalid State Error\n\nPlease contact support with the current date and time.\n\n Code: 107")
 		
 		Debug.TraceUser(eventLog, "107 Server Returned: " +serverResponse, 1)
 		
 	elseIf( serverResponse == 400 )
-		debug.messageBox("CONFIGURATION ERROR\n\nPlease contact exergaming customer support with the current date and time.")
+		debug.messageBox("Server Config Error\n\nPlease contact support with the current date and time.\n\n Code: 108")
 		
 		Debug.TraceUser(eventLog, "108 Server Returned: " +serverResponse, 1)
 		
@@ -260,12 +260,12 @@ function startNormalFetchWithErrorHandling()
 		Debug.TraceUser(eventLog, "110 Success", 0)
 		
 	elseIf( serverResponse == 503)
-		debug.messageBox("Server Unreachable\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.")
+		debug.messageBox("Server Unreachable\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact support with the current date and time.\n\n Code: 107")
 		
 		Debug.TraceUser(eventLog, "107 Server Unreachable, Returned: " +serverResponse, 1)
 
 	else
-		debug.messageBox("SERVER ERROR\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.")
+		debug.messageBox("Cannot Contact Server\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact support with the current date and time.\n\nCode: 111")
 		
 		Debug.TraceUser(eventLog, "111 Unforseen error, Server Returned: " +serverResponse, 2)
 		
@@ -285,7 +285,7 @@ function getLevelUps(string workouts)
 
 	;Special case when workouts are logged after the mod is turned on, for a date that was before the mod was turned on
 	if(workouts == "Workout Logged Prior")
-		debug.messageBox("REST DAY?\n\nThe only new workouts we could find were from before the date you started using our mod.\n\nYou'll only get level ups for workouts done after the mod was turned on.\n\nIf you've only just logged one, you can check using the \"Check for recent workouts\" button in the Exergaming Menu.")
+		debug.messageBox("No new Workouts found\n\n Workouts prior to the mod being turned on are ineligible")
 		
 		Debug.TraceUser(eventLog, "112 The only work outs found were logged before the mod was turned on for a date prior to the mod being turned on, No level up applied", 0)
 		
@@ -380,7 +380,7 @@ function updateXpBar(string levelUpsString, int levelsUp, int healthUp, int stam
 	;first progress, second amount of workout
 	if(levelsUp > 0)
 		levelUpMessage.show(levelsUp,Game.getPlayer().getLevel(),healthUp,staminaUp,magickaUp)
-		debug.Notification("Remember to allocate points in the skill tree")
+		debug.Notification("Remember to allocate perk points in the skills menu")
 	endIf
 	if(outstandingWeight > 0)
 		levelProgressMsg.show(outstandingWeight, getPointsToNextLevel(outstandingWeight))
