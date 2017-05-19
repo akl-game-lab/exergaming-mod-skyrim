@@ -9,6 +9,8 @@ P4PExergamingMCMPlayerAlias property playerReference auto
 ;option IDs
 int exergameModOnSwitch
 int exergameModOffSwitch
+int exergameNotificationOnSwitch
+int exergameNotificationOffSwitch
 int syncStatus
 int forceFetchButton
 int forceFetchCancelButton
@@ -17,6 +19,7 @@ int forceFetchCancelButton
 bool exergameModOn = false
 bool forceFetch = false
 bool forceFetchCancel = false
+bool exergameNotificationOn = false
 
 ;Event log file
 String eventLog = "SkyrimExergameMod_EventLog"
@@ -58,9 +61,11 @@ event OnPageReset(string page)
 					forceFetchButton = AddToggleOption("Check for recent workouts",forceFetch)
 				endIf
 				exergameModOffSwitch = AddToggleOption("Turn Exergame Mode off", exergameModOn)
+				exergameNotificationOffSwitch = AddToggleOption("Toggle skill point autoshow and notifications", exergameNotificationOn)
 			endIf
 		else
 			exergameModOnSwitch = AddInputOption("Turn Exergame Mod on", "");runs code in OnOptionInputOpen()
+			exergameNotificationOnSwitch = AddInputOption("Toggle skill point autoshow and notifications", "")
 		endIf
 	endIf
 endEvent
@@ -93,6 +98,16 @@ event OnOptionSelect(int option)
 			else
 				ShowMessage("SERVER ERROR\n\nPlease try again in a few minutes.\n\nIf this error persists, please contact exergaming customer support with the current date and time.", false)
 			endIf
+		elseif (option == exergameNotificationOffSwitch)
+			exergameNotificationOn = !exergameNotificationOn
+			if (exergameNotificationOn == true)
+				ShowMessage("Skill point autoshow and notifications turned on", false, "Ok")
+				playerReference.notificationsBool = true
+			else 
+				ShowMessage("Skill point autoshow and notifications turned off", false, "Ok")
+				playerReference.notificationsBool = false
+			endif
+			playerReference.saveRequested = true
 		endIf
 	elseIf (option == forceFetchCancelButton)
 		playerReference.forceFetchMade = false
@@ -156,3 +171,4 @@ event OnOptionHighlight(int option)
 		endIf
 	endIf
 endEvent
+Message Property ExerGamingUpdateSkills  Auto  

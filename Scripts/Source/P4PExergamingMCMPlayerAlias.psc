@@ -10,6 +10,7 @@ bool property normalFetchMade auto
 bool property saveRequested auto
 int property pollStartTime auto
 bool property oldSaveLoaded auto
+bool property notificationsBool auto
 
 message property noWorkoutsFound auto
 message property searchComplete auto
@@ -17,6 +18,7 @@ message property priorWorkouts auto
 message property levelUpMessage auto
 message property levelUpDetails auto
 message property levelProgressMsg auto
+message property updateSkill auto
 
 ;Event log file
 String eventLog = "SkyrimExergameMod_EventLog"
@@ -25,6 +27,10 @@ float pollInterval = 0.5
 int pollCount = 1
 int searchCount = 1
 int delayCount = 0
+int aCount = 0
+int flashSkillpointsDelay = 3600 ;ticks of onupdate to wait before displaying skill points info
+int requestOpenMenu = 0
+
 
 ;Resets variables used for leveling or polling
 function initialise()
@@ -36,7 +42,6 @@ function initialise()
 	oldSaveLoaded = false
 	searchCount = 1
 	RegisterForUpdate(pollInterval)
-	
 	Debug.TraceUser(eventLog, "120 Mod Turned On", 0)
 	
 endFunction
@@ -73,11 +78,29 @@ event OnPlayerLoadGame()
 		Debug.TraceUser(eventLog, "123 Save Game loaded. File is an old save: " +oldSaveLoaded, 0)
 		
 	endif
+
 endEvent
 
 ;Executes automatically every second, called by the game
 event onUpdate()
 	int pollDuration = 30
+
+	acount = acount + 1
+
+	if(acount >= flashSkillpointsDelay)
+		if (notificationsBool == true) && (Game.GetPerkPoints() > 0)
+			debug.Notification("Remember to allocate unspent skill points")
+		endif
+		acount = 0
+	endif
+
+	if(requestOpenMenu == 2)
+		requestOpenMenu = 0
+		if(Game.GetPerkPoints() > 0)
+			trySkillsMenu()
+		EndIf
+	endif
+
 
 	
 	if(saveRequested == true)
@@ -86,9 +109,10 @@ event onUpdate()
 		Utility.WaitMenuMode(1)
 		Game.requestSave()
 		updateConfig()
-		
 		Debug.TraceUser(eventLog, "101 Game Saved", 0)
-		
+		if (requestOpenMenu == 1)
+			requestOpenMenu = 2
+		EndIf
 	endIf
 
 	if (normalFetchMade == true && mod(pollCount,6) == 0)
@@ -103,13 +127,17 @@ event onUpdate()
 			getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
 			Utility.wait(2.0)
 			forceFetchMade = false
-			
 			Debug.TraceUser(eventLog, "103 Force fetch returned data", 0)
+			If(Game.GetPerkPoints() > 0)
+				;trySkillsMenu()
+			EndIf
 			
 		elseIf (forceFetchMade == false)
 			noWorkoutsFound.show()
-			
 			Debug.TraceUser(eventLog, "104 No workouts found", 0)
+			If(Game.GetPerkPoints() > 0)
+				;trySkillsMenu()
+			EndIf
 			
 		endIf
 	endIf
@@ -228,12 +256,12 @@ event onUpdate()
 
 		int elapsed = currentDate() - pollStartTime
 		if(elapsed >= pollDuration)
-			searchComplete.show()
 			forceFetchMade = false
 			
 			Debug.TraceUser(eventLog, "106 Fetch from exercise.com Complete, retrieving data from our server", 0)
 			
 			startNormalFetchWithErrorHandling()
+
 		endIf
 	endIf
 	pollCount = pollCount + 1
@@ -341,6 +369,8 @@ function getLevelUps(string workouts)
 
 	updateXpBar(levelUpsString, levelsUp, healthUp, staminaUp, magickaUp)
 	saveRequested = true
+
+
 endFunction
 
 ;Increment the player level and give the player a perk point
@@ -367,7 +397,9 @@ function doLevelUp(int health, int stamina, int magicka)
 	Debug.TraceUser(eventLog, "119.3 LevelUp Done: Stamina Increase: " +stamina, 0)
 	Debug.TraceUser(eventLog, "119.4 LevelUp Done: Carry Capacity increase: " +carryCapacityUp, 0)
 	Debug.TraceUser(eventLog, "119.5 LevelUp Done: Perkpoints incresed by One, New value: " +Game.GetPerkPoints(), 0)
-	
+
+	requestOpenMenu = 1
+
 endFunction
 
 ;update the xp bar to show the progress gained
@@ -380,10 +412,19 @@ function updateXpBar(string levelUpsString, int levelsUp, int healthUp, int stam
 	;first progress, second amount of workout
 	if(levelsUp > 0)
 		levelUpMessage.show(levelsUp,Game.getPlayer().getLevel(),healthUp,staminaUp,magickaUp)
-		debug.Notification("Remember to allocate points in the skill tree")
 	endIf
 	if(outstandingWeight > 0)
 		levelProgressMsg.show(outstandingWeight, getPointsToNextLevel(outstandingWeight))
 	endIf
 	Game.setPlayerExperience(Game.getExperienceForLevel(Game.getPlayer().getLevel())*(outstandingWeight/100))
+
+endFunction
+
+;open the skill points menu
+function trySkillsMenu()
+
+	if (notificationsBool)
+		UI.InvokeString("HUD Menu", "_global.skse.OpenMenu", "StatsMenu")
+	endif
+
 endFunction
