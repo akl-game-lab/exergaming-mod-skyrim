@@ -75,7 +75,7 @@ catch (const std::exception &e)
 return 0;
 }
 */
-
+#pragma optimize( "", off )  
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	LPWSTR *szArgList;

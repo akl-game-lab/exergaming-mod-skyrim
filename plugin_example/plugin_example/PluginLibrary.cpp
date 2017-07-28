@@ -22,6 +22,7 @@ std::string PluginFunctions::workoutToString(json workout)
 	std::string health = std::to_string((int)workout["health"]);
 	std::string stamina = std::to_string((int)workout["stamina"]);
 	std::string magicka = std::to_string((int)workout["magicka"]);
+	//Here we need to output workout["workoutInfo"] to a text file for logging 
 	return weight + "," + health + "," + stamina + "," + magicka;
 }
 
