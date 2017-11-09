@@ -91,7 +91,7 @@ event onUpdate()
 		
 	endIf
 
-	if (normalFetchMade == true && mod(pollCount,6) == 0)
+	if ((normalFetchMade == true) && mod(pollCount,6) == 0)
 		pollCount = 1
 		normalFetchMade = false
 		if(oldSaveLoaded == true)
