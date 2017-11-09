@@ -60,7 +60,7 @@ event OnPageReset(string page)
 				exergameModOffSwitch = AddToggleOption("Turn Exergame Mode off", exergameModOn)
 			endIf
 		else
-			exergameModOnSwitch = AddInputOption("Turn Exergame Mod on", "");runs code in OnOptionInputOpen()
+			exergameModOnSwitch = AddInputOption("Please enter your email", "");runs code in OnOptionInputOpen()
 		endIf
 	endIf
 endEvent
@@ -105,9 +105,9 @@ endEvent
 
 ;Executes when the user tries to turn the mod on
 Event OnOptionInputOpen(int option)
-	ShowMessage("You will not be able to gain levels in game while Exergame Mod is on.", false)
+	;ShowMessage("You will not be able to gain levels in game while Exergame Mod is on.", false)
 	;show user username entry dialog
-	SetInputDialogStartText("Please enter your exergaming email...")
+	;SetInputDialogStartText("Please enter your exergaming email...")
 EndEvent
 
 ;Executes once the user has entered a username
