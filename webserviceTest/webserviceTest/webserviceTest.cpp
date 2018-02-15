@@ -38,6 +38,13 @@ std::string toString(const std::wstring &wstr)
 	return strTo;
 }
 
+//Checks if file exists
+bool is_file_exist(const char *fileName)
+{
+	std::ifstream infile(fileName);
+	return infile.good();
+}
+
 /*
 int main(int argc, char* argv[])
 {
@@ -82,7 +89,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	int argCount;
 
 	std::ofstream reportFile("Service_Report.txt");
+	std::ofstream workoutLog;
 
+	//Open Workout logfile for appending
+	workoutLog.open("henry_test.txt", std::ofstream::out | std::ofstream::app);
+	
 	szArgList = CommandLineToArgvW(GetCommandLine(), &argCount);
 	if (szArgList == NULL)
 	{
@@ -144,5 +155,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	}
 	reportFile << "finished";
 	reportFile.close();
+
+	workoutLog.close();
 	return 0;
 }
