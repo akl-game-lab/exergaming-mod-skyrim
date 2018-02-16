@@ -218,11 +218,11 @@ __int64 PluginFunctions::currentDate()
 	return t;
 }
 
-//Checks if the current save is old
+//Checks if the current save is older than the most recent sync time + 60 seconds
 bool PluginFunctions::isOldSave(int creationDate)
 {
 	int lastSyncDate = config.getConfigProperty("lastSyncDate");
-	return creationDate < lastSyncDate;
+	return creationDate < lastSyncDate && creationDate > 0;
 }
 
 //Returns the workouts from the day of the week of the creation date to the end of the best week between the creation date of the calling save and now as a string (format is "W,H,S,M;W,H,S,M...")

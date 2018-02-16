@@ -10,6 +10,7 @@ bool property normalFetchMade auto
 bool property saveRequested auto
 int property pollStartTime auto
 bool property oldSaveLoaded auto
+bool property isNewGame = True auto
 
 message property noWorkoutsFound auto
 message property searchComplete auto
@@ -38,7 +39,8 @@ function initialise()
 	RegisterForUpdate(pollInterval)
 	
 	Debug.TraceUser(eventLog, "120 Mod Turned On", 0)
-	
+	Debug.TraceUser(eventLog, "isNewGame? :" +isNewGame, 0)
+
 endFunction
 
 ;Resets variables used by the mod when it is turned off
@@ -62,15 +64,20 @@ event OnPlayerLoadGame()
 	initialise()
 	if (syncedUserName != "");Check to see if user is synced with an account
 		Game.SetGameSettingFloat("fXPPerSkillRank", 0)
+		Debug.TraceUser(eventLog, "128 Checking if save is old, Creation Date is: " +creationDate, 0)
 		oldSaveLoaded = isOldSave(creationDate as int)
-		
+		;If the game has no prior saves the creation date will be 0, this will cause a 'Best week' levelup on next load
+		;Handle this by checking the isNewGame flag and correcting the oldSaveLoadedFlag
+		if(isNewGame)
+			oldSaveLoaded = False
+		EndIf
 		Debug.TraceUser(eventLog, "122 Save Game loaded. File is an old save: " +oldSaveLoaded, 0)
 		
 		startNormalFetchWithErrorHandling()
 	else
 		Game.SetGameSettingFloat("fXPPerSkillRank", 1)
 		
-		Debug.TraceUser(eventLog, "123 Save Game loaded. File is an old save: " +oldSaveLoaded, 0)
+		Debug.TraceUser(eventLog, "123 Save Game loaded. No user synced", 0)
 		
 	endif
 endEvent
@@ -82,10 +89,13 @@ event onUpdate()
 	
 	if(saveRequested == true)
 		creationDate = currentDate()
+		Debug.TraceUser(eventLog, "126 CreationDate of save is: " +creationDate, 0)
 		saveRequested = false
 		Utility.WaitMenuMode(1)
 		Game.requestSave()
 		updateConfig()
+		isNewGame = False
+		Debug.TraceUser(eventLog, "129 isNewGame: " +isNewGame, 0)
 		
 		Debug.TraceUser(eventLog, "101 Game Saved", 0)
 		
@@ -98,6 +108,7 @@ event onUpdate()
 			getLevelUps(getWorkoutsFromBestWeek(creationDate))
 			
 			Debug.TraceUser(eventLog, "102 Retreiving work outs from best week as this is an old save", 0)
+			Debug.TraceUser(eventLog, "127 CreationDate of save is: " +creationDate, 0)
 			
 		elseIf (0 < getRawDataWorkoutCount());force fetch returned data
 			getLevelUps(getWorkoutsString(Game.getPlayer().getLevel()))
