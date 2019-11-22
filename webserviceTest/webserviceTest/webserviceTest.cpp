@@ -18,9 +18,12 @@ using namespace concurrency::streams;       // Asynchronous streams
 std::string NORMAL_FETCH = "0";
 std::string FORCE_FETCH = "1";
 
-std::string URL_BASE = "http://exergaming.uoa.auckland.ac.nz/users/";
 
+std::string URL_BASE = "http://130.216.216.167/users/";
+
+//std::string URL_BASE = "http://exergaming.uoa.auckland.ac.nz/users/";
 /*
+
 std::string URL_BASE = "http://ec2-54-252-163-152.ap-southeast-2.compute.amazonaws.com:3000/users/";
 */
 
@@ -98,6 +101,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 		std::string toDate = toString(szArgList[4]);
 		url = URL_BASE + username + "/workouts/hsm/" + fromDate + "/" + toDate;
 	}
+	if (type.compare("DEBUG") == 0) {
+		url = username;
+	}
 
 	reportFile << type + "\n";
 
@@ -123,6 +129,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 
 		// Handle response headers arriving.
 		.then([=](http_response response)
+
 	{
 		// Write response body into the file.
 		return response.body().read_to_end(fileStream->streambuf());

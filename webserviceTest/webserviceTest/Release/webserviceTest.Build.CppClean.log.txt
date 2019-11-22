@@ -1,0 +1,12 @@
+c:\users\mitchell\downloads\skyrim_mod-2016-04-07\skyrim mod\webservicetest\webservicetest\release\webservicetest.pch
+c:\users\mitchell\downloads\skyrim_mod-2016-04-07\skyrim mod\webservicetest\webservicetest\release\vc120.pdb
+c:\users\mitchell\downloads\skyrim_mod-2016-04-07\skyrim mod\webservicetest\webservicetest\release\stdafx.obj
+c:\users\mitchell\downloads\skyrim_mod-2016-04-07\skyrim mod\webservicetest\webservicetest\release\webservicetest.obj
+c:\users\mitchell\downloads\skyrim_mod-2016-04-07\skyrim mod\webservicetest\release\webservicetest.exe
+c:\users\mitchell\downloads\skyrim_mod-2016-04-07\skyrim mod\webservicetest\release\webservicetest.pdb
+c:\users\mitchell\downloads\skyrim_mod-2016-04-07\skyrim mod\webservicetest\webservicetest\release\webservicetest.tlog\cl.command.1.tlog
+c:\users\mitchell\downloads\skyrim_mod-2016-04-07\skyrim mod\webservicetest\webservicetest\release\webservicetest.tlog\cl.read.1.tlog
+c:\users\mitchell\downloads\skyrim_mod-2016-04-07\skyrim mod\webservicetest\webservicetest\release\webservicetest.tlog\cl.write.1.tlog
+c:\users\mitchell\downloads\skyrim_mod-2016-04-07\skyrim mod\webservicetest\webservicetest\release\webservicetest.tlog\link.command.1.tlog
+c:\users\mitchell\downloads\skyrim_mod-2016-04-07\skyrim mod\webservicetest\webservicetest\release\webservicetest.tlog\link.read.1.tlog
+c:\users\mitchell\downloads\skyrim_mod-2016-04-07\skyrim mod\webservicetest\webservicetest\release\webservicetest.tlog\link.write.1.tlog

@@ -1,0 +1,3 @@
+﻿  stdafx.cpp
+  webserviceTest.cpp
+webserviceTest.cpp(83): warning C4101: 'e': unreferenced local variable

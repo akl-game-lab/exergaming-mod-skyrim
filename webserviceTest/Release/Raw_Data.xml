@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><title>Gamelab Exergaming Portal</title><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css"><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"><link rel="stylesheet" href="/stylesheets/style.css"><script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script><script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script></head><body><h1>Not Found</h1><h2>404</h2><pre>Error: Not Found
+    at /home/exergamer/exergame-backend/app.js:47:12
+    at Layer.handle [as handle_request] (/home/exergamer/exergame-backend/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:312:13)
+    at /home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:280:7
+    at Function.process_params (/home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:330:12)
+    at next (/home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:271:10)
+    at /home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:618:15
+    at next (/home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:256:14)
+    at Function.handle (/home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:176:3)
+    at router (/home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:46:12)
+    at Layer.handle [as handle_request] (/home/exergamer/exergame-backend/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:312:13)
+    at /home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:280:7
+    at Function.process_params (/home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:330:12)
+    at next (/home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:271:10)
+    at /home/exergamer/exergame-backend/node_modules/express/lib/router/index.js:618:15</pre></body></html>

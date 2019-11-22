@@ -12,12 +12,19 @@ int property pollStartTime auto
 bool property oldSaveLoaded auto
 bool property isNewGame = True auto
 
+bool property manageOwnStats auto
+int property availablePoints auto
+int property healthPoints auto
+int property magickaPoints auto
+int property staminaPoints auto
+
 message property noWorkoutsFound auto
 message property searchComplete auto
 message property priorWorkouts auto
 message property levelUpMessage auto
 message property levelUpDetails auto
 message property levelProgressMsg auto
+message property ExergamingLevelUpMessageManagingOwn auto
 
 ;Event log file
 String eventLog = "SkyrimExergameMod_EventLog"
@@ -312,7 +319,7 @@ function getLevelUps(string workouts)
 		staminaUp = 3
 		magickaUp = 3
 		;--------------------------------------------------
-		doLevelUp(healthUp,staminaUp,magickaUp)
+		doLevelUp(levelsup, healthUp,staminaUp,magickaUp)
 		levelUpsString = "0,0,0;4,3,3"
 	;General case
 	else
@@ -326,7 +333,7 @@ function getLevelUps(string workouts)
 			int health = getLevelComponent(levelUpsString,n,"H")
 			int stamina = getLevelComponent(levelUpsString,n,"S")
 			int magicka = getLevelComponent(levelUpsString,n,"M")
-			doLevelUp(health,stamina,magicka)
+
 			Debug.TraceUser(eventLog, "115.0 Applying Level up", 0)
 			Debug.TraceUser(eventLog, "115.1 Health: "+health, 0)
 			Debug.TraceUser(eventLog, "115.1 Stamina: "+stamina, 0)
@@ -343,19 +350,34 @@ function getLevelUps(string workouts)
 		outstandingLevel = getOutstandingLevel(levelUpsString)
 		Debug.TraceUser(eventLog, "116 Outstanding Level: "+outstandingLevel, 0)
 	endIf
+	float multiplier = 1
+	if (levelsup > 3)
+		multiplier = 3/(levelsup as float)
+		debug.traceuser(eventlog, levelsup + " " + healthUp + " " + staminaup + " " + magickaup, 0)
+		debug.traceuser(multiplier, 0)
+		levelsup = 3
+	endif
+	debug.TraceUser(eventLog, multiplier, 0)
+	healthup = (healthup * multiplier) as int
+	staminaup = (staminaUp * multiplier) as int
+	magickaup = (magickaup * multiplier) as int
 
 	Debug.TraceUser(eventLog, "117.0 Updating XP bar, levelUpsString: "+levelUpsString, 0)
 	Debug.TraceUser(eventLog, "117.1 Updating XP bar, healthup: "+healthUp, 0)
 	Debug.TraceUser(eventLog, "117.2 Updating XP bar, staminaup: "+staminaUp, 0)
 	Debug.TraceUser(eventLog, "117.3 Updating XP bar, magickaup: "+magickaUp, 0)
-	
-
+	if(manageOwnStats)
+		magickaup = magickaPoints * levelsUp
+		healthUp = healthPoints * levelsUp
+		staminaUp = staminaPoints * levelsUp
+	endif
+	doLevelUp(levelsUp, healthUp, staminaUp, magickaUp)
 	updateXpBar(levelUpsString, levelsUp, healthUp, staminaUp, magickaUp)
 	saveRequested = true
 endFunction
 
 ;Increment the player level and give the player a perk point
-function doLevelUp(int health, int stamina, int magicka)
+function doLevelUp(int level, int health, int stamina, int magicka)
 	
 	Actor player = Game.getPlayer()
 	int currentLevel = player.getLevel()
@@ -363,14 +385,19 @@ function doLevelUp(int health, int stamina, int magicka)
 	Debug.TraceUser(eventLog, "118 Doing Level up, Current Level (preUp): " +currentLevel, 0)
 
 	int carryCapacityUp = (stamina/2)  	;The division function is not working. this seems to work okay as the numbers are whole and simple.
+	
+	float currenthealth = Game.GetPlayer().GetBaseActorValue("health")
+	float currentstamina = Game.getPlayer().getBaseActorValue("stamina")
+	float currentmagicka = Game.getPlayer().getBaseActorValue("magicka")
+	float currentcarryweight = Game.getPlayer().getBaseActorValue("CarryWeight")
 
-	player.modActorValue("health", health)
-	player.modActorValue("stamina", stamina)
-	player.modActorValue("magicka", magicka)
-	player.ModActorValue("CarryWeight", carryCapacityUp) ;Added to increase carry weight proportionally with stamina as in the vanilla version
-	Game.setPlayerLevel(currentLevel + 1)
+	player.setActorValue("health", currenthealth + health)
+	player.setActorValue("stamina", currentstamina + stamina)
+	player.setActorValue("magicka", currentmagicka + magicka)
+	player.setActorValue("CarryWeight", currentcarryweight + carryCapacityUp) ;Added to increase carry weight proportionally with stamina as in the vanilla version
+	Game.setPlayerLevel(currentLevel + level)
 	currentLevel = player.getLevel()
-	Game.setPerkPoints(Game.getPerkPoints() + 1)
+	Game.setPerkPoints(Game.getPerkPoints() + level)
 
 	Debug.TraceUser(eventLog, "119.0 LevelUp Done: New Current Level: " +currentLevel, 0)
 	Debug.TraceUser(eventLog, "119.1 LevelUp Done: Health Increase: " +health, 0)
@@ -390,7 +417,11 @@ function updateXpBar(string levelUpsString, int levelsUp, int healthUp, int stam
 	;display message for progress to next level
 	;first progress, second amount of workout
 	if(levelsUp > 0)
-		levelUpMessage.show(levelsUp,Game.getPlayer().getLevel(),healthUp,staminaUp,magickaUp)
+		if(manageOwnStats)
+			levelUpDetails.show(levelsUp, Game.getPlayer().getLevel())
+		else
+			levelUpMessage.show(levelsUp,Game.getPlayer().getLevel(),magickaUp, healthUp,staminaUp)
+		endif
 		debug.Notification("Remember to allocate perk points in the skills menu")
 	endIf
 	if(outstandingWeight > 0)

@@ -36,7 +36,7 @@ string function getWorkoutsString(int level) global native
 int function getRawDataWorkoutCount() global native
 
 ;Allows papyrus to read the config
-string function getConfigProperty(string propertyName) global native 
+int function getConfigProperty(string propertyName) global native 
 
 ;Allows papyrus to clear the debug
 function clearDebug() global native
@@ -52,6 +52,8 @@ function openSkillsMenu() global native
 
 ;Gets the number of exercise.com points needed to level up
 int function getPointsToNextLevel(float outstandingWeight) global native
+
+function runDiagnosis(string email) global native
 
 ;Updates the config file to match the config object
 function updateConfig() global native
